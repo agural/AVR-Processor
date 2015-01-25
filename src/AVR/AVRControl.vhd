@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date:    15:35:31 01/25/2015 
+-- Create Date:    15:43:50 01/25/2015 
 -- Design Name: 
--- Module Name:    Control - Behavioral 
+-- Module Name:    AVRControl - Behavioral 
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
@@ -29,13 +29,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity Control is
-end Control;
+entity AVRControl is
+end AVRControl;
 
-architecture Behavioral of Control is
+architecture DataFlow of AVRControl is
 
 begin
 
 
-end Behavioral;
+end DataFlow;
 

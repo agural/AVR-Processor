@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date:    15:35:01 01/25/2015 
+-- Create Date:    15:42:11 01/25/2015 
 -- Design Name: 
--- Module Name:    Register - Behavioral 
+-- Module Name:    AVRRegisters - Behavioral 
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
@@ -29,13 +29,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity Register is
-end Register;
+entity AVRRegisters is
+end AVRRegisters;
 
-architecture Behavioral of Register is
+architecture DataFlow of AVRRegisters is
 
 begin
 
 
-end Behavioral;
+end DataFlow;
 

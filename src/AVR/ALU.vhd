@@ -32,10 +32,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity ALU is
 end ALU;
 
-architecture Behavioral of ALU is
+architecture DataFlow of ALU is
 
 begin
 
 
-end Behavioral;
+end DataFlow;
 

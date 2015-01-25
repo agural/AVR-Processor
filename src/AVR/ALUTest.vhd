@@ -56,9 +56,9 @@ entity  ALU_TEST  is
 
 end  ALU_TEST;
 
-architecture Behavioral of ALU_TEST is
+architecture Structural of ALU_TEST is
 
 begin
 
 
-end Behavioral;
+end Structural;

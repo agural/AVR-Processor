@@ -32,10 +32,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity ALUMulBlock is
 end ALUMulBlock;
 
-architecture Behavioral of ALUMulBlock is
+architecture DataFlow of ALUMulBlock is
 
 begin
 
 
-end Behavioral;
+end DataFlow;
 

@@ -53,9 +53,9 @@ entity  REG_TEST  is
 
 end  REG_TEST;
 
-architecture Behavioral of REG_TEST is
+architecture Stuctural of REG_TEST is
 
 begin
 
 
-end Behavioral;
+end Stuctural;

@@ -32,10 +32,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity ALUAddBlock is
 end ALUAddBlock;
 
-architecture Behavioral of ALUAddBlock is
+architecture DataFlow of ALUAddBlock is
 
 begin
 
 
-end Behavioral;
+end DataFlow;
 

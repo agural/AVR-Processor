@@ -32,10 +32,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity ALUStatus is
 end ALUStatus;
 
-architecture Behavioral of ALUStatus is
+architecture DataFlow of ALUStatus is
 
 begin
 
 
-end Behavioral;
+end DataFlow;
 

@@ -32,10 +32,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity ALUShiftBlock is
 end ALUShiftBlock;
 
-architecture Behavioral of ALUShiftBlock is
+architecture DataFlow of ALUShiftBlock is
 
 begin
 
 
-end Behavioral;
+end DataFlow;
 
