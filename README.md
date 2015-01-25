@@ -9,3 +9,4 @@ Peter Cuy and Albert Gural
 * ADC
 * ADD
 * ADIW
+* AND
