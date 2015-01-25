@@ -1,0 +1,5 @@
+set -tmpdir "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/xst/projnav.tmp"
+set -xsthdpdir "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/xst"
+elaborate
+-ifn ALUMulBlock.prj
+-ifmt mixed

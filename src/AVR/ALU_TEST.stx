@@ -1,0 +1,37 @@
+Release 14.7 - xst P.20131013 (nt64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+--> Parameter TMPDIR set to D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/xst/projnav.tmp
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.14 secs
+ 
+--> Parameter xsthdpdir set to D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/xst
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.14 secs
+ 
+--> WARNING:Xst:3164 - Option "-debug" found multiple times in the command line. Only the first occurence is considered.
+
+=========================================================================
+*                          HDL Compilation                              *
+=========================================================================
+WARNING:HDLParsers:3607 - Unit work/opcodes is now defined in a different file.  It was defined in "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/opcodes.vhd", and is now defined in "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/opcode.vhd".
+Compiling vhdl file "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/ALUTest.vhd" in Library work.
+ERROR:HDLParsers:3317 - "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/ALUTest.vhd" Line 42.  Library opcodes cannot be found.
+ERROR:HDLParsers:3013 - "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/ALUTest.vhd" Line 43. Library opcodes is not declared.
+WARNING:HDLParsers:3481 - Library work has no units. Did not save reference file "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/xst/work/hdllib.ref" for it.
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.18 secs
+ 
+--> 
+
+Total memory usage is 214236 kilobytes
+
+Number of errors   :    2 (   0 filtered)
+Number of warnings :    3 (   0 filtered)
+Number of infos    :    0 (   0 filtered)
+

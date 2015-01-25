@@ -1,0 +1,2 @@
+vhdl work "opcode.vhd"
+vhdl work "ALUTest.vhd"
