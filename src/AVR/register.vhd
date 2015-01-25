@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date:    15:06:07 01/25/2015 
+-- Create Date:    15:35:01 01/25/2015 
 -- Design Name: 
--- Module Name:    register - Behavioral 
+-- Module Name:    Register - Behavioral 
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
@@ -29,10 +29,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity register is
-end register;
+entity Register is
+end Register;
 
-architecture Behavioral of register is
+architecture Behavioral of Register is
 
 begin
 

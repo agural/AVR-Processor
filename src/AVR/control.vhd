@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date:    15:07:32 01/25/2015 
+-- Create Date:    15:35:31 01/25/2015 
 -- Design Name: 
--- Module Name:    control - Behavioral 
+-- Module Name:    Control - Behavioral 
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
@@ -29,10 +29,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity control is
-end control;
+entity Control is
+end Control;
 
-architecture Behavioral of control is
+architecture Behavioral of Control is
 
 begin
 
