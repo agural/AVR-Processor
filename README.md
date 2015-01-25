@@ -10,3 +10,4 @@ Peter Cuy and Albert Gural
 * ADD
 * ADIW
 * AND
+* ANDI
