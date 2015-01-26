@@ -1,3 +1,4 @@
-vhdl work "opcodes.vhd"
+vhdl opcodes "opcodes.vhd"
+vhdl ALUCommands "ALUCommands.vhd"
 vhdl work "RegTest.vhd"
 vhdl work "REG_TEST_TB.vhd"

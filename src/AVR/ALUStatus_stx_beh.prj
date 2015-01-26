@@ -1,0 +1,2 @@
+vhdl opcodes "opcodes.vhd"
+vhdl isim_temp "ALUStatus.vhd"

@@ -1,0 +1,2 @@
+vhdl work "opcodes.vhd"
+vhdl work "RegTest.vhd"
