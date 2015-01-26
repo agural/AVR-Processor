@@ -5,5 +5,17 @@
      behavior or data corruption.  It is strongly advised that
      users do not edit the contents of this file. -->
 <messages>
+<msg type="error" file="HDLCompiler" num="104" delta="unknown" >"D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/RegTest.vhd" Line 41: Cannot find &lt;<arg fmt="%s" index="1">opcodes</arg>&gt; in library &lt;<arg fmt="%s" index="2">opcodes</arg>&gt;. Please ensure that the library was compiled, and that a library and a use clause are present in the VHDL file.
+</msg>
+
+<msg type="error" file="HDLCompiler" num="69" delta="unknown" >"D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/RegTest.vhd" Line 47: &lt;<arg fmt="%s" index="1">opcode_word</arg>&gt; is not declared.
+</msg>
+
+<msg type="error" file="HDLCompiler" num="854" delta="unknown" >"D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/RegTest.vhd" Line 44: Unit &lt;<arg fmt="%s" index="1">reg_test</arg>&gt; ignored due to previous errors.
+</msg>
+
+<msg type="error" file="HDLCompiler" num="374" delta="unknown" >"D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/RegTest.vhd" Line 56: Entity &lt;<arg fmt="%s" index="1">reg_test</arg>&gt; is not yet compiled.
+</msg>
+
 </messages>
 

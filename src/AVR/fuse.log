@@ -1,0 +1,12 @@
+Running: D:\Xilinx\14.7\ISE_DS\ISE\bin\nt64\unwrapped\fuse.exe -intstyle ise -incremental -o D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/REG_TEST_TB_isim_beh.exe -prj D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/REG_TEST_TB_beh.prj work.REG_TEST_TB 
+ISim P.20131013 (signature 0x7708f090)
+Number of CPUs detected in this system: 8
+Turning on mult-threading, number of parallel sub-compilation jobs: 16 
+Determining compilation order of HDL files
+Parsing VHDL file "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/opcodes.vhd" into library work
+Parsing VHDL file "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/RegTest.vhd" into library work
+ERROR:HDLCompiler:104 - "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/RegTest.vhd" Line 41: Cannot find <opcodes> in library <opcodes>. Please ensure that the library was compiled, and that a library and a use clause are present in the VHDL file.
+ERROR:HDLCompiler:69 - "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/RegTest.vhd" Line 47: <opcode_word> is not declared.
+ERROR:HDLCompiler:854 - "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/RegTest.vhd" Line 44: Unit <reg_test> ignored due to previous errors.
+ERROR:HDLCompiler:374 - "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/RegTest.vhd" Line 56: Entity <reg_test> is not yet compiled.
+VHDL file D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/RegTest.vhd ignored due to errors

@@ -15,6 +15,21 @@ use opcodes.opcodes.all;
 
 
 entity REG_TEST_TB is
+
+procedure ADC_OP 
+    (signal OP1        : in    integer;
+     signal OP2        : in    integer;
+     signal Registers  : inout REG_ARRAY;
+     signal IR         : out   opcode_word;
+     signal NextRegIn  : out   std_logic_vector(7 downto 0);
+     signal ExpRegAOut : out   std_logic_vector(7 downto 0);
+     signal ExpRegBOut : out   std_logic_vector(7 downto 0)) is
+begin
+    IR := "000111----------";
+    ExpRegAOut := "00000000";
+    ExpRegBOut := "00000000";
+end ADC_OP;
+
 end REG_TEST_TB;
 
 architecture TB_ARCHITECTURE of REG_TEST_TB is 
@@ -28,11 +43,20 @@ architecture TB_ARCHITECTURE of REG_TEST_TB is
         );
     end component;
     
+    constant NUM_REGS : integer := 32;
+    type REG_ARRAY is array (0 to NUM_REGS-1) of std_logic_vector(7 downto 0);
+    signal Registers : REG_ARRAY;
+    
     signal IR           :   opcode_word;                        -- Instruction Register
     signal RegIn        :   std_logic_vector(7 downto 0);       -- input register bus
     signal clock        :   std_logic;                          -- system clock
     signal RegAOut      :   std_logic_vector(7 downto 0);       -- register bus A out
     signal RegBOut      :   std_logic_vector(7 downto 0);  
+    
+ 
+    signal ExpRegAOut      :   std_logic_vector(7 downto 0);    -- expected register bus A out
+    signal ExpRegBOut      :   std_logic_vector(7 downto 0);    -- expected register bus B out
+
     signal  END_SIM     :  BOOLEAN := FALSE;                   -- end simulation flag
     
     begin
@@ -47,7 +71,12 @@ architecture TB_ARCHITECTURE of REG_TEST_TB is
         
     process
     begin
-    
+        for I in 0 to (NUM_REGS-1) loop
+            Registers(I) := "00000000";
+        end loop;
+        ADC_OP(0,0,Registers, IR, RegIn, ExpRegAOut, ExpRegBOut);
+        wait for 20 ns;
+        
         END_SIM <= TRUE;    --end of stimulus events
         wait;               --wait for the simulation to end
     end process;
@@ -76,5 +105,13 @@ architecture TB_ARCHITECTURE of REG_TEST_TB is
 
     end process;
 
+
+     
+
+
 end TB_ARCHITECTURE;
+
+
+
+
 
