@@ -49,13 +49,13 @@ package ALUCommands is
     --Add Block
     constant AddBlockAdd        : std_logic_vector(3 downto 0) := "0000";
     constant AddBlockSub        : std_logic_vector(3 downto 0) := "0010";
-    constant AddBlockAddCarr    : std_logic_vector(3 downto 0) := "0001";
-    constant AddBlockSubCarr    : std_logic_vector(3 downto 0) := "0011";
+    constant AddBlockAddCarry   : std_logic_vector(3 downto 0) := "0001";
+    constant AddBlockSubCarry   : std_logic_vector(3 downto 0) := "0011";
     constant AddBlockNeg        : std_logic_vector(3 downto 0) := "0100";
     
     --Multiply Block
     constant MulBlockLowByte    : std_logic_vector(3 downto 0) := "0000";
-    constant MulBlockHighByt    : std_logic_vector(3 downto 0) := "0001";
+    constant MulBlockHighByte    : std_logic_vector(3 downto 0) := "0001";
     
     
 --  ALU Flags
@@ -80,6 +80,8 @@ package ALUCommands is
 --  ALU Operand 2 Select (ALUOp2Sel) Values
     constant RegOp2         : std_logic := '0';     --Operand 2 is from registers
     constant ImmedOp2       : std_logic := '1';     --Operand 2 is immediate
-
+    
+    constant StatusBitClear : std_logic := '0';
+    constant StatusBitSet   : std_logic := '1';
 
 end package;
