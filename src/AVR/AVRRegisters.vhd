@@ -1,41 +1,52 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date:    15:42:11 01/25/2015 
--- Design Name: 
--- Module Name:    AVRRegisters - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
+----------------------------------------------------------------------------
+--  AVR Registers
+--  General purpose registers for the AVR processor. There are 32 8-bit 
+--  general purpose registers.
 --
--- Dependencies: 
 --
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
+--  Revision History:
+--      01/26/15        Peter Cuy       initial version
 --
-----------------------------------------------------------------------------------
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
+----------------------------------------------------------------------------
+-- bring in the necessary packages
+library  ieee;
+use  ieee.std_logic_1164.all;
+use ieee.numeric_std.all; 
 entity AVRRegisters is
+    port (
+        clock       :   in  std_logic;                          --the system clock
+        EnableIn    :   in  std_logic;
+        SelIn       :   in  std_logic_vector(5 downto 0);
+        SelA        :   in  std_logic_vector(5 downto 0);
+        SelB        :   in  std_logic_vector(5 downto 0);
+        RegIn       :   in  std_logic_vector(7 downto 0);
+        
+        RegAOut     :   out std_logic_vector(7 downto 0);       -- register bus A out
+        RegBOut     :   out std_logic_vector(7 downto 0)        -- register bus B out
+    );
 end AVRRegisters;
 
 architecture DataFlow of AVRRegisters is
-
+    constant NUM_REGS : integer := 32;
+    type REG_ARRAY is array (0 to NUM_REGS-1) of std_logic_vector(7 downto 0);
+    signal Registers : REG_ARRAY;
 begin
 
+    OutputRegA: process (SelA)
+    begin
+        RegAOut <= Registers(to_integer(unsigned(SelA)));
+    end process OutputRegA;
+    
+    OutputRegB: process (SelB)
+    begin
+        RegBOut <= Registers(to_integer(unsigned(SelB)));
+    end process OutputRegB;
+    
+    StoreInput: process (clock)
+    begin
+        if rising_edge(clock) and EnableIn = '1' then
+            Registers(to_integer(unsigned(SelIn))) <= RegIn;
+        end if;
+    end process StoreInput;
 
 end DataFlow;
-
