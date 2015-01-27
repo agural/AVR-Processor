@@ -1,0 +1,38 @@
+Release 14.7 - xst P.20131013 (nt64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+--> Parameter TMPDIR set to C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/xst/projnav.tmp
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.13 secs
+ 
+--> Parameter xsthdpdir set to C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/xst
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.13 secs
+ 
+--> WARNING:Xst:3164 - Option "-debug" found multiple times in the command line. Only the first occurence is considered.
+
+=========================================================================
+*                          HDL Compilation                              *
+=========================================================================
+Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRRegisters.vhd" in Library work.
+Entity <AVRRegisters> compiled.
+Entity <AVRRegisters> (Architecture <DataFlow>) compiled.
+Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUCommands.vhd" in Library ALUCommands.
+Package <alucommands> compiled.
+Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/opcodes.vhd" in Library opcodes.
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.20 secs
+ 
+--> 
+
+Total memory usage is 199804 kilobytes
+
+Number of errors   :    0 (   0 filtered)
+Number of warnings :    1 (   0 filtered)
+Number of infos    :    0 (   0 filtered)
+

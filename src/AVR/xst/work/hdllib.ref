@@ -2,6 +2,8 @@ AR alustatus dataflow C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU
 EN alumulblock NULL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUMulBlock.vhd sub00/vhpl00 1422343191
 EN alu_test NULL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUTest.vhd sub00/vhpl02 1422335475
 EN alustatus NULL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUStatus.vhd sub00/vhpl10 1422345057
+AR avrregisters dataflow C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRRegisters.vhd sub00/vhpl13 1422346728
+EN avrregisters NULL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRRegisters.vhd sub00/vhpl12 1422346727
 AR alu_test structural C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUTest.vhd sub00/vhpl03 1422335476
 EN alufblock NULL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUFBlock.vhd sub00/vhpl04 1422336109
 AR alushiftblock dataflow C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUShiftBlock.vhd sub00/vhpl09 1422340854

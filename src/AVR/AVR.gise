@@ -46,6 +46,9 @@
     <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="ALU_TEST.stx"/>
     <file xil_pn:fileType="FILE_XST" xil_pn:name="ALU_TEST.xst"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AVRControl_stx_beh.prj"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AVRRegisters.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="AVRRegisters.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="AVRRegisters.xst"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AVRRegisters_stx_beh.prj"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="REG_TEST_TB_beh.prj"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="REG_TEST_TB_isim_beh.exe"/>
@@ -100,6 +103,7 @@
     <transform xil_pn:end_ts="1422316088" xil_pn:name="TRAN_regenerateCoresSim" xil_pn:prop_ck="-7517999543491777884" xil_pn:start_ts="1422316088">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForProperties"/>
     </transform>
     <transform xil_pn:end_ts="1422316088" xil_pn:in_ck="-7716512179648095509" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1422316088">
       <status xil_pn:value="SuccessfullyRun"/>
