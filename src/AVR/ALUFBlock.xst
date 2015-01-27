@@ -1,5 +1,5 @@
 set -tmpdir "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/xst/projnav.tmp"
 set -xsthdpdir "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/xst"
 elaborate
--ifn ALUMulBlock.prj
+-ifn ALUFBlock.prj
 -ifmt mixed

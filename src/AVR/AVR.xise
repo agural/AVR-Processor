@@ -21,7 +21,7 @@
     </file>
     <file xil_pn:name="ALUAddBlock.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="2"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
     <file xil_pn:name="ALUShiftBlock.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
@@ -37,7 +37,7 @@
     </file>
     <file xil_pn:name="ALUStatus.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="3"/>
     </file>
     <file xil_pn:name="ALUTest.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
@@ -49,7 +49,7 @@
     </file>
     <file xil_pn:name="ALUCommands.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="2" xil_pn:seqIDinc="9"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="0" xil_pn:seqIDinc="9"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="2" xil_pn:seqIDinc="9"/>
       <library xil_pn:name="ALUCommands"/>
     </file>
     <file xil_pn:name="AVRRegisters.vhd" xil_pn:type="FILE_VHDL">

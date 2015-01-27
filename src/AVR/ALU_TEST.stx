@@ -1,12 +1,12 @@
 Release 14.7 - xst P.20131013 (nt64)
 Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
---> Parameter TMPDIR set to D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/xst/projnav.tmp
+--> Parameter TMPDIR set to C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/xst/projnav.tmp
 
 
 Total REAL time to Xst completion: 0.00 secs
 Total CPU time to Xst completion: 0.14 secs
  
---> Parameter xsthdpdir set to D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/xst
+--> Parameter xsthdpdir set to C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/xst
 
 
 Total REAL time to Xst completion: 0.00 secs
@@ -17,21 +17,25 @@ Total CPU time to Xst completion: 0.14 secs
 =========================================================================
 *                          HDL Compilation                              *
 =========================================================================
-WARNING:HDLParsers:3607 - Unit work/opcodes is now defined in a different file.  It was defined in "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/opcodes.vhd", and is now defined in "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/opcode.vhd".
-Compiling vhdl file "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/ALUTest.vhd" in Library work.
-ERROR:HDLParsers:3317 - "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/ALUTest.vhd" Line 42.  Library opcodes cannot be found.
-ERROR:HDLParsers:3013 - "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/ALUTest.vhd" Line 43. Library opcodes is not declared.
-WARNING:HDLParsers:3481 - Library work has no units. Did not save reference file "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/xst/work/hdllib.ref" for it.
+WARNING:HDLParsers:3607 - Unit work/ALU_TEST is now defined in a different file.  It was defined in "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/ALUTest.vhd", and is now defined in "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUTest.vhd".
+WARNING:HDLParsers:3607 - Unit work/ALU_TEST/Structural is now defined in a different file.  It was defined in "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/ALUTest.vhd", and is now defined in "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUTest.vhd".
+Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/opcodes.vhd" in Library opcodes.
+Package <opcodes> compiled.
+Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUTest.vhd" in Library work.
+Entity <ALU_TEST> compiled.
+Entity <ALU_TEST> (Architecture <Structural>) compiled.
+Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUCommands.vhd" in Library ALUCommands.
+Package <ALUCommands> compiled.
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.18 secs
+Total CPU time to Xst completion: 0.23 secs
  
 --> 
 
-Total memory usage is 214236 kilobytes
+Total memory usage is 208004 kilobytes
 
-Number of errors   :    2 (   0 filtered)
+Number of errors   :    0 (   0 filtered)
 Number of warnings :    3 (   0 filtered)
 Number of infos    :    0 (   0 filtered)
 

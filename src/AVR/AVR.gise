@@ -23,11 +23,23 @@
 
   <files xmlns="http://www.xilinx.com/XMLSchema">
     <file xil_pn:fileType="FILE_LSO" xil_pn:name=".lso"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALUAddBlock.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="ALUAddBlock.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="ALUAddBlock.xst"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALUFBlock.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="ALUFBlock.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="ALUFBlock.xst"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALUMulBlock.prj"/>
     <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="ALUMulBlock.stx"/>
     <file xil_pn:fileType="FILE_XST" xil_pn:name="ALUMulBlock.xst"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="ALUMulBlock_isim_beh.exe"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALUMulBlock_stx_beh.prj"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALUShiftBlock.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="ALUShiftBlock.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="ALUShiftBlock.xst"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALUStatus.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="ALUStatus.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="ALUStatus.xst"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="ALUStatus_isim_beh.exe"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALUStatus_stx_beh.prj"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALU_TEST.prj"/>
@@ -55,6 +67,10 @@
     <transform xil_pn:end_ts="1422317896" xil_pn:in_ck="-7716512179648095509" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1422317896">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputChanged"/>
+      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="ALU.vhd"/>
       <outfile xil_pn:name="ALUAddBlock.vhd"/>
       <outfile xil_pn:name="ALUCommands.vhd"/>

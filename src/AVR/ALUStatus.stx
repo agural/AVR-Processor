@@ -17,9 +17,9 @@ Total CPU time to Xst completion: 0.13 secs
 =========================================================================
 *                          HDL Compilation                              *
 =========================================================================
-Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUMulBlock.vhd" in Library work.
-Entity <alumulblock> compiled.
-Entity <alumulblock> (Architecture <dataflow>) compiled.
+Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUStatus.vhd" in Library work.
+Entity <alustatus> compiled.
+Entity <ALUStatus> (Architecture <DataFlow>) compiled.
 Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUCommands.vhd" in Library ALUCommands.
 Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/opcodes.vhd" in Library opcodes.
 
@@ -29,7 +29,7 @@ Total CPU time to Xst completion: 0.19 secs
  
 --> 
 
-Total memory usage is 199784 kilobytes
+Total memory usage is 199816 kilobytes
 
 Number of errors   :    0 (   0 filtered)
 Number of warnings :    1 (   0 filtered)
