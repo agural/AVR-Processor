@@ -91,23 +91,18 @@ entity ALU is
 end ALU;
 
 architecture DataFlow of ALU is
-    component ALUFBlock
-        port (
-            operand     : in  std_logic_vector(3 downto 0);
-            opA         : in  std_logic_vector(7 downto 0);
-            opB         : in  std_logic_vector(7 downto 0);
-            
-            result      : out std_logic_vector(7 downto 0)
-        );
-    end component;
-    
     signal opA      : std_logic_vector(7 downto 0);
     signal opB      : std_logic_vector(7 downto 0);
 begin
     opB <= regBOut when (ALUOp2Sel = '0') else ImmediateOut;
 
-    FBlock : ALUFBlock
-    port map (ALUBlockInstructionSel, opA, opB, RegIn);
+    FBlock : entity work.ALUFBlock
+    port map (
+        operand => ALUBlockInstructionSel,
+        opA => opA,
+        opB => opB,
+        result => RegIn
+    );
     
     
 
