@@ -56,9 +56,9 @@ end  REG_TEST;
 architecture Stuctural of REG_TEST is
     -- Signals between control unit and registers
     signal EnableIn : std_logic;
-    signal SelIn    : std_logic_vector(5 downto 0);
-    signal SelA     : std_logic_vector(5 downto 0);
-    signal SelB     : std_logic_vector(5 downto 0);
+    signal SelIn    : std_logic_vector(4 downto 0);
+    signal SelA     : std_logic_vector(4 downto 0);
+    signal SelB     : std_logic_vector(4 downto 0);
 
     -- Unused signals from Control Unit (should go to ALU)
     signal ALUStatusMask : std_logic_vector(7 downto 0);
