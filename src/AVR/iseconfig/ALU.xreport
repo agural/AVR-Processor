@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2015-01-25T15:47:19</DateModified>
-  <ModuleName>ALUAddBlock</ModuleName>
+  <DateModified>2015-01-29T03:42:09</DateModified>
+  <ModuleName>ALU</ModuleName>
   <SummaryTimeStamp>Unknown</SummaryTimeStamp>
-  <SavedFilePath>D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/iseconfig/ALU.xreport</SavedFilePath>
-  <ImplementationReportsDirectory>D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR\</ImplementationReportsDirectory>
+  <SavedFilePath>/home/bryanhe/AVR-Processor/src/AVR/iseconfig/ALU.xreport</SavedFilePath>
+  <ImplementationReportsDirectory>/home/bryanhe/AVR-Processor/src/AVR/</ImplementationReportsDirectory>
   <DateInitialized>2015-01-25T15:47:19</DateInitialized>
   <EnableMessageFiltering>false</EnableMessageFiltering>
  </header>

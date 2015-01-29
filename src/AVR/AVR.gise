@@ -23,6 +23,9 @@
 
   <files xmlns="http://www.xilinx.com/XMLSchema">
     <file xil_pn:fileType="FILE_LSO" xil_pn:name=".lso"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALU.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="ALU.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="ALU.xst"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALUAddBlock.prj"/>
     <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="ALUAddBlock.stx"/>
     <file xil_pn:fileType="FILE_XST" xil_pn:name="ALUAddBlock.xst"/>
@@ -45,11 +48,17 @@
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALU_TEST.prj"/>
     <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="ALU_TEST.stx"/>
     <file xil_pn:fileType="FILE_XST" xil_pn:name="ALU_TEST.xst"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AVRControl.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="AVRControl.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="AVRControl.xst"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AVRControl_stx_beh.prj"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AVRRegisters.prj"/>
     <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="AVRRegisters.stx"/>
     <file xil_pn:fileType="FILE_XST" xil_pn:name="AVRRegisters.xst"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AVRRegisters_stx_beh.prj"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="REG_TEST.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="REG_TEST.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="REG_TEST.xst"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="REG_TEST_TB_beh.prj"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="REG_TEST_TB_isim_beh.exe"/>
     <file xil_pn:fileType="FILE_ISIM_MISC" xil_pn:name="REG_TEST_TB_isim_beh.wdb"/>
