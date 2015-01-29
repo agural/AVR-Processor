@@ -57,6 +57,18 @@ architecture DataFlow of ALU is
 
     signal mul_carry   : std_logic;
     signal mul_result  : std_logic_vector(7 downto 0);
+
+    -- garbage signals for status
+    signal status_ALUResult : std_logic_vector(7 downto 0);
+
+    signal status_statusH : std_logic;
+    signal status_statusV : std_logic;
+    signal status_statusN : std_logic;
+    signal status_statusC : std_logic;
+
+    signal status_result : std_logic_vector(7 downto 0);
+
+
 begin
     opB <= regBOut when (ALUOp2Sel = '0') else ImmediateOut;
 
@@ -103,7 +115,24 @@ begin
         result  => mul_result
     );
     
-    
+    StatusBlock : entity work.ALUStatus
+    port map (
+        clk => clock,
 
+        ALUResult => status_ALUResult,
+        statusMask => ALUStatusMask,
+
+        statusH => status_statusH,
+        statusV => status_statusV,
+        statusN => status_statusN,
+        statusC => status_statusC,
+
+        bitChangeEn => ALUStatusBitChangeEn,
+        bitClrSet   => ALUBitClrSet,
+        bitT        => ALUBitTOp,
+
+        status => RegStatus,
+        result => status_result
+    );
 end DataFlow;
 
