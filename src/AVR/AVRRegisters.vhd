@@ -11,15 +11,15 @@ use ALUCommands.ALUCommands.all;
 
 entity AVRRegisters is
     port (
-        clock       :   in  std_logic;
-        EnableIn    :   in  std_logic;
-        SelIn       :   in  std_logic_vector(5 downto 0);
-        SelA        :   in  std_logic_vector(5 downto 0);
-        SelB        :   in  std_logic_vector(5 downto 0);
-        RegIn       :   in  std_logic_vector(7 downto 0);
+        clock    : in  std_logic;                    -- system clock
+        EnableIn : in  std_logic;                    -- specifies write
+        SelIn    : in  std_logic_vector(5 downto 0); -- register to write to
+        SelA     : in  std_logic_vector(5 downto 0); -- register to read from
+        SelB     : in  std_logic_vector(5 downto 0); -- register to read from
+        RegIn    : in  std_logic_vector(7 downto 0); -- value to write to register
 
-        RegAOut     :   out std_logic_vector(7 downto 0);
-        RegBOut     :   out std_logic_vector(7 downto 0)
+        RegAOut  : out std_logic_vector(7 downto 0); -- first output
+        RegBOut  : out std_logic_vector(7 downto 0)  -- second output
     );
 end AVRRegisters;
 
