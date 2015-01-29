@@ -57,8 +57,69 @@ entity  ALU_TEST  is
 end  ALU_TEST;
 
 architecture Structural of ALU_TEST is
+    signal ALUBlockSel            : std_logic_vector(1 downto 0);
+    signal ALUBlockInstructionSel : std_logic_vector(3 downto 0);
+
+    signal ALUOp2Sel              : std_logic;
+    signal ImmediateOut           : std_logic_vector(7 downto 0);
+
+    signal ALUStatusMask          : std_logic_vector(7 downto 0);
+    signal ALUStatusBitChangeEn   : std_logic;
+    signal ALUBitClrSet           : std_logic;
+    signal ALUBitTOp              : std_logic;
+
+    signal RegIn                  : std_logic_vector(7 downto 0);
+
+    -- Unused signals from Control Unit (should go to registers)
+    signal EnableIn : std_logic;
+    signal SelIn    : std_logic_vector(4 downto 0);
+    signal SelA     : std_logic_vector(4 downto 0);
+    signal SelB     : std_logic_vector(4 downto 0);
+
+
 
 begin
+
+    ALU : entity work.ALU
+    port map (
+        clock => clock,
+
+        ALUBlockSel => ALUBlockSel,
+        ALUBlockInstructionSel => ALUBlockInstructionSel,
+
+        ALUOp2Sel => ALUOp2Sel,
+        ImmediateOut => ImmediateOut,
+
+        ALUStatusMask => ALUStatusMask,
+        ALUStatusBitChangeEn => ALUStatusBitChangeEn,
+        ALUBitClrSet => ALUBitClrSet,
+        ALUBitTOp => ALUBitTOp,
+
+        RegAOut => OperandA,
+        RegBOut => OperandB,
+
+        RegIn => Result,
+        RegStatus => StatReg
+    );
+
+    ControlUnit : entity work.AVRControl
+    port map (
+        clock                  => clock,
+        IR                     => IR,
+        ALUStatusMask          => ALUStatusMask,
+        ALUStatusBitChangeEn   => ALUStatusBitChangeEn,
+        ALUBitClrSet           => ALUBitClrSet,
+        ALUBitTOp              => ALUBitTOp,
+        ALUOp2Sel              => ALUOp2Sel,
+        ImmediateOut           => ImmediateOut,
+        ALUBlockSel            => ALUBlockSel,
+        ALUBlockInstructionSel => ALUBlockInstructionSel,
+        EnableIn               => EnableIn,
+        SelIn                  => SelIn,
+        SelA                   => SelA,
+        SelB                   => SelB
+    );
+
 
 
 end Structural;
