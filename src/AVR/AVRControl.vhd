@@ -2,6 +2,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use ieee.std_logic_unsigned.all;
 
 library opcodes;
 use opcodes.opcodes.all;
@@ -133,7 +134,7 @@ begin
 
             --only enable changing of bit s (IR[6:4]) of status register
             ALUStatusMask <= "00000000";
-            ALUStatusMask(to_integer(unsigned(IR(6 downto 4)))) <= '1';
+            ALUStatusMask(conv_integer(IR(6 downto 4))) <= '1';
             ALUBitClrSet <= StatusBitClear;
             EnableIn <= '0';
 
@@ -150,7 +151,7 @@ begin
             --status mask now means which bit of operand 1 we're changing
             --only enable changing of bit b (IR[2:0])
             ALUStatusMask <= "00000000";
-            ALUStatusMask(to_integer(unsigned(IR(2 downto 0)))) <= '1';
+            ALUStatusMask(conv_integer(IR(2 downto 0))) <= '1';
             ALUBitTOp <= '1'; --performing operation with T status bit
         end if;
 
@@ -162,7 +163,7 @@ begin
 
             --only enable changing of bit s (IR[6:4]) of status register
             ALUStatusMask <= "00000000";
-            ALUStatusMask(to_integer(unsigned(IR(6 downto 4)))) <= '1';
+            ALUStatusMask(conv_integer(IR(6 downto 4))) <= '1';
             ALUBitClrSet <= StatusBitSet;
             EnableIn <= '0';
 
@@ -180,7 +181,7 @@ begin
             --status mask now means which bit of operand 1 we're changing
             --only enable changing of bit b (IR[2:0])
             ALUStatusMask <= "00000000";
-            ALUStatusMask(to_integer(unsigned(IR(2 downto 0)))) <= '1';
+            ALUStatusMask(conv_integer(IR(2 downto 0))) <= '1';
 
             ALUStatusBitChangeEn <= '1'; --manually changing status register bit
             ALUBitTOp <= '1'; --performing operation with T status bit
