@@ -22,9 +22,9 @@ entity AVRControl is
         ALUBlockSel            : out std_logic_vector(1 downto 0);
         ALUBlockInstructionSel : out std_logic_vector(3 downto 0);
         EnableIn : out std_logic;
-        SelIn    : out std_logic_vector(5 downto 0);
-        SelA     : out std_logic_vector(5 downto 0);
-        SelB     : out std_logic_vector(5 downto 0)
+        SelIn    : out std_logic_vector(4 downto 0);
+        SelA     : out std_logic_vector(4 downto 0);
+        SelB     : out std_logic_vector(4 downto 0)
     );
 end AVRControl;
 
@@ -64,7 +64,7 @@ begin
             ImmediateOut(7 downto 6) <= "00";
 
             if (CycleCount = '0') then
-                BlockInstructionSel <= AddBlockAdd;
+                ALUBlockInstructionSel <= AddBlockAdd;
                 if (IR(5 downto 4) = "00") then
                     SelA <= std_logic_vector(to_unsigned(24, SelIn'length));
                     SelIn <= std_logic_vector(to_unsigned(24, SelIn'length));
@@ -83,7 +83,7 @@ begin
                 end if;
             end if;
             if (CycleCount = '1') then
-                BlockInstructionSel <= AddBlockAddCarry;
+                ALUBlockInstructionSel <= AddBlockAddCarry;
                 ImmediateOut <= "00000000";
                 if (IR(5 downto 4) = "00") then
                     SelA <= std_logic_vector(to_unsigned(25, SelIn'length));
@@ -114,8 +114,8 @@ begin
             ALUOp2Sel <= ImmedOp2;
             ALUStatusMask <= flag_mask_ZNVS;
             ALUBlockSel <= ALUFBlock;
-            SelA(5)  <= '1';
-            SelIn(5) <= '1';
+            SelA(4)  <= '1';
+            SelIn(4) <= '1';
             ALUBlockInstructionSel <= FBlockAND;
         end if;
 
@@ -131,9 +131,9 @@ begin
             ALUBlockInstructionSel <= FBlockOR;
             ImmediateOut <= "00000000";
 
-            --only enable changing of bit s (IP[6:4]) of status register
+            --only enable changing of bit s (IR[6:4]) of status register
             ALUStatusMask <= "00000000";
-            ALUStatusMask(to_integer(unsigned(IP(6 downto 4)))) <= "1";
+            ALUStatusMask(to_integer(unsigned(IR(6 downto 4)))) <= '1';
             ALUBitClrSet <= StatusBitClear;
             EnableIn <= '0';
 
@@ -148,9 +148,9 @@ begin
             ImmediateOut <= "00000000";
 
             --status mask now means which bit of operand 1 we're changing
-            --only enable changing of bit b (IP[2:0])
+            --only enable changing of bit b (IR[2:0])
             ALUStatusMask <= "00000000";
-            ALUStatusMask(to_integer(unsigned(IP(2 downto 0)))) <= "1";
+            ALUStatusMask(to_integer(unsigned(IR(2 downto 0)))) <= '1';
             ALUBitTOp <= '1'; --performing operation with T status bit
         end if;
 
@@ -160,9 +160,9 @@ begin
             ALUBlockInstructionSel <= FBlockOR;
             ImmediateOut <= "00000000";
 
-            --only enable changing of bit s (IP[6:4]) of status register
+            --only enable changing of bit s (IR[6:4]) of status register
             ALUStatusMask <= "00000000";
-            ALUStatusMask(to_integer(unsigned(IP(6 downto 4)))) <= "1";
+            ALUStatusMask(to_integer(unsigned(IR(6 downto 4)))) <= '1';
             ALUBitClrSet <= StatusBitSet;
             EnableIn <= '0';
 
@@ -178,9 +178,9 @@ begin
             ImmediateOut <= "00000000";
 
             --status mask now means which bit of operand 1 we're changing
-            --only enable changing of bit b (IP[2:0])
+            --only enable changing of bit b (IR[2:0])
             ALUStatusMask <= "00000000";
-            ALUStatusMask(to_integer(unsigned(IP(2 downto 0)))) <= "1";
+            ALUStatusMask(to_integer(unsigned(IR(2 downto 0)))) <= '1';
 
             ALUStatusBitChangeEn <= '1'; --manually changing status register bit
             ALUBitTOp <= '1'; --performing operation with T status bit
@@ -211,8 +211,8 @@ begin
             ALUOp2Sel <= ImmedOp2;
             ALUBlockSel <= ALUAddBlock;
             EnableIn <= '0';
-            SelA(5)  <= '1';
-            SelIn(5) <= '1';
+            SelA(4)  <= '1';
+            SelIn(4) <= '1';
             ALUBlockInstructionSel <= AddBlockSub;
         end if;
 
@@ -269,8 +269,8 @@ begin
             ALUStatusMask <= flag_mask_ZNVS;
             ALUOp2Sel <= ImmedOp2;
             ALUBlockSel <= ALUFBlock;
-            SelA(5)  <= '1';
-            SelIn(5) <= '1';
+            SelA(4)  <= '1';
+            SelIn(4) <= '1';
             ALUBlockInstructionSel <= FBlockOR;
         end if;
 
@@ -290,8 +290,8 @@ begin
             ALUStatusMask <= flag_mask_ZCNVSH;
             ALUOp2Sel <= ImmedOp2;
             ALUBlockSel <= ALUAddBlock;
-            SelA(5)  <= '1';
-            SelIn(5) <= '1';
+            SelA(4)  <= '1';
+            SelIn(4) <= '1';
             ALUBlockInstructionSel <= AddBlockSubCarry;
         end if;
 
@@ -302,7 +302,7 @@ begin
             ImmediateOut(7 downto 6) <= "00";
 
             if (CycleCount = '0') then
-                BlockInstructionSel <= AddBlockSub;
+                ALUBlockInstructionSel <= AddBlockSub;
                 if (IR(5 downto 4) = "00") then
                     SelA <= std_logic_vector(to_unsigned(24, SelIn'length));
                     SelIn <= std_logic_vector(to_unsigned(24, SelIn'length));
@@ -321,7 +321,7 @@ begin
                 end if;
             end if;
             if (CycleCount = '1') then
-                BlockInstructionSel <= AddBlockSubCarry;
+                ALUBlockInstructionSel <= AddBlockSubCarry;
                 ImmediateOut <= "00000000";
                 if (IR(5 downto 4) = "00") then
                     SelA <= std_logic_vector(to_unsigned(25, SelIn'length));
@@ -352,8 +352,8 @@ begin
             ALUStatusMask <= flag_mask_ZCNVSH;
             ALUOp2Sel <= ImmedOp2;
             ALUBlockSel <= ALUAddBlock;
-            SelA(5)  <= '1';
-            SelIn(5) <= '1';
+            SelA(4)  <= '1';
+            SelIn(4) <= '1';
             ALUBlockInstructionSel <= AddBlockSub;
         end if;
 

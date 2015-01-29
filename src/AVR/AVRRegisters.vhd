@@ -13,9 +13,9 @@ entity AVRRegisters is
     port (
         clock    : in  std_logic;                    -- system clock
         EnableIn : in  std_logic;                    -- specifies write
-        SelIn    : in  std_logic_vector(5 downto 0); -- register to write to
-        SelA     : in  std_logic_vector(5 downto 0); -- register to read from
-        SelB     : in  std_logic_vector(5 downto 0); -- register to read from
+        SelIn    : in  std_logic_vector(4 downto 0); -- register to write to
+        SelA     : in  std_logic_vector(4 downto 0); -- register to read from
+        SelB     : in  std_logic_vector(4 downto 0); -- register to read from
         RegIn    : in  std_logic_vector(7 downto 0); -- value to write to register
 
         RegAOut  : out std_logic_vector(7 downto 0); -- first output
