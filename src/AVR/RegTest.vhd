@@ -54,8 +54,54 @@ entity  REG_TEST  is
 end  REG_TEST;
 
 architecture Stuctural of REG_TEST is
+    -- Signals between control unit and registers
+    signal EnableIn : std_logic;
+    signal SelIn    : std_logic_vector(5 downto 0);
+    signal SelA     : std_logic_vector(5 downto 0);
+    signal SelB     : std_logic_vector(5 downto 0);
+
+    -- Unused signals from Control Unit (should go to ALU)
+    signal ALUStatusMask : std_logic_vector(7 downto 0);
+    signal ALUStatusBitChangeEn : std_logic;
+    signal ALUBitClrSet : std_logic;
+    signal ALUBitTOp : std_logic;
+    signal ALUOp2Sel : std_logic;
+    signal ImmediateOut : std_logic_vector(7 downto 0);
+    signal ALUBlockSel  : std_logic_vector(1 downto 0);
+    signal ALUBlockInstructionSel : std_logic_vector(3 downto 0);
 
 begin
 
+    Registers : entity work.AVRRegisters
+    port map (
+        clock    => clock,
+        EnableIn => EnableIn,
+        SelIn    => SelIn,
+        SelA     => SelA,
+        SelB     => SelB,
+        RegIn    => RegIn,
+
+        RegAOut  => RegAOut,
+        RegBOut  => RegBOut
+    );
+
+    ControlUnit : entity work.AVRControl
+    port map (
+        clock                  => clock,
+        IR                     => IR,
+        ALUStatusMask          => ALUStatusMask,
+        ALUStatusBitChangeEn   => ALUStatusBitChangeEn,
+        ALUBitClrSet           => ALUBitClrSet,
+        ALUBitTOp              => ALUBitTOp,
+        ALUOp2Sel              => ALUOp2Sel,
+        ImmediateOut           => ImmediateOut,
+        ALUBlockSel            => ALUBlockSel,
+        ALUBlockInstructionSel => ALUBlockInstructionSel,
+        EnableIn               => EnableIn,
+        SelIn                  => SelIn,
+        SelA                   => SelA,
+        SelB                   => SelB
+    );
 
 end Stuctural;
+
