@@ -24,7 +24,20 @@ entity AVRRegisters is
 end AVRRegisters;
 
 architecture DataFlow of AVRRegisters is
+    constant NUM_REGS : integer := 32;
+    type REG_ARRAY is array (0 to NUM_REGS-1) of std_logic_vector(7 downto 0);
+    signal Registers : REG_ARRAY;
 begin
+
+    RegAOut <= Registers(to_integer(unsigned(SelA)));
+    RegBOut <= Registers(to_integer(unsigned(SelB)));
+
+    WriteRegister: process (clock)
+    begin
+        if rising_edge(clock) and EnableIn = '1' then
+            Registers(to_integer(unsigned(SelIn))) <= RegIn;
+        end if;
+    end process WriteRegister;
 end DataFlow;
 
 
