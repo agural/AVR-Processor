@@ -35,8 +35,8 @@ Compiling architecture dataflow of entity AVRControl [avrcontrol_default]
 Compiling architecture structural of entity ALU_TEST [alu_test_default]
 Compiling architecture tb_architecture of entity testbench
 Time Resolution for simulation is 1ps.
-Waiting for 7 sub-compilation(s) to finish...
+Waiting for 5 sub-compilation(s) to finish...
 Compiled 25 VHDL Units
 Built simulation executable C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/testbench_isim_beh.exe
-Fuse Memory Usage: 36648 KB
-Fuse CPU Usage: 3155 ms
+Fuse Memory Usage: 36944 KB
+Fuse CPU Usage: 3953 ms
