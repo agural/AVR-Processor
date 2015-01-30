@@ -59,7 +59,7 @@ architecture DataFlow of ALU is
     signal status_statusN : std_logic;
     signal status_statusC : std_logic;
 
-    signal status_result : std_logic_vector(7 downto 0);
+    signal ALUResult : std_logic_vector(7 downto 0);
 
 
 begin
@@ -120,7 +120,7 @@ begin
     port map (
         clk => clock,
 
-        ALUResult => RegIn,
+        ALUResult => ALUResult,
         statusMask => ALUStatusMask,
 
         statusH => status_statusH,
@@ -133,7 +133,7 @@ begin
         bitT        => ALUBitTOp,
 
         status => RegStatus,
-        result => status_result
+        result => RegIn
     );
 end DataFlow;
 
