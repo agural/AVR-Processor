@@ -61,7 +61,11 @@ begin
             end if;
 
             status(flag_N) := answer(7);
-            status(flag_V) := status(flag_N) xor status(flag_C);
+            if (answer = "01111111") then
+                status(flag_V) := '1';
+            else
+                status(flag_V) := '0';
+            end if;
             status(flag_S) := status(flag_N) xor status(flag_V);
 
             -- verify that result matches
@@ -100,7 +104,11 @@ begin
             end if;
 
             status(flag_N) := answer(7);
-            status(flag_V) := status(flag_N) xor status(flag_C);
+            if (answer = "10000000") then
+                status(flag_V) := '1';
+            else
+                status(flag_V) := '0';
+            end if;
             status(flag_S) := status(flag_N) xor status(flag_V);
 
             -- verify that result matches
