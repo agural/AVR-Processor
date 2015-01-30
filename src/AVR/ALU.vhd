@@ -27,13 +27,14 @@ entity ALU is
         RegBOut                 :  in  std_logic_vector(7 downto 0);
         
         RegIn                   : out  std_logic_vector(7 downto 0);
-        RegStatus               : inout  std_logic_vector(7 downto 0)
+        RegStatus               : out  std_logic_vector(7 downto 0)
     );
 end ALU;
 
 architecture DataFlow of ALU is
     signal opA      : std_logic_vector(7 downto 0);
     signal opB      : std_logic_vector(7 downto 0);
+    signal status   : std_logic_vector(7 downto 0);
 
     -- garbage signals for Fblock
     signal F_result  : std_logic_vector(7 downto 0);
@@ -64,6 +65,7 @@ architecture DataFlow of ALU is
 begin
     opA <= regAOut;
     opB <= regBOut when (ALUOp2Sel = '0') else ImmediateOut;
+    RegStatus <= status;
 
     FBlock : entity work.ALUFBlock
     port map (
@@ -77,7 +79,7 @@ begin
     port map (
         operand => ALUBlockInstructionSel(2 downto 0),
         opA     => opA,
-        carry   => RegStatus(flag_C),
+        carry   => status(flag_C),
 
         statusV => shift_statusV,
         statusC => shift_statusC,
@@ -89,7 +91,7 @@ begin
         operand => ALUBlockInstructionSel(2 downto 0),
         opA     => opA,
         opB     => opB,
-        carry   => RegStatus(flag_C),
+        carry   => status(flag_C),
 
         statusH => add_statusH,
         statusV => add_statusV,
@@ -147,7 +149,7 @@ begin
         bitClrSet   => ALUBitClrSet,
         bitT        => ALUBitTOp,
 
-        status => RegStatus,
+        status => status,
         result => RegIn
     );
 end DataFlow;
