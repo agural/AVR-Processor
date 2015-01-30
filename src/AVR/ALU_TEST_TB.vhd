@@ -37,9 +37,189 @@ begin
     tb : process
        variable answer   : std_logic_vector(7 downto 0);
        variable status   : std_logic_vector(7 downto 0);
+       variable temp     : std_logic_vector(7 downto 0);
        constant max_value : integer := ((2 ** 8) - 1); -- maximum possible input
     begin
         status := (others => '-');
+
+        --for i in 0 to max_value loop
+        --    --    "1001010ddddd0101";
+        --    IR <= "1001010XXXXX0101";
+        --    OperandA <= std_logic_vector(to_unsigned(i, 8));
+        --    OperandB <= "00000000";
+        --    wait until (clock = '1');
+        --    wait until (clock = '1');
+        --    answer := (OperandA(7) & OperandA(7 downto 1));
+
+        --    if (answer = "00000000") then
+        --        status(flag_Z) := '1';
+        --    else
+        --        status(flag_Z) := '0';
+        --    end if;
+
+        --    status(flag_C) := OperandA(0);
+        --    status(flag_N) := answer(7);
+        --    status(flag_V) := status(flag_N) xor status(flag_C);
+        --    status(flag_S) := status(flag_N) xor status(flag_V);
+
+        --    -- verify that result matches
+        --    assert (std_match(Result, answer))
+        --        report "Wrong answer for ASR(" &
+        --            integer'image(i) & ") = " &
+        --            integer'image(to_integer(unsigned(answer))) &
+        --            " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
+        --    severity ERROR;
+
+        --    -- verify that result matches
+        --    assert (std_match(StatReg, status))
+        --        report "Wrong status for ASR(" &
+        --            integer'image(i) & ") = " &
+        --            integer'image(to_integer(unsigned(answer))) & " (Got " &
+        --            integer'image(to_integer(unsigned(StatReg))) & " instead of " &
+        --            integer'image(to_integer(unsigned(status))) & ")"
+        --    severity ERROR;
+        --end loop;
+
+        --report "DONE WITH ASR";
+
+        for i in 0 to max_value loop
+            for j in 0 to max_value loop
+                --    "0110KKKKddddKKKK";
+                IR <= "0111XXXXXXXXXXXX";
+                OperandA <= std_logic_vector(to_unsigned(i, 8));
+                OperandB <= "XXXXXXXX";
+                temp := std_logic_vector(to_unsigned(j, 8));
+                IR(11 downto 8) <= temp(7 downto 4);
+                IR(3 downto 0)  <= temp(3 downto 0);
+                wait until (clock = '1');
+                wait until (clock = '1');
+                answer := (OperandA and std_logic_vector(to_unsigned(j, 8)));
+
+                if (answer = "00000000") then
+                    status(flag_Z) := '1';
+                else
+                    status(flag_Z) := '0';
+                end if;
+
+                status(flag_N) := answer(7);
+                status(flag_V) := '0';
+                status(flag_S) := status(flag_N) xor status(flag_V);
+
+                -- verify that result matches
+                assert (std_match(Result, answer))
+                    report "Wrong answer for ANDI(" &
+                        integer'image(i) & ", " &
+                        integer'image(j) & ") = " &
+                        integer'image(to_integer(unsigned(answer))) &
+                        " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
+                severity ERROR;
+
+                -- verify that result matches
+                assert (std_match(StatReg, status))
+                    report "Wrong status for ANDI(" &
+                        integer'image(i) & ", " &
+                        integer'image(j) & ") = " &
+                        integer'image(to_integer(unsigned(answer))) & " (Got " &
+                        integer'image(to_integer(unsigned(StatReg))) & " instead of " &
+                        integer'image(to_integer(unsigned(status))) & ")"
+                severity ERROR;
+            end loop;
+        end loop;
+
+        report "DONE WITH ANDI";
+
+
+        for i in 0 to max_value loop
+            for j in 0 to max_value loop
+                --    "0110KKKKddddKKKK";
+                IR <= "0110XXXXXXXXXXXX";
+                OperandA <= std_logic_vector(to_unsigned(i, 8));
+                OperandB <= "XXXXXXXX";
+                temp := std_logic_vector(to_unsigned(j, 8));
+                IR(11 downto 8) <= temp(7 downto 4);
+                IR(3 downto 0)  <= temp(3 downto 0);
+                wait until (clock = '1');
+                wait until (clock = '1');
+                answer := (OperandA or std_logic_vector(to_unsigned(j, 8)));
+
+                if (answer = "00000000") then
+                    status(flag_Z) := '1';
+                else
+                    status(flag_Z) := '0';
+                end if;
+
+                status(flag_N) := answer(7);
+                status(flag_V) := '0';
+                status(flag_S) := status(flag_N) xor status(flag_V);
+
+                -- verify that result matches
+                assert (std_match(Result, answer))
+                    report "Wrong answer for ORI(" &
+                        integer'image(i) & ", " &
+                        integer'image(j) & ") = " &
+                        integer'image(to_integer(unsigned(answer))) &
+                        " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
+                severity ERROR;
+
+                -- verify that result matches
+                assert (std_match(StatReg, status))
+                    report "Wrong status for ORI(" &
+                        integer'image(i) & ", " &
+                        integer'image(j) & ") = " &
+                        integer'image(to_integer(unsigned(answer))) & " (Got " &
+                        integer'image(to_integer(unsigned(StatReg))) & " instead of " &
+                        integer'image(to_integer(unsigned(status))) & ")"
+                severity ERROR;
+            end loop;
+        end loop;
+
+        report "DONE WITH ORI";
+
+        for i in 0 to max_value loop
+            for j in 0 to max_value loop
+                --    "001010rdddddrrrr";
+                IR <= "001010XXXXXXXXXX";
+                OperandA <= std_logic_vector(to_unsigned(i, 8));
+                OperandB <= std_logic_vector(to_unsigned(j, 8));
+                wait until (clock = '1');
+                wait until (clock = '1');
+                answer := (OperandA or OperandB);
+
+                if (answer = "00000000") then
+                    status(flag_Z) := '1';
+                else
+                    status(flag_Z) := '0';
+                end if;
+
+                status(flag_N) := answer(7);
+                status(flag_V) := '0';
+                status(flag_S) := status(flag_N) xor status(flag_V);
+
+                -- verify that result matches
+                assert (std_match(Result, answer))
+                    report "Wrong answer for OR(" &
+                        integer'image(to_integer(unsigned(OperandA))) & ", " &
+                        integer'image(to_integer(unsigned(OperandB))) & ") = " &
+                        integer'image(to_integer(unsigned(answer))) &
+                        " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
+                severity ERROR;
+
+                -- verify that result matches
+                assert (std_match(StatReg, status))
+                    report "Wrong status for OR(" &
+                        integer'image(to_integer(unsigned(OperandA))) & ", " &
+                        integer'image(to_integer(unsigned(OperandB))) & ") = " &
+                        integer'image(to_integer(unsigned(answer))) & " (Got " &
+                        integer'image(to_integer(unsigned(StatReg))) & " instead of " &
+                        integer'image(to_integer(unsigned(status))) & ")"
+                severity ERROR;
+            end loop;
+        end loop;
+
+        report "DONE WITH OR";
+
+
+
         for i in 0 to max_value loop
             for j in 0 to max_value loop
                 --    "001000rdddddrrrr";
@@ -83,7 +263,6 @@ begin
 
         report "DONE WITH AND";
 
-        status := (others => '-');
         for i in 0 to max_value loop
             for j in 0 to max_value loop
                 --    "001001rdddddrrrr";

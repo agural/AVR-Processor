@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2015-01-29T23:33:47</DateModified>
+  <DateModified>2015-01-29T23:41:55</DateModified>
   <ModuleName>ALU_TEST</ModuleName>
   <SummaryTimeStamp>Unknown</SummaryTimeStamp>
   <SavedFilePath>/home/bryanhe/AVR-Processor/src/AVR/iseconfig/ALU_TEST.xreport</SavedFilePath>
