@@ -42,6 +42,7 @@ entity ALUStatus is
 end ALUStatus;
 
 architecture DataFlow of ALUStatus is
+    signal old_status   : std_logic_vector(7 downto 0);
     signal temp_status  : std_logic_vector(7 downto 0);
     signal statusN      : std_logic;
 begin
@@ -54,6 +55,8 @@ begin
             -- C
             if (statusMask(0) = '1') then
                 temp_status(0) <= statusC;
+            else
+                temp_status(0) <= old_status(0);
             end if;
             
             -- Z
@@ -63,26 +66,36 @@ begin
                 else
                     temp_status(1) <= '0';
                 end if;
+            else
+                temp_status(1) <= old_status(1);
             end if;
             
             -- N
             if (statusMask(2) = '1') then
                 temp_status(2) <= statusN;
+            else
+                temp_status(2) <= old_status(2);
             end if;
             
             -- V
             if (statusMask(3) = '1') then
                 temp_status(3) <= statusV;
+            else
+                temp_status(3) <= old_status(3);
             end if;
             
             -- S
             if (statusMask(4) = '1') then
                 temp_status(4) <= statusN XOR statusV;
+            else
+                temp_status(4) <= old_status(4);
             end if;
             
             -- H
             if (statusMask(5) = '1') then
                 temp_status(5) <= statusH;
+            else
+                temp_status(5) <= old_status(5);
             end if;
         elsif (bitT = '1') then                     -- BLD / BST
             if (bitChangeEn = '1') then
@@ -97,16 +110,23 @@ begin
                 else
                     result <= ALUResult AND (not statusMask);
                 end if;
+                temp_status(6) <= old_status(6);
             end if;
         else                                        -- BCLR / BSET
             if (bitClrSet = '1') then
-                temp_status <= temp_status OR statusMask;
+                temp_status <= old_status OR statusMask;
             else
-                temp_status <= temp_status AND (not statusMask);
+                temp_status <= old_status AND (not statusMask);
             end if;
         end if;
     end process;
 
+    process(clk)
+    begin
+        if (rising_edge(clk)) then
+            old_status <= temp_status;
+        end if;
+    end process;
     status <= temp_status;
 end DataFlow;
 
