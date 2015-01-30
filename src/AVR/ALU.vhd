@@ -122,7 +122,7 @@ begin
                'X'           when (ALUBlockSel = ALUMulBlock)   else
                'X';
 
-    statusV <= 'X'           when (ALUBlockSel = ALUFBlock)     else
+    statusV <= '0'           when (ALUBlockSel = ALUFBlock)     else
                shift_statusV when (ALUBlockSel = ALUShiftBlock) else
                add_statusV   when (ALUBlockSel = ALUAddBlock)   else
                'X'           when (ALUBlockSel = ALUMulBlock)   else
