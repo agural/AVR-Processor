@@ -187,19 +187,23 @@ begin
 
         -- Testing: CPC
         IR <= "0000011000111110";
+		  wait until (clock = '1');
         wait for 10 ns;
         assert(RegAOut = "00000011");
         assert(RegBOut = "00011110");
         RegIn <= "10000100";
+		  wait until (clock = '1');
         wait for 10 ns;
 
 
         -- Testing: ADC
         IR <= "0001111011000110";
+		  wait until (clock = '1');
         wait for 10 ns;
         assert(RegAOut = "00001100");
         assert(RegBOut = "00010110");
         RegIn <= "10101110";
+		  wait until (clock = '1');
         wait for 10 ns;
 
 

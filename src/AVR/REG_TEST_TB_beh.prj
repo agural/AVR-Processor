@@ -1,6 +1,0 @@
-vhdl opcodes "opcodes.vhd"
-vhdl ALUCommands "ALUCommands.vhd"
-vhdl work "AVRRegisters.vhd"
-vhdl work "AVRControl.vhd"
-vhdl work "RegTest.vhd"
-vhdl work "REG_TEST_TB.vhd"

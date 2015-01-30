@@ -1,29 +1,51 @@
-Running: D:\Xilinx\14.7\ISE_DS\ISE\bin\nt64\unwrapped\fuse.exe -intstyle ise -incremental -o C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/REG_TEST_TB_isim_beh.exe -prj C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/REG_TEST_TB_beh.prj work.REG_TEST_TB 
-ISim P.20131013 (signature 0x7708f090)
-Number of CPUs detected in this system: 4
-Turning on mult-threading, number of parallel sub-compilation jobs: 8 
+Running: /opt/Xilinx/14.7/ISE_DS/ISE/bin/lin64/unwrapped/fuse -intstyle ise -incremental -o /home/bryanhe/AVR-Processor/src/AVR/testbench_isim_beh.exe -prj /home/bryanhe/AVR-Processor/src/AVR/testbench_beh.prj work.testbench 
+ISim P.20131013 (signature 0xfbc00daa)
+Number of CPUs detected in this system: 8
+Turning on mult-threading, number of parallel sub-compilation jobs: 16 
 Determining compilation order of HDL files
-Parsing VHDL file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/opcodes.vhd" into library opcodes
-Parsing VHDL file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUCommands.vhd" into library ALUCommands
-Parsing VHDL file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRRegisters.vhd" into library work
-Parsing VHDL file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRControl.vhd" into library work
-Parsing VHDL file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/RegTest.vhd" into library work
-Parsing VHDL file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/REG_TEST_TB.vhd" into library work
+Parsing VHDL file "/home/bryanhe/AVR-Processor/src/AVR/opcodes.vhd" into library opcodes
+Parsing VHDL file "/home/bryanhe/AVR-Processor/src/AVR/ALUCommands.vhd" into library ALUCommands
+Parsing VHDL file "/home/bryanhe/AVR-Processor/src/AVR/ALUStatus.vhd" into library work
+Parsing VHDL file "/home/bryanhe/AVR-Processor/src/AVR/ALUShiftBlock.vhd" into library work
+Parsing VHDL file "/home/bryanhe/AVR-Processor/src/AVR/ALUMulBlock.vhd" into library work
+Parsing VHDL file "/home/bryanhe/AVR-Processor/src/AVR/ALUFBlock.vhd" into library work
+Parsing VHDL file "/home/bryanhe/AVR-Processor/src/AVR/ALUAddBlock.vhd" into library work
+Parsing VHDL file "/home/bryanhe/AVR-Processor/src/AVR/AVRControl.vhd" into library work
+Parsing VHDL file "/home/bryanhe/AVR-Processor/src/AVR/ALU.vhd" into library work
+Parsing VHDL file "/home/bryanhe/AVR-Processor/src/AVR/ALUTest.vhd" into library work
+Parsing VHDL file "/home/bryanhe/AVR-Processor/src/AVR/ALU_TEST_TB.vhd" into library work
 Starting static elaboration
+WARNING:HDLCompiler:746 - "/build/xfndry10/P.20131013/rtf/vhdl/src/ieee/numeric_std.vhd" Line 3225: Range is empty (null range)
 Completed static elaboration
+Fuse Memory Usage: 98980 KB
+Fuse CPU Usage: 1130 ms
 Compiling package standard
 Compiling package std_logic_1164
 Compiling package numeric_std
+Compiling package math_real
 Compiling package opcodes
 Compiling package alucommands
 Compiling package std_logic_arith
 Compiling package std_logic_unsigned
-Compiling architecture dataflow of entity AVRRegisters [avrregisters_default]
+Compiling architecture dataflow of entity ALUFBlock [alufblock_default]
+Compiling architecture dataflow of entity ALUShiftBlock [alushiftblock_default]
+Compiling architecture dataflow of entity ALUAddBlock [aluaddblock_default]
+Compiling architecture dataflow of entity ALUMulBlock [alumulblock_default]
+Compiling architecture dataflow of entity ALUStatus [alustatus_default]
+Compiling architecture dataflow of entity ALU [alu_default]
 Compiling architecture dataflow of entity AVRControl [avrcontrol_default]
-Compiling architecture stuctural of entity REG_TEST [reg_test_default]
-Compiling architecture tb_architecture of entity reg_test_tb
+Compiling architecture structural of entity ALU_TEST [alu_test_default]
+Compiling architecture tb_architecture of entity testbench
 Time Resolution for simulation is 1ps.
+<<<<<<< HEAD
 Compiled 14 VHDL Units
 Built simulation executable C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/REG_TEST_TB_isim_beh.exe
 Fuse Memory Usage: 52892 KB
 Fuse CPU Usage: 5655 ms
+=======
+Compiled 25 VHDL Units
+Built simulation executable /home/bryanhe/AVR-Processor/src/AVR/testbench_isim_beh.exe
+Fuse Memory Usage: 1205816 KB
+Fuse CPU Usage: 1450 ms
+GCC CPU Usage: 5730 ms
+>>>>>>> 2d0c4a7f7b48a2c5965aa93ffe3cfb51d315b6c7

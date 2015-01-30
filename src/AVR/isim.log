@@ -1,6 +1,6 @@
 ISim log file
-Running: C:\Users\Albert\Documents\GitHub\AVR-Processor\src\AVR\REG_TEST_TB_isim_beh.exe -intstyle ise -gui -tclbatch isim.cmd -wdb C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/REG_TEST_TB_isim_beh.wdb 
-ISim P.20131013 (signature 0x7708f090)
+Running: /home/bryanhe/AVR-Processor/src/AVR/testbench_isim_beh.exe -intstyle ise -gui -tclbatch isim.cmd -wdb /home/bryanhe/AVR-Processor/src/AVR/testbench_isim_beh.wdb 
+ISim P.20131013 (signature 0xfbc00daa)
 WARNING: A WEBPACK license was found.
 WARNING: Please use Xilinx License Configuration Manager to check out a full ISim license.
 WARNING: ISim will run in Lite mode. Please refer to the ISim documentation for more information on the differences between the Lite and the Full version.
@@ -10,12 +10,43 @@ Time resolution is 1 ps
 # wave add /
 # run 1000 ns
 Simulator is doing circuit initialization process.
-at 0 ps, Instance /reg_test_tb/UUT/Registers/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-at 0 ps, Instance /reg_test_tb/UUT/Registers/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
 Finished circuit initialization process.
+<<<<<<< HEAD
 at 30 ns(1), Instance /reg_test_tb/UUT/Registers/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
 # run all
 # run all
 # run all
 # run all
 # run all
+=======
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 0 ps, Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 10 ns(2), Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 10 ns(2), Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 10 ns(2), Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 10 ns(2), Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 10 ns(2), Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 10 ns(2), Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 10 ns(2), Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 10 ns(2), Instance /testbench/uut/ALU/FBlock/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 30 ns(1), Instance /testbench/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 30 ns(1), Instance /testbench/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 30 ns(1): Error: Wrong status for AND(0, 0) = 0 (Got 0 instead of 0)
+# run all
+at 2621430 ns(1): Note: DONE WITH AND (/testbench/).
+at 5242870 ns(1): Note: DONE WITH SIMULATIONS (/testbench/).
+>>>>>>> 2d0c4a7f7b48a2c5965aa93ffe3cfb51d315b6c7
