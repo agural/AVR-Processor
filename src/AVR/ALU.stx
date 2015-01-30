@@ -4,28 +4,19 @@ Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
 
 
 Total REAL time to Xst completion: 0.00 secs
-<<<<<<< Updated upstream
 Total CPU time to Xst completion: 0.53 secs
-=======
-Total CPU time to Xst completion: 0.04 secs
->>>>>>> Stashed changes
  
 --> Parameter xsthdpdir set to C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/xst
 
 
 Total REAL time to Xst completion: 0.00 secs
-<<<<<<< Updated upstream
 Total CPU time to Xst completion: 0.53 secs
-=======
-Total CPU time to Xst completion: 0.04 secs
->>>>>>> Stashed changes
  
 --> WARNING:Xst:3164 - Option "-debug" found multiple times in the command line. Only the first occurence is considered.
 
 =========================================================================
 *                          HDL Compilation                              *
 =========================================================================
-<<<<<<< Updated upstream
 WARNING:HDLParsers:3607 - Unit work/ALU is now defined in a different file.  It was defined in "/home/bryanhe/AVR-Processor/src/AVR/ALU.vhd", and is now defined in "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU.vhd".
 WARNING:HDLParsers:3607 - Unit work/ALU/DataFlow is now defined in a different file.  It was defined in "/home/bryanhe/AVR-Processor/src/AVR/ALU.vhd", and is now defined in "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU.vhd".
 WARNING:HDLParsers:3607 - Unit work/ALUAddBlock is now defined in a different file.  It was defined in "/home/bryanhe/AVR-Processor/src/AVR/ALUAddBlock.vhd", and is now defined in "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUAddBlock.vhd".
@@ -40,30 +31,15 @@ Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUF
 Entity <alufblock> compiled.
 Entity <alufblock> (Architecture <dataflow>) compiled.
 Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUShiftBlock.vhd" in Library work.
-=======
-Compiling vhdl file "/home/bryanhe/AVR-Processor/src/AVR/opcodes.vhd" in Library opcodes.
-Compiling vhdl file "/home/bryanhe/AVR-Processor/src/AVR/ALUCommands.vhd" in Library ALUCommands.
-Compiling vhdl file "/home/bryanhe/AVR-Processor/src/AVR/ALUFBlock.vhd" in Library work.
-Architecture dataflow of Entity alufblock is up to date.
-Compiling vhdl file "/home/bryanhe/AVR-Processor/src/AVR/ALUShiftBlock.vhd" in Library work.
->>>>>>> Stashed changes
 Architecture dataflow of Entity alushiftblock is up to date.
 Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUAddBlock.vhd" in Library work.
 Architecture dataflow of Entity aluaddblock is up to date.
-<<<<<<< Updated upstream
 Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUMulBlock.vhd" in Library work.
 Entity <alumulblock> compiled.
 Entity <alumulblock> (Architecture <dataflow>) compiled.
 Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUStatus.vhd" in Library work.
 Architecture dataflow of Entity alustatus is up to date.
 Compiling vhdl file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU.vhd" in Library work.
-=======
-Compiling vhdl file "/home/bryanhe/AVR-Processor/src/AVR/ALUMulBlock.vhd" in Library work.
-Architecture dataflow of Entity alumulblock is up to date.
-Compiling vhdl file "/home/bryanhe/AVR-Processor/src/AVR/ALUStatus.vhd" in Library work.
-Architecture dataflow of Entity alustatus is up to date.
-Compiling vhdl file "/home/bryanhe/AVR-Processor/src/AVR/ALU.vhd" in Library work.
->>>>>>> Stashed changes
 Entity <alu> compiled.
 Entity <alu> (Architecture <dataflow>) compiled.
 
@@ -73,12 +49,7 @@ Total CPU time to Xst completion: 1.06 secs
  
 --> 
 
-<<<<<<< Updated upstream
 Total memory usage is 211964 kilobytes
-=======
-
-Total memory usage is 472000 kilobytes
->>>>>>> Stashed changes
 
 Number of errors   :    0 (   0 filtered)
 Number of warnings :    9 (   0 filtered)
