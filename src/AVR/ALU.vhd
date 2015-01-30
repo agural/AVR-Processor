@@ -29,6 +29,9 @@ architecture DataFlow of ALU is
     signal opA      : std_logic_vector(7 downto 0);
     signal opB      : std_logic_vector(7 downto 0);
 
+    -- garbage signals for Fblock
+    signal F_result  : std_logic_vector(7 downto 0);
+
     -- garbage signals for shift
     signal shift_operand : std_logic_vector(2 downto 0);
     signal shift_carry   : std_logic;
@@ -73,7 +76,7 @@ begin
         operand => ALUBlockInstructionSel,
         opA => opA,
         opB => opB,
-        result => RegIn
+        result => F_result
     );
 
     ShiftBlock : entity work.ALUShiftBlock
