@@ -13,17 +13,21 @@ Simulator is doing circuit initialization process.
 at 0 ps, Instance /reg_test_tb/UUT/Registers/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
 at 0 ps, Instance /reg_test_tb/UUT/Registers/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
 Finished circuit initialization process.
-at 10 ns: Error: Assertion violation
-at 10 ns: Error: Assertion violation
-at 30 ns: Error: Assertion violation
-at 30 ns: Error: Assertion violation
+at 10 ns(1), Instance /reg_test_tb/UUT/Registers/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 675 ns: Error: Assertion violation
+at 675 ns: Error: Assertion violation
+at 695 ns: Error: Assertion violation
+at 695 ns: Error: Assertion violation
+at 715 ns: Error: Assertion violation
 # restart
 # run all
 Simulator is doing circuit initialization process.
 at 0 ps, Instance /reg_test_tb/UUT/Registers/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
 at 0 ps, Instance /reg_test_tb/UUT/Registers/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
 Finished circuit initialization process.
-at 10 ns: Error: Assertion violation
-at 10 ns: Error: Assertion violation
-at 30 ns: Error: Assertion violation
-at 30 ns: Error: Assertion violation
+at 10 ns(1), Instance /reg_test_tb/UUT/Registers/ : Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+at 675 ns: Error: Assertion violation
+at 675 ns: Error: Assertion violation
+at 695 ns: Error: Assertion violation
+at 695 ns: Error: Assertion violation
+at 715 ns: Error: Assertion violation

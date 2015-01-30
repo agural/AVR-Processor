@@ -23,8 +23,8 @@ Compiling architecture dataflow of entity AVRControl [avrcontrol_default]
 Compiling architecture stuctural of entity REG_TEST [reg_test_default]
 Compiling architecture tb_architecture of entity reg_test_tb
 Time Resolution for simulation is 1ps.
-Waiting for 3 sub-compilation(s) to finish...
+Waiting for 1 sub-compilation(s) to finish...
 Compiled 14 VHDL Units
 Built simulation executable C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/REG_TEST_TB_isim_beh.exe
-Fuse Memory Usage: 35304 KB
-Fuse CPU Usage: 2921 ms
+Fuse Memory Usage: 35344 KB
+Fuse CPU Usage: 2984 ms

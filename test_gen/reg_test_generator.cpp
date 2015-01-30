@@ -203,6 +203,18 @@ int main () {
     codes["SUBI"] = make_pair(op_const   , "0101"      );
     codes["SWAP"] = make_pair(op_onearg  , "0010"      );
 
+    cout << "-- initialize all registers to 0" << endl;
+    for(int i = 0; i < 32; i++) {
+        int ra = i;
+        int rb = i;
+        cout << "IR <= \"" << codes["ADD"].second << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";" << endl;
+        cout << "wait for 10 ns;" << endl;
+        string out = to_bin(i, 8);
+        cout << "RegIn <= \"" << out << "\";" << endl;
+        cout << "wait for 10 ns;" << endl;
+        regs[ra] = out;
+    }
+
     for(int t = 0; t < 100; t++) {
         string cur = ops[rand() % NUM_OPS];
         int ra = rand() % 32;
