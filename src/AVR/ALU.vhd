@@ -52,12 +52,13 @@ architecture DataFlow of ALU is
 
     -- garbage signals for mul
     signal mul_result  : std_logic_vector(7 downto 0);
+    signal mul_statusC : std_logic;
 
     -- garbage signals for status
-    signal status_statusH : std_logic;
-    signal status_statusV : std_logic;
-    signal status_statusN : std_logic;
-    signal status_statusC : std_logic;
+    signal statusH : std_logic;
+    signal statusV : std_logic;
+    signal statusN : std_logic;
+    signal statusC : std_logic;
 
     signal ALUResult : std_logic_vector(7 downto 0);
 
@@ -105,7 +106,7 @@ begin
         opA     => opA,
         opB     => opB,
 
-        carry   => RegStatus(flag_C),
+        carry   => mul_statusC,
         result  => mul_result
     );
 
@@ -115,6 +116,30 @@ begin
                  mul_result   when (ALUBlockSel = ALUMulBlock)   else
                  (others => 'X');
 
+    statusH <= 'X'           when (ALUBlockSel = ALUFBlock)     else
+               'X'           when (ALUBlockSel = ALUShiftBlock) else
+               add_statusH   when (ALUBlockSel = ALUAddBlock)   else
+               'X'           when (ALUBlockSel = ALUMulBlock)   else
+               'X';
+
+    statusV <= 'X'           when (ALUBlockSel = ALUFBlock)     else
+               shift_statusV when (ALUBlockSel = ALUShiftBlock) else
+               add_statusV   when (ALUBlockSel = ALUAddBlock)   else
+               'X'           when (ALUBlockSel = ALUMulBlock)   else
+               'X';
+
+    statusN <= 'X'           when (ALUBlockSel = ALUFBlock)     else
+               shift_statusN when (ALUBlockSel = ALUShiftBlock) else
+               'X'           when (ALUBlockSel = ALUAddBlock)   else
+               'X'           when (ALUBlockSel = ALUMulBlock)   else
+               'X';
+
+    statusC <= 'X'           when (ALUBlockSel = ALUFBlock)     else
+               shift_statusC when (ALUBlockSel = ALUShiftBlock) else
+               add_statusC   when (ALUBlockSel = ALUAddBlock)   else
+               mul_statusC   when (ALUBlockSel = ALUMulBlock)   else
+               'X';
+
     
     StatusBlock : entity work.ALUStatus
     port map (
@@ -123,10 +148,10 @@ begin
         ALUResult => ALUResult,
         statusMask => ALUStatusMask,
 
-        statusH => status_statusH,
-        statusV => status_statusV,
-        statusN => status_statusN,
-        statusC => status_statusC,
+        statusH => statusH,
+        statusV => statusV,
+        statusN => statusN,
+        statusC => statusC,
 
         bitChangeEn => ALUStatusBitChangeEn,
         bitClrSet   => ALUBitClrSet,
