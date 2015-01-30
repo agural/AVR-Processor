@@ -2,6 +2,12 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+library opcodes;
+use opcodes.opcodes.all;
+
+library ALUCommands;
+use ALUCommands.ALUCommands.all;
+
 entity ALU is
     port (
         clock                   :  in  std_logic;                          -- the system clock
@@ -21,7 +27,7 @@ entity ALU is
         RegBOut                 :  in  std_logic_vector(7 downto 0);
         
         RegIn                   : out  std_logic_vector(7 downto 0);
-        RegStatus               : out  std_logic_vector(7 downto 0)
+        RegStatus               : inout  std_logic_vector(7 downto 0)
     );
 end ALU;
 
@@ -33,24 +39,18 @@ architecture DataFlow of ALU is
     signal F_result  : std_logic_vector(7 downto 0);
 
     -- garbage signals for shift
-    signal shift_carry   : std_logic;
-
     signal shift_statusN : std_logic;
     signal shift_statusV : std_logic;
     signal shift_statusC : std_logic;
     signal shift_result  : std_logic_vector(7 downto 0);
 
     -- garbage signals for add
-    signal add_carry   : std_logic;
-
     signal add_statusH : std_logic;
     signal add_statusV : std_logic;
     signal add_statusC : std_logic;
     signal add_result  : std_logic_vector(7 downto 0);
 
     -- garbage signals for mul
-
-    signal mul_carry   : std_logic;
     signal mul_result  : std_logic_vector(7 downto 0);
 
     -- garbage signals for status
@@ -80,7 +80,7 @@ begin
     port map (
         operand => ALUBlockInstructionSel(2 downto 0),
         opA     => opA,
-        carry   => shift_carry,
+        carry   => RegStatus(flag_C),
 
         statusN => shift_statusN,
         statusV => shift_statusV,
@@ -93,7 +93,7 @@ begin
         operand => ALUBlockInstructionSel(2 downto 0),
         opA     => opA,
         opB     => opB,
-        carry   => add_carry,
+        carry   => RegStatus(flag_C),
 
         statusH => add_statusH,
         statusV => add_statusV,
@@ -107,7 +107,7 @@ begin
         opA     => opA,
         opB     => opB,
 
-        carry   => mul_carry,
+        carry   => RegStatus(flag_C),
         result  => mul_result
     );
     
