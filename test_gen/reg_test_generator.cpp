@@ -78,7 +78,8 @@ SBCI    0100
 SUBI    0101
 */
 void op_const(string op, int ra, int rb) {
-    cout << "IR <= \"" << op << "0000" << to_bin(ra, 4) << "0000\";" << endl;
+    if(ra < 16) ra += 16;
+    cout << "IR <= \"" << op << "0000" << to_bin(ra-16, 4) << "0000\";" << endl;
     cout << "wait for 10 ns;" << endl;
     cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
     string out = to_bin(rand() % 256, 8);
@@ -95,19 +96,19 @@ SBIW    10010111
 void op_constw(string op, int ra, int rb) {
     cout << "IR <= \"1001011" << op << "00" << to_bin(ra, 2) << "0000\";" << endl;
     cout << "wait for 10 ns;" << endl;
-    cout << "assert(RegAOut = \"" << regs[25 + 2 * ra] << "\");" << endl;
+    cout << "assert(RegAOut = \"" << regs[24 + 2 * ra] << "\");" << endl;
     string out = to_bin(rand() % 256, 8);
     cout << "RegIn <= \"" << out << "\";" << endl;
     cout << "wait for 10 ns;" << endl;
-    regs[25 + 2 * ra] = out;
+    regs[24 + 2 * ra] = out;
 
     cout << "IR <= \"1001011" << op << "00" << to_bin(ra, 2) << "0000\";" << endl;
     cout << "wait for 10 ns;" << endl;
-    cout << "assert(RegAOut = \"" << regs[24 + 2 * ra] << "\");" << endl;
+    cout << "assert(RegAOut = \"" << regs[25 + 2 * ra] << "\");" << endl;
     out = to_bin(rand() % 256, 8);
     cout << "RegIn <= \"" << out << "\";" << endl;
     cout << "wait for 10 ns;" << endl;
-    regs[24 + 2 * ra] = out;
+    regs[25 + 2 * ra] = out;
 }
 
 /*
@@ -215,7 +216,7 @@ int main () {
         regs[ra] = out;
     }
 
-    for(int t = 0; t < 100; t++) {
+    for(int t = 0; t < 1000; t++) {
         string cur = ops[rand() % NUM_OPS];
         int ra = rand() % 32;
         int rb = rand() % 32;
