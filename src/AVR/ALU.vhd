@@ -26,7 +26,7 @@ entity ALU is
         RegAOut                 :  in  std_logic_vector(7 downto 0);
         RegBOut                 :  in  std_logic_vector(7 downto 0);
         
-        RegIn                   : out  std_logic_vector(7 downto 0);
+        RegIn                   : inout  std_logic_vector(7 downto 0);
         RegStatus               : inout  std_logic_vector(7 downto 0)
     );
 end ALU;
@@ -110,12 +110,19 @@ begin
         carry   => RegStatus(flag_C),
         result  => mul_result
     );
+
+    RegIn <= F_result     when (ALUBlockSel = ALUFBlock)     else
+             shift_result when (ALUBlockSel = ALUShiftBlock) else
+             add_result   when (ALUBlockSel = ALUAddBlock)   else
+             mul_result   when (ALUBlockSel = ALUMulBlock)   else
+             (others => 'X');
+
     
     StatusBlock : entity work.ALUStatus
     port map (
         clk => clock,
 
-        ALUResult => status_ALUResult,
+        ALUResult => RegIn,
         statusMask => ALUStatusMask,
 
         statusH => status_statusH,
