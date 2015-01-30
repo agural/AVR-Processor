@@ -54,8 +54,6 @@ architecture DataFlow of ALU is
     signal mul_result  : std_logic_vector(7 downto 0);
 
     -- garbage signals for status
-    signal status_ALUResult : std_logic_vector(7 downto 0);
-
     signal status_statusH : std_logic;
     signal status_statusV : std_logic;
     signal status_statusN : std_logic;
