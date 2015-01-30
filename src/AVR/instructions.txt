@@ -17,15 +17,15 @@
 [X] 1001010ddddd0011  INC 
 [X] 1001010ddddd0110  LSR 
 [ ] 100111rdddddrrrr  MUL 
-[ ] 1001010ddddd0001  NEG 
+[-] 1001010ddddd0001  NEG 
 [X] 001010rdddddrrrr  OR  
 [X] 0110KKKKddddKKKK  ORI 
 [X] 1001010ddddd0111  ROR 
 [X] 000010rdddddrrrr  SBC 
-[ ] 0100KKKKddddKKKK  SBCI  
+[X] 0100KKKKddddKKKK  SBCI  
 [ ] 10010111KKddKKKK  SBIW  
 [X] 000110rdddddrrrr  SUB 
-[ ] 0101KKKKddddKKKK  SUBI  
+[X] 0101KKKKddddKKKK  SUBI  
 [X] 1001010ddddd0010  SWAP  
 
 Does BCLR write old or new value as answer
