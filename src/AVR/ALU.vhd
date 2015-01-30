@@ -109,11 +109,11 @@ begin
         result  => mul_result
     );
 
-    RegIn <= F_result     when (ALUBlockSel = ALUFBlock)     else
-             shift_result when (ALUBlockSel = ALUShiftBlock) else
-             add_result   when (ALUBlockSel = ALUAddBlock)   else
-             mul_result   when (ALUBlockSel = ALUMulBlock)   else
-             (others => 'X');
+    ALUResult <= F_result     when (ALUBlockSel = ALUFBlock)     else
+                 shift_result when (ALUBlockSel = ALUShiftBlock) else
+                 add_result   when (ALUBlockSel = ALUAddBlock)   else
+                 mul_result   when (ALUBlockSel = ALUMulBlock)   else
+                 (others => 'X');
 
     
     StatusBlock : entity work.ALUStatus
