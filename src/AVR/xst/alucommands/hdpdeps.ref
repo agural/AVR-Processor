@@ -1,5 +1,11 @@
 V3 3
 FL /home/bryanhe/AVR-Processor/src/AVR/ALUCommands.vhd 2015/01/28.20:43:53 P.20131013
+<<<<<<< Updated upstream
+=======
+PH ALUCommands/ALUCommands 1422588304 \
+      FL /home/bryanhe/AVR-Processor/src/AVR/ALUCommands.vhd \
+      PB ieee/std_logic_1164 1381692176
+>>>>>>> Stashed changes
 FL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUCommands.vhd 2015/01/26.23:54:24 P.20131013
 PH ALUCommands/ALUCommands 1422589750 \
       FL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUCommands.vhd \

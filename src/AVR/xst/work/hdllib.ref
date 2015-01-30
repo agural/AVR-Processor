@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 AR alu dataflow C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU.vhd sub00/vhpl19 1422589762
 EN avrcontrol NULL /home/bryanhe/AVR-Processor/src/AVR/AVRControl.vhd sub00/vhpl14 1422533236
 AR alustatus dataflow C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUStatus.vhd sub00/vhpl11 1422589760
@@ -18,3 +19,25 @@ AR aluaddblock dataflow C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/A
 EN alu NULL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU.vhd sub00/vhpl18 1422589761
 AR avrcontrol dataflow /home/bryanhe/AVR-Processor/src/AVR/AVRControl.vhd sub00/vhpl15 1422533237
 AR alumulblock dataflow C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUMulBlock.vhd sub00/vhpl01 1422589758
+=======
+AR alu dataflow /home/bryanhe/AVR-Processor/src/AVR/ALU.vhd sub00/vhpl19 1422588316
+EN avrcontrol NULL /home/bryanhe/AVR-Processor/src/AVR/AVRControl.vhd sub00/vhpl14 1422533236
+AR alustatus dataflow /home/bryanhe/AVR-Processor/src/AVR/ALUStatus.vhd sub00/vhpl11 1422588314
+EN alumulblock NULL /home/bryanhe/AVR-Processor/src/AVR/ALUMulBlock.vhd sub00/vhpl00 1422588311
+EN alu_test NULL /home/bryanhe/AVR-Processor/src/AVR/ALUTest.vhd sub00/vhpl02 1422532602
+EN reg_test NULL /home/bryanhe/AVR-Processor/src/AVR/RegTest.vhd sub00/vhpl16 1422532743
+EN alustatus NULL /home/bryanhe/AVR-Processor/src/AVR/ALUStatus.vhd sub00/vhpl10 1422588313
+AR avrregisters dataflow /home/bryanhe/AVR-Processor/src/AVR/AVRRegisters.vhd sub00/vhpl13 1422532740
+EN avrregisters NULL /home/bryanhe/AVR-Processor/src/AVR/AVRRegisters.vhd sub00/vhpl12 1422532739
+AR alu_test structural /home/bryanhe/AVR-Processor/src/AVR/ALUTest.vhd sub00/vhpl03 1422532603
+EN alufblock NULL /home/bryanhe/AVR-Processor/src/AVR/ALUFBlock.vhd sub00/vhpl04 1422588305
+AR alushiftblock dataflow /home/bryanhe/AVR-Processor/src/AVR/ALUShiftBlock.vhd sub00/vhpl09 1422588308
+AR alufblock dataflow /home/bryanhe/AVR-Processor/src/AVR/ALUFBlock.vhd sub00/vhpl05 1422588306
+AR reg_test stuctural /home/bryanhe/AVR-Processor/src/AVR/RegTest.vhd sub00/vhpl17 1422532744
+EN alushiftblock NULL /home/bryanhe/AVR-Processor/src/AVR/ALUShiftBlock.vhd sub00/vhpl08 1422588307
+EN aluaddblock NULL /home/bryanhe/AVR-Processor/src/AVR/ALUAddBlock.vhd sub00/vhpl06 1422588309
+AR aluaddblock dataflow /home/bryanhe/AVR-Processor/src/AVR/ALUAddBlock.vhd sub00/vhpl07 1422588310
+EN alu NULL /home/bryanhe/AVR-Processor/src/AVR/ALU.vhd sub00/vhpl18 1422588315
+AR avrcontrol dataflow /home/bryanhe/AVR-Processor/src/AVR/AVRControl.vhd sub00/vhpl15 1422533237
+AR alumulblock dataflow /home/bryanhe/AVR-Processor/src/AVR/ALUMulBlock.vhd sub00/vhpl01 1422588312
+>>>>>>> Stashed changes
