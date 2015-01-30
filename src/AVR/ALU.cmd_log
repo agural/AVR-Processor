@@ -1,0 +1,4 @@
+vhdtdtfi -lib opcodes opcodes.vhd -lib ALUCommands ALUCommands.vhd -lib work ALUStatus.vhd -lib work ALUShiftBlock.vhd -lib work ALUMulBlock.vhd -lib work ALUFBlock.vhd -lib work ALUAddBlock.vhd -lib work ALU.vhd -prj AVR -o ALU.spl -module ALU -template /opt/Xilinx/14.7/ISE_DS/ISE//data/splfile.tft -deleteonerror 
+spl2sym -intstyle ise -family spartan3e ALU.spl /home/bryanhe/AVR-Processor/src/AVR/ALU.sym 
+vhdtdtfi -lib opcodes opcodes.vhd -lib ALUCommands ALUCommands.vhd -lib work ALUStatus.vhd -lib work ALUShiftBlock.vhd -lib work ALUMulBlock.vhd -lib work ALUFBlock.vhd -lib work ALUAddBlock.vhd -lib work ALU.vhd -prj AVR -o ALU.spl -module ALU -template /opt/Xilinx/14.7/ISE_DS/ISE//data/splfile.tft -deleteonerror 
+spl2sym -intstyle ise -family spartan3e ALU.spl /home/bryanhe/AVR-Processor/src/AVR/ALU.sym 

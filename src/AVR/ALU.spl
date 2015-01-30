@@ -1,0 +1,16 @@
+[Inputs]
+clock
+ALUOp2Sel
+ALUStatusBitChangeEn
+ALUBitClrSet
+ALUBitTOp
+=ALUBlockSel[1:0]=
+=ALUBlockInstructionSel[3:0]=
+=ImmediateOut[7:0]=
+=ALUStatusMask[7:0]=
+=RegAOut[7:0]=
+=RegBOut[7:0]=
+[Outputs]
+=RegIn[7:0]=
+=RegStatus[7:0]=
+[BiDir]
