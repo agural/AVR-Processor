@@ -212,110 +212,110 @@ begin
 
         report "DONE WITH INC";
 
-        --for i in 0 to max_value loop
-        --    for j in 0 to max_value loop
-        --        --    "000010rdddddrrrr";
-        --        IR <= "000010XXXXXXXXXX";
-        --        OperandA <= std_logic_vector(to_unsigned(i, 8));
-        --        OperandB <= std_logic_vector(to_unsigned(j, 8));
-        --        wait until (clock = '1');
-        --        wait until (clock = '1');
-        --        answer := std_logic_vector(unsigned(OperandA) - unsigned(OperandB) - ("0000000" & status(flag_C)));
-        --        answer8 := std_logic_vector(unsigned('0' & OperandA) - unsigned('0' & OperandB) - ("00000000" & status(flag_C)));
-        --        answer7 := std_logic_vector(unsigned('0' & OperandA(6 downto 0)) - unsigned('0' & OperandB(6 downto 0)) - ("000000" & status(flag_C)));
-        --        answer4 := std_logic_vector(unsigned('0' & OperandA(3 downto 0)) - unsigned('0' & OperandB(3 downto 0)) - ("000" & status(flag_C)));
+        for i in 0 to max_value loop
+            for j in 0 to max_value loop
+                --    "000010rdddddrrrr";
+                IR <= "000010XXXXXXXXXX";
+                OperandA <= std_logic_vector(to_unsigned(i, 8));
+                OperandB <= std_logic_vector(to_unsigned(j, 8));
+                wait until (clock = '1');
+                wait until (clock = '1');
+                answer := std_logic_vector(unsigned(OperandA) - unsigned(OperandB) - ("0000000" & status(flag_C)));
+                answer8 := std_logic_vector(unsigned('0' & OperandA) - unsigned('0' & OperandB) - ("00000000" & status(flag_C)));
+                answer7 := std_logic_vector(unsigned('0' & OperandA(6 downto 0)) - unsigned('0' & OperandB(6 downto 0)) - ("000000" & status(flag_C)));
+                answer4 := std_logic_vector(unsigned('0' & OperandA(3 downto 0)) - unsigned('0' & OperandB(3 downto 0)) - ("000" & status(flag_C)));
 
-        --        if (answer = "00000000") then
-        --            status(flag_Z) := '1';
-        --        else
-        --            status(flag_Z) := '0';
-        --        end if;
+                if (answer = "00000000") then
+                    status(flag_Z) := '1';
+                else
+                    status(flag_Z) := '0';
+                end if;
 
-        --        status(flag_C) := answer8(8);
-        --        status(flag_N) := answer(7);
-        --        if (answer8(8) = answer7(7)) then
-        --            status(flag_V) := '0';
-        --        else
-        --            status(flag_V) := '1';
-        --        end if;
-        --        status(flag_S) := status(flag_N) xor status(flag_V);
-        --        status(flag_H) := answer4(4);
+                status(flag_C) := answer8(8);
+                status(flag_N) := answer(7);
+                if (answer8(8) = answer7(7)) then
+                    status(flag_V) := '0';
+                else
+                    status(flag_V) := '1';
+                end if;
+                status(flag_S) := status(flag_N) xor status(flag_V);
+                status(flag_H) := answer4(4);
 
-        --        -- verify that result matches
-        --        assert (std_match(Result, answer))
-        --            report "Wrong answer for SBC(" &
-        --                integer'image(to_integer(unsigned(OperandA))) & ", " &
-        --                integer'image(to_integer(unsigned(OperandB))) & ") = " &
-        --                integer'image(to_integer(unsigned(answer))) &
-        --                " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
-        --        severity ERROR;
+                -- verify that result matches
+                assert (std_match(Result, answer))
+                    report "Wrong answer for SBC(" &
+                        integer'image(to_integer(unsigned(OperandA))) & ", " &
+                        integer'image(to_integer(unsigned(OperandB))) & ") = " &
+                        integer'image(to_integer(unsigned(answer))) &
+                        " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
+                severity ERROR;
 
-        --        -- verify that result matches
-        --        assert (std_match(StatReg, status))
-        --            report "Wrong status for SBC(" &
-        --                integer'image(to_integer(unsigned(OperandA))) & ", " &
-        --                integer'image(to_integer(unsigned(OperandB))) & ") = " &
-        --                integer'image(to_integer(unsigned(answer))) & " (Got " &
-        --                integer'image(to_integer(unsigned(StatReg))) & " instead of " &
-        --                integer'image(to_integer(unsigned(status))) & ")"
-        --        severity ERROR;
-        --    end loop;
-        --end loop;
+                -- verify that result matches
+                assert (std_match(StatReg, status))
+                    report "Wrong status for SBC(" &
+                        integer'image(to_integer(unsigned(OperandA))) & ", " &
+                        integer'image(to_integer(unsigned(OperandB))) & ") = " &
+                        integer'image(to_integer(unsigned(answer))) & " (Got " &
+                        integer'image(to_integer(unsigned(StatReg))) & " instead of " &
+                        integer'image(to_integer(unsigned(status))) & ")"
+                severity ERROR;
+            end loop;
+        end loop;
 
-        --report "DONE WITH SBC";
+        report "DONE WITH SBC";
 
 
-        -- for i in 0 to max_value loop
-        --     for j in 0 to max_value loop
-        --         --    "000110rdddddrrrr";
-        --         IR <= "000110XXXXXXXXXX";
-        --         OperandA <= std_logic_vector(to_unsigned(i, 8));
-        --         OperandB <= std_logic_vector(to_unsigned(j, 8));
-        --         wait until (clock = '1');
-        --         wait until (clock = '1');
-        --         answer := std_logic_vector(unsigned(OperandA) - unsigned(OperandB));
-        --         answer8 := std_logic_vector(unsigned('0' & OperandA) - unsigned('0' & OperandB));
-        --         answer7 := std_logic_vector(unsigned('0' & OperandA(6 downto 0)) - unsigned('0' & OperandB(6 downto 0)));
-        --         answer4 := std_logic_vector(unsigned('0' & OperandA(3 downto 0)) - unsigned('0' & OperandB(3 downto 0)));
+         for i in 0 to max_value loop
+             for j in 0 to max_value loop
+                 --    "000110rdddddrrrr";
+                 IR <= "000110XXXXXXXXXX";
+                 OperandA <= std_logic_vector(to_unsigned(i, 8));
+                 OperandB <= std_logic_vector(to_unsigned(j, 8));
+                 wait until (clock = '1');
+                 wait until (clock = '1');
+                 answer := std_logic_vector(unsigned(OperandA) - unsigned(OperandB));
+                 answer8 := std_logic_vector(unsigned('0' & OperandA) - unsigned('0' & OperandB));
+                 answer7 := std_logic_vector(unsigned('0' & OperandA(6 downto 0)) - unsigned('0' & OperandB(6 downto 0)));
+                 answer4 := std_logic_vector(unsigned('0' & OperandA(3 downto 0)) - unsigned('0' & OperandB(3 downto 0)));
 
-        --         if (answer = "00000000") then
-        --             status(flag_Z) := '1';
-        --         else
-        --             status(flag_Z) := '0';
-        --         end if;
+                 if (answer = "00000000") then
+                     status(flag_Z) := '1';
+                 else
+                     status(flag_Z) := '0';
+                 end if;
 
-        --         status(flag_c) := answer8(8);
-        --         status(flag_N) := answer(7);
-        --         if (answer8(8) = answer7(7)) then
-        --             status(flag_V) := '0';
-        --         else
-        --             status(flag_V) := '1';
-        --         end if;
-        --         status(flag_S) := status(flag_N) xor status(flag_V);
-        --         status(flag_H) := answer4(4);
+                 status(flag_c) := answer8(8);
+                 status(flag_N) := answer(7);
+                 if (answer8(8) = answer7(7)) then
+                     status(flag_V) := '0';
+                 else
+                     status(flag_V) := '1';
+                 end if;
+                 status(flag_S) := status(flag_N) xor status(flag_V);
+                 status(flag_H) := answer4(4);
 
-        --         -- verify that result matches
-        --         assert (std_match(Result, answer))
-        --             report "Wrong answer for SUB(" &
-        --                 integer'image(to_integer(unsigned(OperandA))) & ", " &
-        --                 integer'image(to_integer(unsigned(OperandB))) & ") = " &
-        --                 integer'image(to_integer(unsigned(answer))) &
-        --                 " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
-        --         severity ERROR;
+                 -- verify that result matches
+                 assert (std_match(Result, answer))
+                     report "Wrong answer for SUB(" &
+                         integer'image(to_integer(unsigned(OperandA))) & ", " &
+                         integer'image(to_integer(unsigned(OperandB))) & ") = " &
+                         integer'image(to_integer(unsigned(answer))) &
+                         " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
+                 severity ERROR;
 
-        --         -- verify that result matches
-        --         assert (std_match(StatReg, status))
-        --             report "Wrong status for SUB(" &
-        --                 integer'image(to_integer(unsigned(OperandA))) & ", " &
-        --                 integer'image(to_integer(unsigned(OperandB))) & ") = " &
-        --                 integer'image(to_integer(unsigned(answer))) & " (Got " &
-        --                 integer'image(to_integer(unsigned(StatReg))) & " instead of " &
-        --                 integer'image(to_integer(unsigned(status))) & ")"
-        --         severity ERROR;
-        --     end loop;
-        -- end loop;
+                 -- verify that result matches
+                 assert (std_match(StatReg, status))
+                     report "Wrong status for SUB(" &
+                         integer'image(to_integer(unsigned(OperandA))) & ", " &
+                         integer'image(to_integer(unsigned(OperandB))) & ") = " &
+                         integer'image(to_integer(unsigned(answer))) & " (Got " &
+                         integer'image(to_integer(unsigned(StatReg))) & " instead of " &
+                         integer'image(to_integer(unsigned(status))) & ")"
+                 severity ERROR;
+             end loop;
+         end loop;
 
-        -- report "DONE WITH SUB";
+         report "DONE WITH SUB";
 
 
 
