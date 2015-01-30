@@ -47,7 +47,7 @@ architecture DataFlow of ALUStatus is
 begin
     statusN <= ALUResult(ALUResult'length - 1); -- high bit is sign bit
     
-    process(ALUResult, statusMask, statusH, statusV, statusC, bitChangeEn, bitClrSet, bitT)
+    process(ALUResult, statusMask, statusH, statusV, statusN, statusC, bitChangeEn, bitClrSet, bitT)
     begin
         result <= ALUResult;
         if (bitT = '0' AND bitChangeEn = '0') then  -- Normal operation
