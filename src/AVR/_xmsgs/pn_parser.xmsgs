@@ -8,44 +8,7 @@
 <!-- Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.    -->
 
 <messages>
-<<<<<<< HEAD
-<msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU.vhd&quot; into library work</arg>
-</msg>
-
 <msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUAddBlock.vhd&quot; into library work</arg>
-</msg>
-
-<msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUCommands.vhd&quot; into library ALUCommands</arg>
-</msg>
-
-<msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUFBlock.vhd&quot; into library work</arg>
-</msg>
-
-<msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUMulBlock.vhd&quot; into library work</arg>
-</msg>
-
-<msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUShiftBlock.vhd&quot; into library work</arg>
-</msg>
-
-<msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUStatus.vhd&quot; into library work</arg>
-</msg>
-
-<msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUTest.vhd&quot; into library work</arg>
-</msg>
-
-<msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRControl.vhd&quot; into library work</arg>
-</msg>
-
-<msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRRegisters.vhd&quot; into library work</arg>
-</msg>
-
-<msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/RegTest.vhd&quot; into library work</arg>
-</msg>
-
-<msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/opcodes.vhd&quot; into library opcodes</arg>
-=======
-<msg type="info" file="ProjectMgmt" num="1061" ><arg fmt="%s" index="1">Parsing VHDL file &quot;/home/bryanhe/AVR-Processor/src/AVR/ALU_TEST_TB.vhd&quot; into library work</arg>
->>>>>>> 64d4a2182c247ae7b93569fad109a3819fd52dce
 </msg>
 
 </messages>

@@ -1,5 +1,5 @@
 AR alu dataflow C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU.vhd sub00/vhpl19 1422589762
-EN avrcontrol NULL /home/bryanhe/AVR-Processor/src/AVR/AVRControl.vhd sub00/vhpl14 1422533236
+EN avrcontrol NULL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRControl.vhd sub00/vhpl14 1422620477
 AR alustatus dataflow C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUStatus.vhd sub00/vhpl11 1422589760
 EN alumulblock NULL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUMulBlock.vhd sub00/vhpl00 1422589757
 EN alu_test NULL /home/bryanhe/AVR-Processor/src/AVR/ALUTest.vhd sub00/vhpl02 1422532602
@@ -16,5 +16,5 @@ EN alushiftblock NULL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU
 EN aluaddblock NULL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUAddBlock.vhd sub00/vhpl06 1422589755
 AR aluaddblock dataflow C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUAddBlock.vhd sub00/vhpl07 1422589756
 EN alu NULL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU.vhd sub00/vhpl18 1422589761
-AR avrcontrol dataflow /home/bryanhe/AVR-Processor/src/AVR/AVRControl.vhd sub00/vhpl15 1422533237
+AR avrcontrol dataflow C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRControl.vhd sub00/vhpl15 1422620478
 AR alumulblock dataflow C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUMulBlock.vhd sub00/vhpl01 1422589758

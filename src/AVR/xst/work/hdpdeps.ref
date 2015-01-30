@@ -1,4 +1,4 @@
-V3 52
+V3 53
 FL /home/bryanhe/AVR-Processor/src/AVR/ALU.vhd 2015/01/29.03:42:28 P.20131013
 FL /home/bryanhe/AVR-Processor/src/AVR/ALUAddBlock.vhd 2015/01/28.20:43:53 P.20131013
 FL /home/bryanhe/AVR-Processor/src/AVR/ALUFBlock.vhd 2015/01/28.20:43:53 P.20131013
@@ -7,30 +7,23 @@ FL /home/bryanhe/AVR-Processor/src/AVR/ALUShiftBlock.vhd 2015/01/28.20:43:53 P.2
 FL /home/bryanhe/AVR-Processor/src/AVR/ALUTest.vhd 2015/01/29.03:56:22 P.20131013
 EN work/ALU_TEST 1422532602 FL /home/bryanhe/AVR-Processor/src/AVR/ALUTest.vhd \
       PB ieee/std_logic_1164 1381692176 PB ieee/std_logic_arith 1381692177 \
-      PB ieee/NUMERIC_STD 1381692181 LB opcodes PH opcodes/opcodes 1422589749
+      PB ieee/NUMERIC_STD 1381692181 LB opcodes PH opcodes/opcodes 1422620475
 AR work/ALU_TEST/Structural 1422532603 \
       FL /home/bryanhe/AVR-Processor/src/AVR/ALUTest.vhd EN work/ALU_TEST 1422532602 \
       CP work/ALU CP work/AVRControl
 FL /home/bryanhe/AVR-Processor/src/AVR/AVRControl.vhd 2015/01/29.04:07:09 P.20131013
-EN work/AVRControl 1422533236 \
-      FL /home/bryanhe/AVR-Processor/src/AVR/AVRControl.vhd \
-      PB ieee/std_logic_1164 1381692176 PB ieee/NUMERIC_STD 1381692181 \
-      PB ieee/STD_LOGIC_UNSIGNED 1381692179 LB opcodes PH opcodes/opcodes 1422589749 \
-      LB ALUCommands PH ALUCommands/ALUCommands 1422589750
-AR work/AVRControl/DataFlow 1422533237 \
-      FL /home/bryanhe/AVR-Processor/src/AVR/AVRControl.vhd EN work/AVRControl 1422533236
 FL /home/bryanhe/AVR-Processor/src/AVR/AVRRegisters.vhd 2015/01/29.03:25:13 P.20131013
 EN work/AVRRegisters 1422532739 \
       FL /home/bryanhe/AVR-Processor/src/AVR/AVRRegisters.vhd \
       PB ieee/std_logic_1164 1381692176 PB ieee/NUMERIC_STD 1381692181 LB opcodes \
-      PH opcodes/opcodes 1422589749 LB ALUCommands PH ALUCommands/ALUCommands 1422589750
+      PH opcodes/opcodes 1422620475 LB ALUCommands PH ALUCommands/ALUCommands 1422620476
 AR work/AVRRegisters/DataFlow 1422532740 \
       FL /home/bryanhe/AVR-Processor/src/AVR/AVRRegisters.vhd \
       EN work/AVRRegisters 1422532739
 FL /home/bryanhe/AVR-Processor/src/AVR/RegTest.vhd 2015/01/29.03:58:50 P.20131013
 EN work/REG_TEST 1422532743 FL /home/bryanhe/AVR-Processor/src/AVR/RegTest.vhd \
       PB ieee/std_logic_1164 1381692176 PB ieee/std_logic_arith 1381692177 \
-      PB ieee/NUMERIC_STD 1381692181 LB opcodes PH opcodes/opcodes 1422589749
+      PB ieee/NUMERIC_STD 1381692181 LB opcodes PH opcodes/opcodes 1422620475
 AR work/REG_TEST/Stuctural 1422532744 \
       FL /home/bryanhe/AVR-Processor/src/AVR/RegTest.vhd EN work/REG_TEST 1422532743 \
       CP work/AVRRegisters CP work/AVRControl
@@ -38,7 +31,7 @@ FL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU.vhd 2015/01/29.19:
 EN work/ALU 1422589761 \
       FL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU.vhd \
       PB ieee/std_logic_1164 1381692176 PB ieee/NUMERIC_STD 1381692181 LB opcodes \
-      PH opcodes/opcodes 1422589749 LB ALUCommands PH ALUCommands/ALUCommands 1422589750
+      PH opcodes/opcodes 1422620475 LB ALUCommands PH ALUCommands/ALUCommands 1422620476
 AR work/ALU/DataFlow 1422589762 \
       FL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALU.vhd \
       EN work/ALU 1422589761 CP work/ALUFBlock CP work/ALUShiftBlock \
@@ -79,6 +72,15 @@ AR work/ALUStatus/DataFlow 1422589760 \
       FL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUStatus.vhd \
       EN work/ALUStatus 1422589759
 FL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUTest.vhd 2015/01/25.15:57:25 P.20131013
+FL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRControl.vhd 2015/01/30.03:59:18 P.20131013
+EN work/AVRControl 1422620477 \
+      FL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRControl.vhd \
+      PB ieee/std_logic_1164 1381692176 PB ieee/NUMERIC_STD 1381692181 \
+      PB ieee/STD_LOGIC_UNSIGNED 1381692179 LB opcodes PH opcodes/opcodes 1422620475 \
+      LB ALUCommands PH ALUCommands/ALUCommands 1422620476
+AR work/AVRControl/DataFlow 1422620478 \
+      FL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRControl.vhd \
+      EN work/AVRControl 1422620477
 FL C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRRegisters.vhd 2015/01/26.20:59:21 P.20131013
 FL "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/ALUMulBlock.vhd" 2015/01/25.15:39:21 P.20131013
 FL "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/ALUTest.vhd" 2015/01/25.15:39:47 P.20131013
