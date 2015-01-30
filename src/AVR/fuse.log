@@ -1,12 +1,14 @@
-Running: D:\Xilinx\14.7\ISE_DS\ISE\bin\nt64\unwrapped\fuse.exe -intstyle ise -incremental -o D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/REG_TEST_TB_isim_beh.exe -prj D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/REG_TEST_TB_beh.prj work.REG_TEST_TB 
+Running: D:\Xilinx\14.7\ISE_DS\ISE\bin\nt64\unwrapped\fuse.exe -intstyle ise -incremental -o C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/REG_TEST_TB_isim_beh.exe -prj C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/REG_TEST_TB_beh.prj work.REG_TEST_TB 
 ISim P.20131013 (signature 0x7708f090)
-Number of CPUs detected in this system: 8
-Turning on mult-threading, number of parallel sub-compilation jobs: 16 
+Number of CPUs detected in this system: 4
+Turning on mult-threading, number of parallel sub-compilation jobs: 8 
 Determining compilation order of HDL files
-Parsing VHDL file "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/opcodes.vhd" into library opcodes
-Parsing VHDL file "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/ALUCommands.vhd" into library ALUCommands
-Parsing VHDL file "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/RegTest.vhd" into library work
-Parsing VHDL file "D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/REG_TEST_TB.vhd" into library work
+Parsing VHDL file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/opcodes.vhd" into library opcodes
+Parsing VHDL file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/ALUCommands.vhd" into library ALUCommands
+Parsing VHDL file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRRegisters.vhd" into library work
+Parsing VHDL file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/AVRControl.vhd" into library work
+Parsing VHDL file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/RegTest.vhd" into library work
+Parsing VHDL file "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/REG_TEST_TB.vhd" into library work
 Starting static elaboration
 Completed static elaboration
 Compiling package standard
@@ -15,11 +17,14 @@ Compiling package numeric_std
 Compiling package opcodes
 Compiling package alucommands
 Compiling package std_logic_arith
+Compiling package std_logic_unsigned
+Compiling architecture dataflow of entity AVRRegisters [avrregisters_default]
+Compiling architecture dataflow of entity AVRControl [avrcontrol_default]
 Compiling architecture stuctural of entity REG_TEST [reg_test_default]
 Compiling architecture tb_architecture of entity reg_test_tb
 Time Resolution for simulation is 1ps.
-Waiting for 1 sub-compilation(s) to finish...
-Compiled 9 VHDL Units
-Built simulation executable D:/Google Drive/Dropbox/git/AVR-Processor/src/AVR/REG_TEST_TB_isim_beh.exe
-Fuse Memory Usage: 37932 KB
-Fuse CPU Usage: 717 ms
+Waiting for 3 sub-compilation(s) to finish...
+Compiled 14 VHDL Units
+Built simulation executable C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/REG_TEST_TB_isim_beh.exe
+Fuse Memory Usage: 35304 KB
+Fuse CPU Usage: 2921 ms

@@ -15,11 +15,12 @@
 struct XSI_INFO xsi_info;
 
 char *IEEE_P_2592010699;
-char *STD_STANDARD;
-char *OPCODES_P_2431924499;
-char *ALUCOMMANDS_P_1015570589;
 char *IEEE_P_3499444699;
 char *IEEE_P_1242562249;
+char *OPCODES_P_2431924499;
+char *STD_STANDARD;
+char *ALUCOMMANDS_P_1015570589;
+char *IEEE_P_3620187407;
 
 
 int main(int argc, char **argv)
@@ -33,6 +34,9 @@ int main(int argc, char **argv)
     opcodes_p_2431924499_init();
     alucommands_p_1015570589_init();
     ieee_p_3499444699_init();
+    ieee_p_3620187407_init();
+    work_a_0227929785_3990940387_init();
+    work_a_0742008511_3990940387_init();
     work_a_1282967129_1115916627_init();
     work_a_2476457035_2494385415_init();
 
@@ -41,11 +45,12 @@ int main(int argc, char **argv)
 
     IEEE_P_2592010699 = xsi_get_engine_memory("ieee_p_2592010699");
     xsi_register_ieee_std_logic_1164(IEEE_P_2592010699);
-    STD_STANDARD = xsi_get_engine_memory("std_standard");
-    OPCODES_P_2431924499 = xsi_get_engine_memory("opcodes_p_2431924499");
-    ALUCOMMANDS_P_1015570589 = xsi_get_engine_memory("alucommands_p_1015570589");
     IEEE_P_3499444699 = xsi_get_engine_memory("ieee_p_3499444699");
     IEEE_P_1242562249 = xsi_get_engine_memory("ieee_p_1242562249");
+    OPCODES_P_2431924499 = xsi_get_engine_memory("opcodes_p_2431924499");
+    STD_STANDARD = xsi_get_engine_memory("std_standard");
+    ALUCOMMANDS_P_1015570589 = xsi_get_engine_memory("alucommands_p_1015570589");
+    IEEE_P_3620187407 = xsi_get_engine_memory("ieee_p_3620187407");
 
     return xsi_run_simulation(argc, argv);
 

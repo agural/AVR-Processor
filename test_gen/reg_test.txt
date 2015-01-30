@@ -1,0 +1,861 @@
+
+
+-- Testing: CPC
+IR <= "0000011000111110";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+assert(RegBOut = "00000000");
+RegIn <= "10000100";
+wait for 10 ns;
+
+
+-- Testing: ADC
+IR <= "0001111011000110";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+assert(RegBOut = "00000000");
+RegIn <= "10101110";
+wait for 10 ns;
+
+
+-- Testing: ORI
+IR <= "0110000011110000";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "11110001";
+wait for 10 ns;
+
+
+-- Testing: SBC
+IR <= "0000100110111001";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+assert(RegBOut = "00000000");
+RegIn <= "11101011";
+wait for 10 ns;
+
+
+-- Testing: BSET
+IR <= "1001010001001000";
+wait for 10 ns;
+wait for 10 ns;
+
+
+-- Testing: SUBI
+IR <= "0101000011000000";
+wait for 10 ns;
+assert(RegAOut = "10101110");
+RegIn <= "10011001";
+wait for 10 ns;
+
+
+-- Testing: ADIW
+IR <= "1001011000000000";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "00000110";
+wait for 10 ns;
+IR <= "1001011000000000";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "10110111";
+wait for 10 ns;
+
+
+-- Testing: SBCI
+IR <= "0100000011110000";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "00010010";
+wait for 10 ns;
+
+
+-- Testing: CPI
+IR <= "0011000010000000";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "10111011";
+wait for 10 ns;
+
+
+-- Testing: CPC
+IR <= "0000011001101111";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+assert(RegBOut = "00000000");
+RegIn <= "00000011";
+wait for 10 ns;
+
+
+-- Testing: ADIW
+IR <= "1001011000000000";
+wait for 10 ns;
+assert(RegAOut = "00000110");
+RegIn <= "00100101";
+wait for 10 ns;
+IR <= "1001011000000000";
+wait for 10 ns;
+assert(RegAOut = "10110111");
+RegIn <= "00011111";
+wait for 10 ns;
+
+
+-- Testing: BLD
+IR <= "1111100101000100";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "10010110";
+wait for 10 ns;
+
+
+-- Testing: INC
+IR <= "1001010001010011";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "00010011";
+wait for 10 ns;
+
+
+-- Testing: SUB
+IR <= "0001100010011010";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+assert(RegBOut = "00000000");
+RegIn <= "00011100";
+wait for 10 ns;
+
+
+-- Testing: NEG
+IR <= "1001010011100001";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "00100000";
+wait for 10 ns;
+
+
+-- Testing: ANDI
+IR <= "0111000011110000";
+wait for 10 ns;
+assert(RegAOut = "11110001");
+RegIn <= "01000000";
+wait for 10 ns;
+
+
+-- Testing: SWAP
+IR <= "1001010101100010";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "00010010";
+wait for 10 ns;
+
+
+-- Testing: ADD
+IR <= "0000111100100110";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+assert(RegBOut = "00010010");
+RegIn <= "10011110";
+wait for 10 ns;
+
+
+-- Testing: CPI
+IR <= "0011000010010000";
+wait for 10 ns;
+assert(RegAOut = "00011100");
+RegIn <= "10101101";
+wait for 10 ns;
+
+
+-- Testing: BSET
+IR <= "1001010001001000";
+wait for 10 ns;
+wait for 10 ns;
+
+
+-- Testing: BSET
+IR <= "1001010000111000";
+wait for 10 ns;
+wait for 10 ns;
+
+
+-- Testing: ASR
+IR <= "1001010100000101";
+wait for 10 ns;
+assert(RegAOut = "01000000");
+RegIn <= "00110010";
+wait for 10 ns;
+
+
+-- Testing: CPI
+IR <= "0011000000010000";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "11110110";
+wait for 10 ns;
+
+
+-- Testing: SBC
+IR <= "0000101100011101";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+assert(RegBOut = "00000000");
+RegIn <= "11100001";
+wait for 10 ns;
+
+
+-- Testing: SUBI
+IR <= "0101000011110000";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "10110000";
+wait for 10 ns;
+
+
+-- Testing: CPC
+IR <= "0000010110010010";
+wait for 10 ns;
+assert(RegAOut = "00100101");
+assert(RegBOut = "00000000");
+RegIn <= "10111001";
+wait for 10 ns;
+
+
+-- Testing: SUBI
+IR <= "0101000011110000";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "00101100";
+wait for 10 ns;
+
+
+-- Testing: NEG
+IR <= "1001010111100001";
+wait for 10 ns;
+assert(RegAOut = "00010010");
+RegIn <= "10011001";
+wait for 10 ns;
+
+
+-- Testing: ADC
+IR <= "0001110010010000";
+wait for 10 ns;
+assert(RegAOut = "00011100");
+assert(RegBOut = "00000000");
+RegIn <= "10110010";
+wait for 10 ns;
+
+
+-- Testing: BSET
+IR <= "1001010000111000";
+wait for 10 ns;
+wait for 10 ns;
+
+
+-- Testing: ADD
+IR <= "0000111001110110";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+assert(RegBOut = "00010010");
+RegIn <= "10111111";
+wait for 10 ns;
+
+
+-- Testing: LSR
+IR <= "1001010101100110";
+wait for 10 ns;
+assert(RegAOut = "00010010");
+RegIn <= "00101101";
+wait for 10 ns;
+
+
+-- Testing: AND
+IR <= "0010000011100110";
+wait for 10 ns;
+assert(RegAOut = "00100000");
+assert(RegBOut = "00000000");
+RegIn <= "10000011";
+wait for 10 ns;
+
+
+-- Testing: ADIW
+IR <= "1001011000010000";
+wait for 10 ns;
+assert(RegAOut = "11101011");
+RegIn <= "11111111";
+wait for 10 ns;
+IR <= "1001011000010000";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "01101001";
+wait for 10 ns;
+
+
+-- Testing: ADD
+IR <= "0000110000011101";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+assert(RegBOut = "00000000");
+RegIn <= "11010001";
+wait for 10 ns;
+
+
+-- Testing: DEC
+IR <= "1001010111011010";
+wait for 10 ns;
+assert(RegAOut = "00101100");
+RegIn <= "00010110";
+wait for 10 ns;
+
+
+-- Testing: BCLR
+IR <= "1001010011011000";
+wait for 10 ns;
+wait for 10 ns;
+
+
+-- Testing: SBC
+IR <= "0000100001001111";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+assert(RegBOut = "00000000");
+RegIn <= "01001010";
+wait for 10 ns;
+
+
+-- Testing: ADIW
+IR <= "1001011000000000";
+wait for 10 ns;
+assert(RegAOut = "00100101");
+RegIn <= "00111001";
+wait for 10 ns;
+IR <= "1001011000000000";
+wait for 10 ns;
+assert(RegAOut = "00011111");
+RegIn <= "00101100";
+wait for 10 ns;
+
+
+-- Testing: INC
+IR <= "1001010010110011";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "00010010";
+wait for 10 ns;
+
+
+-- Testing: NEG
+IR <= "1001010100110001";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "10011110";
+wait for 10 ns;
+
+
+-- Testing: ADC
+IR <= "0001111101000101";
+wait for 10 ns;
+assert(RegAOut = "10010110");
+assert(RegBOut = "00000000");
+RegIn <= "11010100";
+wait for 10 ns;
+
+
+-- Testing: SWAP
+IR <= "1001010101000010";
+wait for 10 ns;
+assert(RegAOut = "11010100");
+RegIn <= "01011001";
+wait for 10 ns;
+
+
+-- Testing: BLD
+IR <= "1111100101010010";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "00100010";
+wait for 10 ns;
+
+
+-- Testing: SUBI
+IR <= "0101000011000000";
+wait for 10 ns;
+assert(RegAOut = "10011001");
+RegIn <= "11010011";
+wait for 10 ns;
+
+
+-- Testing: INC
+IR <= "1001010011010011";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "11010011";
+wait for 10 ns;
+
+
+-- Testing: ADD
+IR <= "0000110101010110";
+wait for 10 ns;
+assert(RegAOut = "00100010");
+assert(RegBOut = "00000000");
+RegIn <= "11011001";
+wait for 10 ns;
+
+
+-- Testing: NEG
+IR <= "1001010010100001";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "11000000";
+wait for 10 ns;
+
+
+-- Testing: SUBI
+IR <= "0101000010110000";
+wait for 10 ns;
+assert(RegAOut = "00010010");
+RegIn <= "10000001";
+wait for 10 ns;
+
+
+-- Testing: MUL
+IR <= "1001110001001110";
+wait for 10 ns;
+assert(RegAOut = "01001010");
+assert(RegBOut = "10000011");
+RegIn <= "01011111";
+wait for 10 ns;
+IR <= "1001110001001110";
+wait for 10 ns;
+assert(RegAOut = "01001010");
+assert(RegBOut = "10000011");
+RegIn <= "01010000";
+wait for 10 ns;
+
+
+-- Testing: LSR
+IR <= "1001010101000110";
+wait for 10 ns;
+assert(RegAOut = "01011001");
+RegIn <= "10001101";
+wait for 10 ns;
+
+
+-- Testing: NEG
+IR <= "1001010110110001";
+wait for 10 ns;
+assert(RegAOut = "11111111");
+RegIn <= "00010101";
+wait for 10 ns;
+
+
+-- Testing: LSR
+IR <= "1001010110110110";
+wait for 10 ns;
+assert(RegAOut = "00010101");
+RegIn <= "10000010";
+wait for 10 ns;
+
+
+-- Testing: OR
+IR <= "0010101110000000";
+wait for 10 ns;
+assert(RegAOut = "00101100");
+assert(RegBOut = "00110010");
+RegIn <= "10010010";
+wait for 10 ns;
+
+
+-- Testing: BCLR
+IR <= "1001010011101000";
+wait for 10 ns;
+wait for 10 ns;
+
+
+-- Testing: SUBI
+IR <= "0101000001010000";
+wait for 10 ns;
+assert(RegAOut = "00010011");
+RegIn <= "01101001";
+wait for 10 ns;
+
+
+-- Testing: CPI
+IR <= "0011000011110000";
+wait for 10 ns;
+assert(RegAOut = "10010010");
+RegIn <= "01101010";
+wait for 10 ns;
+
+
+-- Testing: SBIW
+IR <= "1001011100100000";
+wait for 10 ns;
+assert(RegAOut = "00010110");
+RegIn <= "11011001";
+wait for 10 ns;
+IR <= "1001011100100000";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "00010110";
+wait for 10 ns;
+
+
+-- Testing: DEC
+IR <= "1001010001111010";
+wait for 10 ns;
+assert(RegAOut = "10111111");
+RegIn <= "11010100";
+wait for 10 ns;
+
+
+-- Testing: SUBI
+IR <= "0101000010100000";
+wait for 10 ns;
+assert(RegAOut = "11000000");
+RegIn <= "11010000";
+wait for 10 ns;
+
+
+-- Testing: INC
+IR <= "1001010010000011";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "11111010";
+wait for 10 ns;
+
+
+-- Testing: DEC
+IR <= "1001010110111010";
+wait for 10 ns;
+assert(RegAOut = "10000010");
+RegIn <= "10101101";
+wait for 10 ns;
+
+
+-- Testing: INC
+IR <= "1001010001000011";
+wait for 10 ns;
+assert(RegAOut = "01001010");
+RegIn <= "01111001";
+wait for 10 ns;
+
+
+-- Testing: CP
+IR <= "0001011100101011";
+wait for 10 ns;
+assert(RegAOut = "10011110");
+assert(RegBOut = "10101101");
+RegIn <= "00100101";
+wait for 10 ns;
+
+
+-- Testing: EOR
+IR <= "0010011001011100";
+wait for 10 ns;
+assert(RegAOut = "01101001");
+assert(RegBOut = "00010110");
+RegIn <= "11110100";
+wait for 10 ns;
+
+
+-- Testing: ADC
+IR <= "0001111100111000";
+wait for 10 ns;
+assert(RegAOut = "10011110");
+assert(RegBOut = "10010010");
+RegIn <= "00101000";
+wait for 10 ns;
+
+
+-- Testing: INC
+IR <= "1001010010110011";
+wait for 10 ns;
+assert(RegAOut = "10000001");
+RegIn <= "11000101";
+wait for 10 ns;
+
+
+-- Testing: DEC
+IR <= "1001010110011010";
+wait for 10 ns;
+assert(RegAOut = "00111001");
+RegIn <= "10010111";
+wait for 10 ns;
+
+
+-- Testing: BST
+IR <= "1111101010101110";
+wait for 10 ns;
+assert(RegAOut = "11010000");
+wait for 10 ns;
+
+
+-- Testing: ADIW
+IR <= "1001011000010000";
+wait for 10 ns;
+assert(RegAOut = "10101101");
+RegIn <= "01101000";
+wait for 10 ns;
+IR <= "1001011000010000";
+wait for 10 ns;
+assert(RegAOut = "01101001");
+RegIn <= "11010100";
+wait for 10 ns;
+
+
+-- Testing: ROR
+IR <= "1001010010100111";
+wait for 10 ns;
+assert(RegAOut = "11010000");
+RegIn <= "00100101";
+wait for 10 ns;
+
+
+-- Testing: SBCI
+IR <= "0100000000010000";
+wait for 10 ns;
+assert(RegAOut = "01010000");
+RegIn <= "00010100";
+wait for 10 ns;
+
+
+-- Testing: SBC
+IR <= "0000100110111010";
+wait for 10 ns;
+assert(RegAOut = "01101000");
+assert(RegBOut = "00100101");
+RegIn <= "10100101";
+wait for 10 ns;
+
+
+-- Testing: LSR
+IR <= "1001010010000110";
+wait for 10 ns;
+assert(RegAOut = "11111010");
+RegIn <= "10001100";
+wait for 10 ns;
+
+
+-- Testing: SUB
+IR <= "0001100010011011";
+wait for 10 ns;
+assert(RegAOut = "10110010");
+assert(RegBOut = "11000101");
+RegIn <= "10000111";
+wait for 10 ns;
+
+
+-- Testing: COM
+IR <= "1001010011000000";
+wait for 10 ns;
+assert(RegAOut = "11010011");
+RegIn <= "11110001";
+wait for 10 ns;
+
+
+-- Testing: INC
+IR <= "1001010111010011";
+wait for 10 ns;
+assert(RegAOut = "11011001");
+RegIn <= "10010101";
+wait for 10 ns;
+
+
+-- Testing: NEG
+IR <= "1001010110110001";
+wait for 10 ns;
+assert(RegAOut = "10100101");
+RegIn <= "11000000";
+wait for 10 ns;
+
+
+-- Testing: CP
+IR <= "0001010010011000";
+wait for 10 ns;
+assert(RegAOut = "10000111");
+assert(RegBOut = "10001100");
+RegIn <= "10011010";
+wait for 10 ns;
+
+
+-- Testing: DEC
+IR <= "1001010001101010";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "10110101";
+wait for 10 ns;
+
+
+-- Testing: SBIW
+IR <= "1001011100110000";
+wait for 10 ns;
+assert(RegAOut = "10110000");
+RegIn <= "11011001";
+wait for 10 ns;
+IR <= "1001011100110000";
+wait for 10 ns;
+assert(RegAOut = "10011001");
+RegIn <= "00100011";
+wait for 10 ns;
+
+
+-- Testing: COM
+IR <= "1001010101010000";
+wait for 10 ns;
+assert(RegAOut = "11011001");
+RegIn <= "00111000";
+wait for 10 ns;
+
+
+-- Testing: ASR
+IR <= "1001010100010101";
+wait for 10 ns;
+assert(RegAOut = "11100001");
+RegIn <= "01101100";
+wait for 10 ns;
+
+
+-- Testing: LSR
+IR <= "1001010001100110";
+wait for 10 ns;
+assert(RegAOut = "10110101");
+RegIn <= "01001110";
+wait for 10 ns;
+
+
+-- Testing: LSR
+IR <= "1001010100000110";
+wait for 10 ns;
+assert(RegAOut = "00110010");
+RegIn <= "11111110";
+wait for 10 ns;
+
+
+-- Testing: SBCI
+IR <= "0100000011110000";
+wait for 10 ns;
+assert(RegAOut = "01101100");
+RegIn <= "11100010";
+wait for 10 ns;
+
+
+-- Testing: BSET
+IR <= "1001010000111000";
+wait for 10 ns;
+wait for 10 ns;
+
+
+-- Testing: MUL
+IR <= "1001110001110101";
+wait for 10 ns;
+assert(RegAOut = "11010100");
+assert(RegBOut = "11110100");
+RegIn <= "00111000";
+wait for 10 ns;
+IR <= "1001110001110101";
+wait for 10 ns;
+assert(RegAOut = "11010100");
+assert(RegBOut = "11110100");
+RegIn <= "00101010";
+wait for 10 ns;
+
+
+-- Testing: LSR
+IR <= "1001010010010110";
+wait for 10 ns;
+assert(RegAOut = "10000111");
+RegIn <= "10000010";
+wait for 10 ns;
+
+
+-- Testing: NEG
+IR <= "1001010110100001";
+wait for 10 ns;
+assert(RegAOut = "11010100");
+RegIn <= "01111000";
+wait for 10 ns;
+
+
+-- Testing: CP
+IR <= "0001011000110001";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+assert(RegBOut = "11100010");
+RegIn <= "00100110";
+wait for 10 ns;
+
+
+-- Testing: SBIW
+IR <= "1001011100010000";
+wait for 10 ns;
+assert(RegAOut = "11000000");
+RegIn <= "00111110";
+wait for 10 ns;
+IR <= "1001011100010000";
+wait for 10 ns;
+assert(RegAOut = "01111000");
+RegIn <= "01100010";
+wait for 10 ns;
+
+
+-- Testing: DEC
+IR <= "1001010101101010";
+wait for 10 ns;
+assert(RegAOut = "00101101");
+RegIn <= "00110100";
+wait for 10 ns;
+
+
+-- Testing: ANDI
+IR <= "0111000011110000";
+wait for 10 ns;
+assert(RegAOut = "10010111");
+RegIn <= "00111111";
+wait for 10 ns;
+
+
+-- Testing: ROR
+IR <= "1001010111100111";
+wait for 10 ns;
+assert(RegAOut = "00100011");
+RegIn <= "01101101";
+wait for 10 ns;
+
+
+-- Testing: ROR
+IR <= "1001010000110111";
+wait for 10 ns;
+assert(RegAOut = "00000000");
+RegIn <= "00101000";
+wait for 10 ns;
+
+
+-- Testing: BLD
+IR <= "1111100111100101";
+wait for 10 ns;
+assert(RegAOut = "01101101");
+RegIn <= "11001011";
+wait for 10 ns;
+
+
+-- Testing: LSR
+IR <= "1001010000110110";
+wait for 10 ns;
+assert(RegAOut = "00101000");
+RegIn <= "01000001";
+wait for 10 ns;
+
+
+-- Testing: BCLR
+IR <= "1001010011001000";
+wait for 10 ns;
+wait for 10 ns;
+
+
+-- Testing: CP
+IR <= "0001011001011011";
+wait for 10 ns;
+assert(RegAOut = "11110100");
+assert(RegBOut = "00111110");
+RegIn <= "00101000";
+wait for 10 ns;

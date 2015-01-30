@@ -5,14 +5,5 @@
      behavior or data corruption.  It is strongly advised that
      users do not edit the contents of this file. -->
 <messages>
-<msg type="error" file="HDLCompiler" num="439" delta="unknown" >"/home/bryanhe/AVR-Processor/src/AVR/ALUTest.vhd" Line 102: Formal port <arg fmt="%s" index="1">regstatus</arg> of mode <arg fmt="%s" index="2">inout</arg> cannot be associated with actual port <arg fmt="%s" index="3">statreg</arg> of mode <arg fmt="%s" index="4">out</arg>
-</msg>
-
-<msg type="error" file="HDLCompiler" num="101" delta="unknown" >"/home/bryanhe/AVR-Processor/src/AVR/ALUTest.vhd" Line 102: <arg fmt="%s" index="1">statreg</arg> with mode &apos;out&apos; cannot be read
-</msg>
-
-<msg type="error" file="HDLCompiler" num="854" delta="unknown" >"/home/bryanhe/AVR-Processor/src/AVR/ALUTest.vhd" Line 59: Unit &lt;<arg fmt="%s" index="1">structural</arg>&gt; ignored due to previous errors.
-</msg>
-
 </messages>
 

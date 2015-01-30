@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2015-01-29T19:55:49</DateModified>
+  <DateModified>2015-01-29T21:23:49</DateModified>
   <ModuleName>ALU_TEST</ModuleName>
   <SummaryTimeStamp>Unknown</SummaryTimeStamp>
-  <SavedFilePath>/home/bryanhe/AVR-Processor/src/AVR/iseconfig/ALU_TEST.xreport</SavedFilePath>
-  <ImplementationReportsDirectory>/home/bryanhe/AVR-Processor/src/AVR/</ImplementationReportsDirectory>
+  <SavedFilePath>C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/iseconfig/ALU_TEST.xreport</SavedFilePath>
+  <ImplementationReportsDirectory>C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR\</ImplementationReportsDirectory>
   <DateInitialized>2015-01-29T18:21:45</DateInitialized>
   <EnableMessageFiltering>false</EnableMessageFiltering>
  </header>
