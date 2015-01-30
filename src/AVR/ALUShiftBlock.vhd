@@ -27,7 +27,6 @@ entity ALUShiftBlock is
         opA         : in  std_logic_vector(7 downto 0);
         carry       : in  std_logic;
         
-        statusN     : out std_logic;
         statusV     : out std_logic;
         statusC     : out std_logic;
         result      : out std_logic_vector(7 downto 0)
@@ -39,7 +38,6 @@ architecture DataFlow of ALUShiftBlock is
 begin
     result  <= tempOut;
     
-    statusN <= tempOut(tempOut'length - 1);
     statusV <= opA(0) XOR tempOut(tempOut'length - 1);
     statusC <= opA(0);
     

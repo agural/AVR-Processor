@@ -39,7 +39,6 @@ architecture DataFlow of ALU is
     signal F_result  : std_logic_vector(7 downto 0);
 
     -- garbage signals for shift
-    signal shift_statusN : std_logic;
     signal shift_statusV : std_logic;
     signal shift_statusC : std_logic;
     signal shift_result  : std_logic_vector(7 downto 0);
@@ -57,7 +56,6 @@ architecture DataFlow of ALU is
     -- garbage signals for status
     signal statusH : std_logic;
     signal statusV : std_logic;
-    signal statusN : std_logic;
     signal statusC : std_logic;
 
     signal ALUResult : std_logic_vector(7 downto 0);
@@ -81,7 +79,6 @@ begin
         opA     => opA,
         carry   => RegStatus(flag_C),
 
-        statusN => shift_statusN,
         statusV => shift_statusV,
         statusC => shift_statusC,
         result  => shift_result
@@ -128,13 +125,7 @@ begin
                'X'           when (ALUBlockSel = ALUMulBlock)   else
                'X';
 
-    statusN <= 'X'           when (ALUBlockSel = ALUFBlock)     else
-               shift_statusN when (ALUBlockSel = ALUShiftBlock) else
-               'X'           when (ALUBlockSel = ALUAddBlock)   else
-               'X'           when (ALUBlockSel = ALUMulBlock)   else
-               'X';
-
-    statusC <= 'X'           when (ALUBlockSel = ALUFBlock)     else
+    statusC <= '1'           when (ALUBlockSel = ALUFBlock)     else    -- 1 for COM (others don't matter)
                shift_statusC when (ALUBlockSel = ALUShiftBlock) else
                add_statusC   when (ALUBlockSel = ALUAddBlock)   else
                mul_statusC   when (ALUBlockSel = ALUMulBlock)   else
@@ -150,7 +141,6 @@ begin
 
         statusH => statusH,
         statusV => statusV,
-        statusN => statusN,
         statusC => statusC,
 
         bitChangeEn => ALUStatusBitChangeEn,

@@ -30,7 +30,6 @@ entity ALUStatus is
         
         statusH     : in  std_logic;    -- input flags from ALU calculation
         statusV     : in  std_logic;
-        statusN     : in  std_logic;
         statusC     : in  std_logic;
         
         bitChangeEn : in  std_logic;    -- allow change to individual status bits outside normal mode
@@ -44,8 +43,11 @@ end ALUStatus;
 
 architecture DataFlow of ALUStatus is
     signal temp_status  : std_logic_vector(7 downto 0);
+    signal statusN      : std_logic;
 begin
-    process(ALUResult, statusMask, statusH, statusV, statusN, statusC, bitChangeEn, bitClrSet, bitT)
+    statusN <= ALUResult(ALUResult'length - 1); -- high bit is sign bit
+    
+    process(ALUResult, statusMask, statusH, statusV, statusC, bitChangeEn, bitClrSet, bitT)
     begin
         result <= ALUResult;
         if (bitT = '0' AND bitChangeEn = '0') then  -- Normal operation
@@ -56,7 +58,7 @@ begin
             
             -- Z
             if (statusMask(1) = '1') then
-                if (ALUResult = std_logic_vector(to_unsigned(0, 8))) then
+                if (ALUResult = std_logic_vector(to_unsigned(0, ALUResult'length))) then
                     temp_status(1) <= '1';
                 else
                     temp_status(1) <= '0';
