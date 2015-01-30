@@ -222,6 +222,8 @@ begin
                 ALUStatusMask <= flag_mask_ZNVS;
                 ALUBlockSel <= ALUAddBlock;
                 ALUBlockInstructionSel <= AddBlockSub;
+                ALUOp2Sel <= ImmedOp2;
+                ImmediateOut <= "00000001";
             end if;
 
             if std_match(IR, OpEOR   ) then
@@ -234,6 +236,8 @@ begin
                 ALUStatusMask <= flag_mask_ZNVS;
                 ALUBlockSel <= ALUAddBlock;
                 ALUBlockInstructionSel <= AddBlockAdd;
+                ALUOp2Sel <= ImmedOp2;
+                ImmediateOut <= "00000001";
             end if;
 
             if std_match(IR, OpLSR   ) then

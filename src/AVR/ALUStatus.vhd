@@ -107,11 +107,6 @@ begin
         end if;
     end process;
 
-    process(clk)
-    begin
-        if (rising_edge(clk)) then
-            status <= temp_status;
-        end if;
-    end process;
+    status <= temp_status;
 end DataFlow;
 

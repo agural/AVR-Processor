@@ -1,4 +1,4 @@
-Running: /opt/Xilinx/14.7/ISE_DS/ISE/bin/lin64/unwrapped/fuse -intstyle ise -incremental -o /home/bryanhe/AVR-Processor/src/AVR/testbench_isim_beh.exe -prj /home/bryanhe/AVR-Processor/src/AVR/testbench_beh.prj work.testbench 
+Running: /opt/Xilinx/14.7/ISE_DS/ISE/bin/lin64/unwrapped/fuse -relaunch -intstyle "ise" -incremental -o "/home/bryanhe/AVR-Processor/src/AVR/testbench_isim_beh.exe" -prj "/home/bryanhe/AVR-Processor/src/AVR/testbench_beh.prj" "work.testbench" 
 ISim P.20131013 (signature 0xfbc00daa)
 Number of CPUs detected in this system: 8
 Turning on mult-threading, number of parallel sub-compilation jobs: 16 
@@ -17,8 +17,8 @@ Parsing VHDL file "/home/bryanhe/AVR-Processor/src/AVR/ALU_TEST_TB.vhd" into lib
 Starting static elaboration
 WARNING:HDLCompiler:746 - "/build/xfndry10/P.20131013/rtf/vhdl/src/ieee/numeric_std.vhd" Line 3225: Range is empty (null range)
 Completed static elaboration
-Fuse Memory Usage: 98980 KB
-Fuse CPU Usage: 1130 ms
+Fuse Memory Usage: 98972 KB
+Fuse CPU Usage: 1200 ms
 Compiling package standard
 Compiling package std_logic_1164
 Compiling package numeric_std
@@ -37,15 +37,9 @@ Compiling architecture dataflow of entity AVRControl [avrcontrol_default]
 Compiling architecture structural of entity ALU_TEST [alu_test_default]
 Compiling architecture tb_architecture of entity testbench
 Time Resolution for simulation is 1ps.
-<<<<<<< HEAD
-Compiled 14 VHDL Units
-Built simulation executable C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/REG_TEST_TB_isim_beh.exe
-Fuse Memory Usage: 52892 KB
-Fuse CPU Usage: 5655 ms
-=======
+Waiting for 1 sub-compilation(s) to finish...
 Compiled 25 VHDL Units
 Built simulation executable /home/bryanhe/AVR-Processor/src/AVR/testbench_isim_beh.exe
-Fuse Memory Usage: 1205816 KB
-Fuse CPU Usage: 1450 ms
-GCC CPU Usage: 5730 ms
->>>>>>> 2d0c4a7f7b48a2c5965aa93ffe3cfb51d315b6c7
+Fuse Memory Usage: 1205884 KB
+Fuse CPU Usage: 1420 ms
+GCC CPU Usage: 380 ms

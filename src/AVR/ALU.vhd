@@ -35,6 +35,7 @@ architecture DataFlow of ALU is
     signal opA      : std_logic_vector(7 downto 0);
     signal opB      : std_logic_vector(7 downto 0);
     signal status   : std_logic_vector(7 downto 0);
+    signal carry    : std_logic;
 
     -- garbage signals for Fblock
     signal F_result  : std_logic_vector(7 downto 0);
@@ -79,7 +80,7 @@ begin
     port map (
         operand => ALUBlockInstructionSel(2 downto 0),
         opA     => opA,
-        carry   => status(flag_C),
+        carry   => carry,
 
         statusV => shift_statusV,
         statusC => shift_statusC,
@@ -91,7 +92,7 @@ begin
         operand => ALUBlockInstructionSel(2 downto 0),
         opA     => opA,
         opB     => opB,
-        carry   => status(flag_C),
+        carry   => carry,
 
         statusH => add_statusH,
         statusV => add_statusV,
@@ -152,5 +153,12 @@ begin
         status => status,
         result => RegIn
     );
+
+    SaveCarry : process(clock)
+    begin
+        if (rising_edge(clock)) then
+            carry <= status(flag_C);
+        end if;
+    end process SaveCarry;
 end DataFlow;
 
