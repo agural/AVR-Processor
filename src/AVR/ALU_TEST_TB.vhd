@@ -42,6 +42,50 @@ begin
         status := (others => '-');
         for i in 0 to max_value loop
             for j in 0 to max_value loop
+                --    "001000rdddddrrrr";
+                IR <= "001000XXXXXXXXXX";
+                OperandA <= std_logic_vector(to_unsigned(i, 8));
+                OperandB <= std_logic_vector(to_unsigned(j, 8));
+                wait until (clock = '1');
+                wait until (clock = '1');
+                answer := (OperandA and OperandB);
+
+                if (answer = "00000000") then
+                    status(flag_Z) := '1';
+                else
+                    status(flag_Z) := '0';
+                end if;
+
+                status(flag_N) := answer(7);
+                status(flag_V) := '0';
+                status(flag_S) := status(flag_N) xor status(flag_V);
+
+                -- verify that result matches
+                assert (std_match(Result, answer))
+                    report "Wrong answer for AND(" &
+                        integer'image(to_integer(unsigned(OperandA))) & ", " &
+                        integer'image(to_integer(unsigned(OperandB))) & ") = " &
+                        integer'image(to_integer(unsigned(answer))) &
+                        " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
+                severity ERROR;
+
+                -- verify that result matches
+                assert (std_match(StatReg, status))
+                    report "Wrong status for AND(" &
+                        integer'image(to_integer(unsigned(OperandA))) & ", " &
+                        integer'image(to_integer(unsigned(OperandB))) & ") = " &
+                        integer'image(to_integer(unsigned(answer))) & " (Got " &
+                        integer'image(to_integer(unsigned(StatReg))) & " instead of " &
+                        integer'image(to_integer(unsigned(status))) & ")"
+                severity ERROR;
+            end loop;
+        end loop;
+
+        report "DONE WITH AND";
+
+        status := (others => '-');
+        for i in 0 to max_value loop
+            for j in 0 to max_value loop
                 --    "001001rdddddrrrr";
                 IR <= "001001XXXXXXXXXX";
                 OperandA <= std_logic_vector(to_unsigned(i, 8));
@@ -49,17 +93,17 @@ begin
                 wait until (clock = '1');
                 wait until (clock = '1');
                 answer := (OperandA xor OperandB);
-                
-					 if (answer = "00000000") then
-					     status(flag_Z) := '1';
-					 else
-					     status(flag_Z) := '0';
-				    end if;
+
+                if (answer = "00000000") then
+                    status(flag_Z) := '1';
+                else
+                    status(flag_Z) := '0';
+                end if;
 
                 status(flag_N) := answer(7);
-					 status(flag_V) := '0';
-					 status(flag_S) := status(flag_N) xor status(flag_V);
-					 
+                status(flag_V) := '0';
+                status(flag_S) := status(flag_N) xor status(flag_V);
+
                 -- verify that result matches
                 assert (std_match(Result, answer))
                     report "Wrong answer for XOR(" &
@@ -75,8 +119,8 @@ begin
                         integer'image(to_integer(unsigned(OperandA))) & ", " &
                         integer'image(to_integer(unsigned(OperandB))) & ") = " &
                         integer'image(to_integer(unsigned(answer))) & " (Got " &
-								integer'image(to_integer(unsigned(StatReg))) & " instead of " &
-								integer'image(to_integer(unsigned(status))) & ")"
+                        integer'image(to_integer(unsigned(StatReg))) & " instead of " &
+                        integer'image(to_integer(unsigned(status))) & ")"
                 severity ERROR;
             end loop;
         end loop;
