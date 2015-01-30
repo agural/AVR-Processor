@@ -33,7 +33,6 @@ architecture DataFlow of ALU is
     signal F_result  : std_logic_vector(7 downto 0);
 
     -- garbage signals for shift
-    signal shift_operand : std_logic_vector(2 downto 0);
     signal shift_carry   : std_logic;
 
     signal shift_statusN : std_logic;
@@ -42,7 +41,6 @@ architecture DataFlow of ALU is
     signal shift_result  : std_logic_vector(7 downto 0);
 
     -- garbage signals for add
-    signal add_operand : std_logic_vector(2 downto 0);
     signal add_carry   : std_logic;
 
     signal add_statusH : std_logic;
@@ -51,7 +49,6 @@ architecture DataFlow of ALU is
     signal add_result  : std_logic_vector(7 downto 0);
 
     -- garbage signals for mul
-    signal mul_operand : std_logic;
 
     signal mul_carry   : std_logic;
     signal mul_result  : std_logic_vector(7 downto 0);
@@ -81,7 +78,7 @@ begin
 
     ShiftBlock : entity work.ALUShiftBlock
     port map (
-        operand => shift_operand,
+        operand => ALUBlockInstructionSel(2 downto 0),
         opA     => opA,
         carry   => shift_carry,
 
@@ -93,7 +90,7 @@ begin
     
     AddBlock : entity work.ALUAddBlock
     port map (
-        operand => add_operand,
+        operand => ALUBlockInstructionSel(2 downto 0),
         opA     => opA,
         opB     => opB,
         carry   => add_carry,
@@ -106,7 +103,7 @@ begin
     
     MulBlock : entity work.ALUMulBlock
     port map (
-        operand => mul_operand,
+        operand => ALUBlockInstructionSel(0),
         opA     => opA,
         opB     => opB,
 
