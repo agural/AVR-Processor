@@ -38,12 +38,57 @@ begin
        variable answer   : std_logic_vector(7 downto 0);
        variable answer7  : std_logic_vector(7 downto 0);
        variable answer8  : std_logic_vector(8 downto 0);
+       variable answer16 : std_logic_vector(16 downto 0);
        variable answer4  : std_logic_vector(4 downto 0);
        variable status   : std_logic_vector(7 downto 0);
        variable temp     : std_logic_vector(7 downto 0);
        constant max_value : integer := ((2 ** 8) - 1); -- maximum possible input
     begin
         status := (others => '-');
+
+        for i in 1 to max_value loop
+            for j in 1 to max_value loop
+                --    "100111rdddddrrrr";
+                IR <= "100111XXXXXXXXXX";
+                OperandA <= std_logic_vector(to_unsigned(i, 8));
+                OperandB <= std_logic_vector(to_unsigned(j, 8));
+                answer16 := std_logic_vector(to_unsigned(i * j, 16));
+                wait until (clock = '1');
+                wait until (clock = '1');
+
+                -- verify that result matches
+                assert (std_match(Result, answer16(7 downto 0)))
+                    report "Wrong answer for MUL(" &
+                        integer'image(to_integer(unsigned(OperandA))) & ", " &
+                        integer'image(to_integer(unsigned(OperandB))) & ") = " &
+                        integer'image(to_integer(unsigned(answer))) &
+                        " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
+                severity ERROR;
+
+                wait until (clock = '1');
+
+                -- verify that result matches
+                assert (std_match(Result, answer16(15 downto 8)))
+                    report "Wrong answer for MUL(" &
+                        integer'image(to_integer(unsigned(OperandA))) & ", " &
+                        integer'image(to_integer(unsigned(OperandB))) & ") = " &
+                        integer'image(to_integer(unsigned(answer))) &
+                        " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
+                severity ERROR;
+
+                ---- verify that result matches
+                --assert (std_match(StatReg, status))
+                --    report "Wrong status for MUL(" &
+                --        integer'image(to_integer(unsigned(OperandA))) & ", " &
+                --        integer'image(to_integer(unsigned(temp))) & ") = " &
+                --        integer'image(to_integer(unsigned(answer))) & " (Got " &
+                --        integer'image(to_integer(unsigned(StatReg))) & " instead of " &
+                --        integer'image(to_integer(unsigned(status))) & ")"
+                --severity ERROR;
+            end loop;
+        end loop;
+
+        report "DONE WITH MUL";
 
         for i in 0 to max_value loop
             for j in 0 to max_value loop
