@@ -1,3 +1,22 @@
+----------------------------------------------------------------------------
+--
+--  Atmel AVR Register Array Test Bench
+--
+--  Because of the nature of the tests required, it was seen as a lot
+--  simpler to create a C++ program to generate the tests.
+--  This allows us to use smart data structures that prevent excessive
+--  code duplication.
+--  
+--  The C++ generator code can be found in:
+--      ../../test_gen/reg_test_generator.cpp
+--  And the associated generated tests are in:
+--      ../../test_gen/reg_test.txt
+--
+--  Revision History:
+--      01/28/15    Bryan He        initial version
+--
+----------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -35,6 +54,7 @@ begin
 
     -- generate the stimulus and test the design
     tb : process
+       -- answers of different lengths (to help compute flags)
        variable answer   : std_logic_vector(7 downto 0);
        variable answer7  : std_logic_vector(7 downto 0);
        variable answer8  : std_logic_vector(8 downto 0);
@@ -45,6 +65,7 @@ begin
        variable temp     : std_logic_vector(7 downto 0);
        constant max_value : integer := ((2 ** 8) - 1); -- maximum possible input
     begin
+        -- initially status is unknown (so do not check values)
         status := (others => '-');
         
         -- clear all status bits
@@ -68,6 +89,7 @@ begin
         wait for 20 ns;
         
         
+        -- Test NEG
         for i in 0 to max_value loop
             --    "1001010ddddd0001";
             wait until (clock = '1');
@@ -91,8 +113,8 @@ begin
             status(flag_N) := answer(7);
             status(flag_C) := answer8(8);
             status(flag_H) := answer4(4);
-            status(flag_V) := answer8(8) xor answer7(7); -- TODO
-            status(flag_S) := status(flag_N) xor status(flag_V); -- TODO
+            status(flag_V) := answer8(8) xor answer7(7);
+            status(flag_S) := status(flag_N) xor status(flag_V);
 
             -- verify that result matches
             assert (std_match(Result, answer))
@@ -115,6 +137,7 @@ begin
         report "DONE WITH NEG";
         
 
+        -- Test Mul
         --    "100111rdddddrrrr";
         IR <= "100111XXXXXXXXXX";
         wait until (clock = '1');
@@ -159,6 +182,7 @@ begin
 
         report "DONE WITH MUL";
 
+        -- Test SBCI
         for i in 0 to max_value loop
             for j in 0 to max_value loop
                 --    "0100KKKKddddKKKK";
@@ -214,6 +238,7 @@ begin
         report "DONE WITH SBCI";
         
 
+        -- Test SUBI
         for i in 0 to max_value loop
             for j in 0 to max_value loop
                 --    "0101KKKKddddKKKK";
@@ -269,6 +294,7 @@ begin
         report "DONE WITH SUBI";
         
 
+        -- Test Not
         for i in 0 to max_value loop
             --    "1001010ddddd0000";
             IR <= "1001010XXXXX0000";
@@ -309,6 +335,7 @@ begin
 
         report "DONE WITH NOT";
 
+        -- Test Dec
         for i in 0 to max_value loop
             --    "1001010ddddd1010";
             IR <= "1001010XXXXX1010";
@@ -352,6 +379,7 @@ begin
 
         report "DONE WITH DEC";
 
+        -- Test Inc
         for i in 0 to max_value loop
             --    "1001010ddddd0011";
             IR <= "1001010XXXXX0011";
@@ -395,6 +423,7 @@ begin
 
         report "DONE WITH INC";
 
+        -- Test SBC
         -- clear carry flag
         IR <= "1001010010001000";
         status(flag_c) := '0';
@@ -454,6 +483,7 @@ begin
         report "DONE WITH SBC";
 
 
+         -- Test Sub
          for i in 0 to max_value loop
              for j in 0 to max_value loop
                  --    "000110rdddddrrrr";
@@ -507,6 +537,7 @@ begin
          report "DONE WITH SUB";
 
 
+        -- Test Add with carry
         -- clear carry flag
         IR <= "1001010010001000";
         status(flag_c) := '0';
@@ -566,6 +597,7 @@ begin
         report "DONE WITH ADC";
 
 
+        -- Test add
         for i in 0 to max_value loop
             for j in 0 to max_value loop
                 --    "000011rdddddrrrr";
@@ -618,6 +650,7 @@ begin
 
         report "DONE WITH ADD";
 
+        -- Test BSET
         for i in 0 to 7 loop
             --    "100101000sss1000";
             IR <= "100101000XXX1000";
@@ -650,12 +683,13 @@ begin
         report "DONE WITH BSET";
 
 
+        -- Test BCLR
         for i in 0 to 7 loop
             --    "100101001sss1000";
             IR <= "100101001XXX1000";
             IR(6 downto 4) <= std_logic_vector(to_unsigned(i, 3));
             OperandA <= "00000000";
-            OperandB <= "00000000";
+            OperandB <= "11111111";
             wait until (clock = '1');
             wait until (clock = '1');
             answer := (0 => status(i), others => '0');
@@ -682,6 +716,7 @@ begin
         report "DONE WITH BCLR";
 
 
+        -- Test Swap
         for i in 0 to max_value loop
             --    "1001010ddddd0010";
             IR <= "1001010XXXXX0010";
@@ -711,6 +746,7 @@ begin
 
         report "DONE WITH SWAP";
 
+        -- Test Rotate Right
         for i in 0 to max_value loop
             --    "1001010ddddd0111";
             IR <= "1001010XXXXX0111";
@@ -751,6 +787,7 @@ begin
 
         report "DONE WITH ROR";
 
+        -- Test Logical Shift
         for i in 0 to max_value loop
             --    "1001010ddddd0110";
             IR <= "1001010XXXXX0110";
@@ -792,6 +829,7 @@ begin
         report "DONE WITH LSR";
 
 
+        -- Test Arithmetic Shift
         for i in 0 to max_value loop
             --    "1001010ddddd0101";
             IR <= "1001010XXXXX0101";
@@ -832,12 +870,11 @@ begin
 
         report "DONE WITH ASR";
 
+        -- Test And I
         for i in 0 to max_value loop
             for j in 0 to max_value loop
                 wait until (clock = '1');
-					 wait for 5 ns;
                 --    "0110KKKKddddKKKK";
-
                 IR <= "0111XXXXXXXXXXXX";
                 OperandA <= std_logic_vector(to_unsigned(i, 8));
                 OperandB <= "XXXXXXXX";
@@ -882,6 +919,7 @@ begin
         report "DONE WITH ANDI";
 
 
+        -- Test OrI
         for i in 0 to max_value loop
             for j in 0 to max_value loop
                 --    "0110KKKKddddKKKK";
@@ -928,6 +966,7 @@ begin
 
         report "DONE WITH ORI";
 
+        -- Test Or
         for i in 0 to max_value loop
             for j in 0 to max_value loop
                 --    "001010rdddddrrrr";
@@ -973,6 +1012,7 @@ begin
 
 
 
+        -- Test And
         for i in 0 to max_value loop
             for j in 0 to max_value loop
                 --    "001000rdddddrrrr";
@@ -1016,6 +1056,7 @@ begin
 
         report "DONE WITH AND";
 
+        -- Test Exclusive Or
         for i in 0 to max_value loop
             for j in 0 to max_value loop
                 --    "001001rdddddrrrr";
