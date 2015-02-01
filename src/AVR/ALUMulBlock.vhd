@@ -33,7 +33,7 @@ entity ALUMulBlock is
 end ALUMulBlock;
 
 architecture DataFlow of ALUMulBlock is
-    signal leftover : std_logic_vector(7 downto 0);
+    signal leftover : std_logic_vector(5 downto 0);
     signal partial  : std_logic_vector(13 downto 0);
 begin
     process (operand, opA, opB)
@@ -43,13 +43,13 @@ begin
         -- A * B = (AH + AL) * (BH + BL) = AH * BH + AH * BL + AL * BH + AL * BL
         -- the low byte is the low byte of AH * BL + AL * BH + AL * BL
         if (operand = '0') then
-            partial  <= std_logic_vector((unsigned("0" & opA(3 downto 0) & "00") * unsigned("0" & opB(7 downto 4) & "00")) +
-                                         (unsigned("0" & opA(7 downto 4) & "00") * unsigned("0" & opB(3 downto 0) & "00")) +
-                                         (unsigned("000" & opA(3 downto 0))      * unsigned("000" & opB(3 downto 0))));
+            partial  <= std_logic_vector(("00" & unsigned(opA(3 downto 0)) * unsigned(opB(7 downto 4)) & "0000") +
+                                         ("00" & unsigned(opA(7 downto 4)) * unsigned(opB(3 downto 0)) & "0000") +
+                                         ("000000" & unsigned(opA(3 downto 0)) * unsigned(opB(3 downto 0))));
         -- the high byte is the sum of AH * BH and the leftover from the low byte computation
         else
-            partial  <= std_logic_vector((unsigned("000" & opA(7 downto 4)) * unsigned("000" & opB(7 downto 4))) +
-                                          unsigned("000000" & leftover));
+            partial  <= std_logic_vector(("000000" & unsigned(opA(7 downto 4)) * unsigned(opB(7 downto 4))) +
+                                          unsigned("00000000" & leftover));
         end if;
     end process;
     
@@ -57,7 +57,7 @@ begin
     begin
         result   <= partial(7 downto 0);
         carry    <= partial(8);
-        leftover <= std_logic_vector("00" & partial(13 downto 8));
+        leftover <= std_logic_vector(partial(13 downto 8));
     end process;
 end DataFlow;
 
