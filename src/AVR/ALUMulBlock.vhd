@@ -46,10 +46,10 @@ begin
         -- A * B = (AH + AL) * (BH + BL) = AH * BH + AH * BL + AL * BH + AL * BL
         -- the low byte is the low byte of AH * BL + AL * BH + AL * BL
         if (operand = '0') then
-            partial  <= std_logic_vector((signed(std_logic_vector(to_signed(0, 2)) & opA(3 downto 0)) *
-                                          signed(std_logic_vector(to_signed(0, 2)) & opB(7 downto 4))  ) +
-                                         (signed(std_logic_vector(to_signed(0, 2)) & opA(7 downto 4)) *
-                                          signed(std_logic_vector(to_signed(0, 2)) & opB(3 downto 0))  ) +
+            partial  <= std_logic_vector((signed(opA(3 downto 0) & std_logic_vector(to_signed(0, 2))) *
+                                          signed(opB(7 downto 4) & std_logic_vector(to_signed(0, 2)))  ) +
+                                         (signed(opA(7 downto 4) & std_logic_vector(to_signed(0, 2))) *
+                                          signed(opB(3 downto 0) & std_logic_vector(to_signed(0, 2)))  ) +
                                          (signed(std_logic_vector(to_signed(0, 2)) & opA(3 downto 0)) *
                                           signed(std_logic_vector(to_signed(0, 2)) & opB(3 downto 0))  ));
         -- the high byte is the sum of AH * BH and the leftover from the low byte computation
