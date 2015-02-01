@@ -10,6 +10,7 @@
 --     20 Apr 98  Glen George       Fixed minor syntax bugs.
 --     18 Apr 04  Glen George       Updated comments and formatting.
 --     21 Jan 06  Glen George       Updated comments.
+--     28 Jan 15  Bryan He          Added connections to ALU and control block
 --
 ----------------------------------------------------------------------------
 
@@ -57,6 +58,7 @@ entity  ALU_TEST  is
 end  ALU_TEST;
 
 architecture Structural of ALU_TEST is
+    -- Communication between Control Unit and ALU
     signal ALUBlockSel            : std_logic_vector(1 downto 0);
     signal ALUBlockInstructionSel : std_logic_vector(3 downto 0);
 
@@ -80,6 +82,8 @@ architecture Structural of ALU_TEST is
 
 begin
 
+    -- Connect the ALU to the testing interface (reads input values and gives
+    -- status and result)
     ALU : entity work.ALU
     port map (
         clock => clock,
@@ -102,6 +106,8 @@ begin
         RegStatus => StatReg
     );
 
+    -- Connect the Control Unit to the testing interface (reads instruction
+    -- and tells ALU what to do)
     ControlUnit : entity work.AVRControl
     port map (
         clock                  => clock,
@@ -119,7 +125,5 @@ begin
         SelA                   => SelA,
         SelB                   => SelB
     );
-
-
 
 end Structural;
