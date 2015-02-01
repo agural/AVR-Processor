@@ -141,7 +141,7 @@ begin
                     report "Wrong answer for MUL(" &
                         integer'image(to_integer(unsigned(OperandA))) & ", " &
                         integer'image(to_integer(unsigned(OperandB))) & ") = " &
-                        integer'image(to_integer(unsigned(answer16))) &
+                        integer'image(to_integer(unsigned(answer15))) &
                         " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
                 severity ERROR;
 
