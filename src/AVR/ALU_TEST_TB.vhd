@@ -94,9 +94,9 @@ begin
             --    "1001010ddddd0001";
             wait until (clock = '1');
             IR <= "1001010XXXXX0001";
+            wait until (clock = '1');
             OperandA <= std_logic_vector(to_unsigned(i, 8));
             OperandB <= "00000000";
-            wait until (clock = '1');
             wait until (clock = '1');
             
             answer  := std_logic_vector(-signed(OperandA));
@@ -187,11 +187,11 @@ begin
             for j in 0 to max_value loop
                 --    "0100KKKKddddKKKK";
                 IR <= "0100XXXXXXXXXXXX";
-                OperandA <= std_logic_vector(to_unsigned(i, 8));
                 temp := std_logic_vector(to_unsigned(j, 8));
                 IR(11 downto 8) <= temp(7 downto 4);
                 IR(3 downto 0) <= temp(3 downto 0);
                 wait until (clock = '1');
+                OperandA <= std_logic_vector(to_unsigned(i, 8));
                 wait until (clock = '1');
                 answer := std_logic_vector(unsigned(OperandA) - unsigned(temp) - ("0000000" & status(flag_C)));
                 answer8 := std_logic_vector(unsigned('0' & OperandA) - unsigned('0' & temp) - ("00000000" & status(flag_C)));
@@ -243,11 +243,11 @@ begin
             for j in 0 to max_value loop
                 --    "0101KKKKddddKKKK";
                 IR <= "0101XXXXXXXXXXXX";
-                OperandA <= std_logic_vector(to_unsigned(i, 8));
                 temp := std_logic_vector(to_unsigned(j, 8));
                 IR(11 downto 8) <= temp(7 downto 4);
                 IR(3 downto 0) <= temp(3 downto 0);
                 wait until (clock = '1');
+                OperandA <= std_logic_vector(to_unsigned(i, 8));
                 wait until (clock = '1');
                 answer := std_logic_vector(unsigned(OperandA) - unsigned(temp));
                 answer8 := std_logic_vector(unsigned('0' & OperandA) - unsigned('0' & temp));
@@ -298,9 +298,9 @@ begin
         for i in 0 to max_value loop
             --    "1001010ddddd0000";
             IR <= "1001010XXXXX0000";
+            wait until (clock = '1');
             OperandA <= std_logic_vector(to_unsigned(i, 8));
             OperandB <= "00000000";
-            wait until (clock = '1');
             wait until (clock = '1');
             answer := not OperandA;
 
@@ -339,9 +339,9 @@ begin
         for i in 0 to max_value loop
             --    "1001010ddddd1010";
             IR <= "1001010XXXXX1010";
+            wait until (clock = '1');
             OperandA <= std_logic_vector(to_unsigned(i, 8));
             OperandB <= "00000000";
-            wait until (clock = '1');
             wait until (clock = '1');
             answer := std_logic_vector(unsigned(OperandA) - "00000001");
 
@@ -876,12 +876,12 @@ begin
                 wait until (clock = '1');
                 --    "0110KKKKddddKKKK";
                 IR <= "0111XXXXXXXXXXXX";
-                OperandA <= std_logic_vector(to_unsigned(i, 8));
-                OperandB <= "XXXXXXXX";
                 temp := std_logic_vector(to_unsigned(j, 8));
                 IR(11 downto 8) <= temp(7 downto 4);
                 IR(3 downto 0)  <= temp(3 downto 0);
                 wait until (clock = '1');
+                OperandA <= std_logic_vector(to_unsigned(i, 8));
+                OperandB <= "XXXXXXXX";
                 wait until (clock = '1');
                 answer := (OperandA and std_logic_vector(to_unsigned(j, 8)));
 
@@ -924,12 +924,12 @@ begin
             for j in 0 to max_value loop
                 --    "0110KKKKddddKKKK";
                 IR <= "0110XXXXXXXXXXXX";
-                OperandA <= std_logic_vector(to_unsigned(i, 8));
-                OperandB <= "XXXXXXXX";
                 temp := std_logic_vector(to_unsigned(j, 8));
                 IR(11 downto 8) <= temp(7 downto 4);
                 IR(3 downto 0)  <= temp(3 downto 0);
                 wait until (clock = '1');
+                OperandA <= std_logic_vector(to_unsigned(i, 8));
+                OperandB <= "XXXXXXXX";
                 wait until (clock = '1');
                 answer := (OperandA or std_logic_vector(to_unsigned(j, 8)));
 
@@ -971,9 +971,9 @@ begin
             for j in 0 to max_value loop
                 --    "001010rdddddrrrr";
                 IR <= "001010XXXXXXXXXX";
+                wait until (clock = '1');
                 OperandA <= std_logic_vector(to_unsigned(i, 8));
                 OperandB <= std_logic_vector(to_unsigned(j, 8));
-                wait until (clock = '1');
                 wait until (clock = '1');
                 answer := (OperandA or OperandB);
 
@@ -1017,9 +1017,9 @@ begin
             for j in 0 to max_value loop
                 --    "001000rdddddrrrr";
                 IR <= "001000XXXXXXXXXX";
+                wait until (clock = '1');
                 OperandA <= std_logic_vector(to_unsigned(i, 8));
                 OperandB <= std_logic_vector(to_unsigned(j, 8));
-                wait until (clock = '1');
                 wait until (clock = '1');
                 answer := (OperandA and OperandB);
 
@@ -1061,9 +1061,9 @@ begin
             for j in 0 to max_value loop
                 --    "001001rdddddrrrr";
                 IR <= "001001XXXXXXXXXX";
+                wait until (clock = '1');
                 OperandA <= std_logic_vector(to_unsigned(i, 8));
                 OperandB <= std_logic_vector(to_unsigned(j, 8));
-                wait until (clock = '1');
                 wait until (clock = '1');
                 answer := (OperandA xor OperandB);
 

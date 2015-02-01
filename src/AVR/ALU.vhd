@@ -101,7 +101,7 @@ begin
     ShiftBlock : entity work.ALUShiftBlock
     port map (
         operand => ALUBlockInstructionSel(2 downto 0),
-        opA     => opA,
+        op      => opA,
         carry   => carry,
 
         statusV => shift_statusV,
