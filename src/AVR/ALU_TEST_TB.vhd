@@ -73,7 +73,8 @@ begin
             IR <= "1001010XXXXX0001";
             OperandA <= std_logic_vector(to_unsigned(i, 8));
             OperandB <= "00000000";
-            wait for 10 ns;
+            wait until (clock = '1');
+            wait until (clock = '1');
             
             answer  := std_logic_vector(-signed(OperandA));
             answer4 := std_logic_vector(-signed('0' & OperandA(3 downto 0)));
