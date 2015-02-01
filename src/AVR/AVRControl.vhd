@@ -2,7 +2,6 @@
 -- Company:         Caltech EE 119B
 -- Engineer:        Albert Gural and Bryan He
 -- 
--- Create Date:     15:07:46 01/25/2015
 -- Design Name:     AVR-Processor
 -- Module Name:     AVRControl - DataFlow 
 -- Project Name:    AVR-Processor
