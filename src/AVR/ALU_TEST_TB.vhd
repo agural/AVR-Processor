@@ -115,18 +115,18 @@ begin
         report "DONE WITH NEG";
         
 
+        --    "100111rdddddrrrr";
+        IR <= "100111XXXXXXXXXX";
+        wait until (clock = '1');
         for i in 1 to max_value loop
             for j in 1 to max_value loop
-                --    "100111rdddddrrrr";
-                IR <= "100111XXXXXXXXXX";
                 OperandA <= std_logic_vector(to_unsigned(i, 8));
                 OperandB <= std_logic_vector(to_unsigned(j, 8));
                 answer15 := std_logic_vector(to_unsigned(i * j, 16));
                 wait until (clock = '1');
-                wait until (clock = '1');
 
                 -- verify that result matches
-                assert (std_match(Result, answer15(15 downto 8)))
+                assert (std_match(Result, answer15(7 downto 0)))
                     report "Wrong answer for MUL(" &
                         integer'image(to_integer(unsigned(OperandA))) & ", " &
                         integer'image(to_integer(unsigned(OperandB))) & ") = " &
@@ -137,7 +137,7 @@ begin
                 wait until (clock = '1');
 
                 -- verify that result matches
-                assert (std_match(Result, answer15(7 downto 0)))
+                assert (std_match(Result, answer15(15 downto 8)))
                     report "Wrong answer for MUL(" &
                         integer'image(to_integer(unsigned(OperandA))) & ", " &
                         integer'image(to_integer(unsigned(OperandB))) & ") = " &
