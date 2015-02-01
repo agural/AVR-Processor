@@ -1,20 +1,17 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company:         Caltech EE 119B
+-- Engineer:        Albert Gural and Bryan He
 -- 
--- Create Date:    15:07:46 01/25/2015 
--- Design Name: 
--- Module Name:    ALUFBlock - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
+-- Create Date:     15:07:46 01/25/2015
+-- Design Name:     AVR-Processor
+-- Module Name:     ALUFBlock - DataFlow 
+-- Project Name:    AVR-Processor
+-- Target Devices:  Xilinx Spartan III XC3S1200EFGG3204C
+-- Tool versions:   Xilinx ISE 14.7
+-- Description:     Computes logical operations on two arguments.
 --
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
+-- Revision: 1.0
+-- For file history, see https://github.com/agural/AVR-Processor 
 --
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -23,11 +20,11 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity ALUFBlock is
     port (
-        operand     : in  std_logic_vector(3 downto 0);
-        opA         : in  std_logic_vector(7 downto 0);
-        opB         : in  std_logic_vector(7 downto 0);
+        operand     : in  std_logic_vector(3 downto 0);     -- Selects which logic operation to do
+        opA         : in  std_logic_vector(7 downto 0);     -- Argument A
+        opB         : in  std_logic_vector(7 downto 0);     -- Argument B
         
-        result      : out std_logic_vector(7 downto 0)
+        result      : out std_logic_vector(7 downto 0)      -- Result of logic operation
     );
 end ALUFBlock;
 
