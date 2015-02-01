@@ -2,8 +2,19 @@
 --
 --  Atmel AVR Register Array Test Bench
 --
+--  Because of the nature of the tests required, it was seen as a lot
+--  simpler to create a C++ program to generate the tests.
+--  This allows us to use smart data structures that prevent excessive
+--  code duplication.
+--  
+--  The C++ generator code can be found in:
+--      ../../test_gen/reg_test_generator.cpp
+--  And the associated generated tests are in:
+--      ../../test_gen/reg_test.txt
+--
 --  Revision History:
 --      01/25/15    Peter Cuy       initial version
+--      01/28/15    Albert Gural    added C++ generated tests
 --
 ----------------------------------------------------------------------------
 -- bring in the necessary packages
