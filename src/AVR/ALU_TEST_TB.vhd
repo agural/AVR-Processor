@@ -118,8 +118,8 @@ begin
         --    "100111rdddddrrrr";
         IR <= "100111XXXXXXXXXX";
         wait until (clock = '1');
-        for i in 1 to max_value loop
-            for j in 1 to max_value loop
+        for i in 0 to max_value loop
+            for j in 0 to max_value loop
                 OperandA <= std_logic_vector(to_unsigned(i, 8));
                 OperandB <= std_logic_vector(to_unsigned(j, 8));
                 answer15 := std_logic_vector(to_unsigned(i * j, 16));
