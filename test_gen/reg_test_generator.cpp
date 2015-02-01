@@ -39,6 +39,7 @@ SUB     000110
 */
 void op_standard(string op, int ra, int rb) {
     cout << "IR <= \"" << op << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";" << endl;
+    cout << "wait until (clock = '1');" << endl;
     cout << "wait for 10 ns;" << endl;
     cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
     cout << "assert(RegBOut = \"" << regs[rb] << "\");" << endl;
@@ -61,6 +62,7 @@ SWAP    1001010     0010
 */
 void op_onearg(string op, int ra, int rb) {
     cout << "IR <= \"1001010" << to_bin(ra, 5) << op << "\";" << endl;
+    cout << "wait until (clock = '1');" << endl;
     cout << "wait for 10 ns;" << endl;
     cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
     string out = to_bin(rand() % 256, 8);
@@ -80,6 +82,7 @@ SUBI    0101
 void op_const(string op, int ra, int rb) {
     if(ra < 16) ra += 16;
     cout << "IR <= \"" << op << "0000" << to_bin(ra-16, 4) << "0000\";" << endl;
+    cout << "wait until (clock = '1');" << endl;
     cout << "wait for 10 ns;" << endl;
     cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
     string out = to_bin(rand() % 256, 8);
@@ -95,6 +98,7 @@ SBIW    10010111
 */
 void op_constw(string op, int ra, int rb) {
     cout << "IR <= \"1001011" << op << "00" << to_bin(ra, 2) << "0000\";" << endl;
+    cout << "wait until (clock = '1');" << endl;
     cout << "wait for 10 ns;" << endl;
     cout << "assert(RegAOut = \"" << regs[24 + 2 * ra] << "\");" << endl;
     string out = to_bin(rand() % 256, 8);
@@ -103,6 +107,7 @@ void op_constw(string op, int ra, int rb) {
     regs[24 + 2 * ra] = out;
 
     cout << "IR <= \"1001011" << op << "00" << to_bin(ra, 2) << "0000\";" << endl;
+    cout << "wait until (clock = '1');" << endl;
     cout << "wait for 10 ns;" << endl;
     cout << "assert(RegAOut = \"" << regs[25 + 2 * ra] << "\");" << endl;
     out = to_bin(rand() % 256, 8);
@@ -118,6 +123,7 @@ BSET    100101000   1000
 */
 void op_bit1(string op, int ra, int rb) {
     cout << "IR <= \"10010100" << op << to_bin(ra, 3) << "1000\";" << endl;
+    cout << "wait until (clock = '1');" << endl;
     cout << "wait for 10 ns;" << endl;
     cout << "wait for 10 ns;" << endl;
 }
@@ -129,6 +135,7 @@ BST     1111101     -
 */
 void op_bit2(string op, int ra, int rb) {
     cout << "IR <= \"111110" << op << to_bin(ra, 5) << ((op == "1")?rand()%2:0) << to_bin(rb, 3) << "\";" << endl;
+    cout << "wait until (clock = '1');" << endl;
     cout << "wait for 10 ns;" << endl;
     cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
     if(op == "0") {
@@ -145,6 +152,7 @@ MUL     100111
 */
 void op_mult(string op, int ra, int rb) {
     cout << "IR <= \"" << op << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";" << endl;
+    cout << "wait until (clock = '1');" << endl;
     cout << "wait for 10 ns;" << endl;
     cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
     cout << "assert(RegBOut = \"" << regs[rb] << "\");" << endl;
@@ -154,6 +162,7 @@ void op_mult(string op, int ra, int rb) {
     regs[0] = out;
 
     cout << "IR <= \"" << op << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";" << endl;
+    cout << "wait until (clock = '1');" << endl;
     cout << "wait for 10 ns;" << endl;
     cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
     cout << "assert(RegBOut = \"" << regs[rb] << "\");" << endl;
@@ -209,6 +218,7 @@ int main () {
         int ra = i;
         int rb = i;
         cout << "IR <= \"" << codes["ADD"].second << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";" << endl;
+        cout << "wait until (clock = '1');" << endl;
         cout << "wait for 10 ns;" << endl;
         string out = to_bin(i, 8);
         cout << "RegIn <= \"" << out << "\";" << endl;
