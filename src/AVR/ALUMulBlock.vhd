@@ -36,6 +36,9 @@ architecture DataFlow of ALUMulBlock is
     signal leftover : std_logic_vector(7 downto 0);
     signal partial  : std_logic_vector(11 downto 0);
 begin
+    result   <= partial(7 downto 0);
+    carry    <= partial(8);
+    leftover <= std_logic_vector(to_signed(0, 4)) & partial(11 downto 8);
     process(operand, opA, opB)
     begin
         -- compute low byte
@@ -43,21 +46,17 @@ begin
         -- A * B = (AH + AL) * (BH + BL) = AH * BH + AH * BL + AL * BH + AL * BL
         -- the low byte is the low byte of AH * BL + AL * BH + AL * BL
         if (operand = '0') then
-            partial  <= std_logic_vector((signed(std_logic_vector(to_signed(0, 8)) & opA(3 downto 0)) *
-                                          signed(std_logic_vector(to_signed(0, 8)) & opB(7 downto 4))  ) +
-                                         (signed(std_logic_vector(to_signed(0, 8)) & opA(7 downto 4)) *
-                                          signed(std_logic_vector(to_signed(0, 8)) & opB(3 downto 0))  ) +
-                                         (signed(std_logic_vector(to_signed(0, 8)) & opA(3 downto 0)) *
-                                          signed(std_logic_vector(to_signed(0, 8)) & opB(3 downto 0))  ));
-            result   <= partial(7 downto 0);
-            leftover <= std_logic_vector(to_signed(0, 4)) & partial(11 downto 8);
+            partial  <= std_logic_vector((signed(std_logic_vector(to_signed(0, 2)) & opA(3 downto 0)) *
+                                          signed(std_logic_vector(to_signed(0, 2)) & opB(7 downto 4))  ) +
+                                         (signed(std_logic_vector(to_signed(0, 2)) & opA(7 downto 4)) *
+                                          signed(std_logic_vector(to_signed(0, 2)) & opB(3 downto 0))  ) +
+                                         (signed(std_logic_vector(to_signed(0, 2)) & opA(3 downto 0)) *
+                                          signed(std_logic_vector(to_signed(0, 2)) & opB(3 downto 0))  ));
         -- the high byte is the sum of AH * BH and the leftover from the low byte computation
         else
-            partial  <= std_logic_vector((signed(std_logic_vector(to_signed(0, 5)) & opA(7 downto 4)) *
-                                          signed(std_logic_vector(to_signed(0, 5)) & opB(7 downto 4))  ) +
-                                         signed('0' & leftover));
-            result   <= partial(7 downto 0);
-            carry    <= partial(8);
+            partial  <= std_logic_vector((signed(std_logic_vector(to_signed(0, 2)) & opA(7 downto 4)) *
+                                          signed(std_logic_vector(to_signed(0, 2)) & opB(7 downto 4))  ) +
+                                         signed("0000" & leftover));
         end if;
     end process;
 end DataFlow;
