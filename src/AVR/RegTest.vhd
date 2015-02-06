@@ -56,10 +56,18 @@ end  REG_TEST;
 architecture Stuctural of REG_TEST is
     -- Signals between control unit and registers
     signal EnableIn : std_logic;
-    signal SelIn    : std_logic_vector(4 downto 0);
-    signal SelA     : std_logic_vector(4 downto 0);
-    signal SelB     : std_logic_vector(4 downto 0);
+    signal SelIn    : std_logic_vector(6 downto 0);
+    signal SelA     : std_logic_vector(6 downto 0);
+    signal SelB     : std_logic_vector(6 downto 0);
 
+    signal RegDataInSel : std_logic_vector(1 downto 0); -- select value to update registers
+    signal SpecAddr     : std_logic_vector(1 downto 0); -- selects X, Y, Z, or SP
+    signal SpecWr       : std_logic;                    -- whether to write to the special addresses
+    signal AddrOffset   : std_logic_vector(15 downto 0); -- offset for address
+    signal MemRegAddr   : std_logic_vector(15 downto 0); -- register-based indirect memory access
+    signal DataIOSel    : std_logic;                 -- selects whether data is input or output
+    signal MemRegData   : std_logic_vector(7 downto 0);
+    
     -- Unused signals from Control Unit (should go to ALU)
     signal ALUStatusMask : std_logic_vector(7 downto 0);
     signal ALUStatusBitChangeEn : std_logic;
@@ -79,16 +87,33 @@ begin
         SelIn    => SelIn,
         SelA     => SelA,
         SelB     => SelB,
-        RegIn    => RegIn,
+
+        ALUIn        => RegIn,
+        RegDataImm   => ImmediateOut,
+        RegDataInSel => RegDataInSel,
 
         RegAOut  => RegAOut,
-        RegBOut  => RegBOut
+        RegBOut  => RegBOut,
+
+        SpecOut  => open,
+        SpecAddr => SpecAddr,
+        SpecWr   => SpecWr,
+
+        MemRegData => MemRegData,
+        AddrOffset => AddrOffset,
+        MemRegAddr => MemRegAddr,
+        DataIOSel  => DataIOSel,
+
+        Reset      => '1' -- no reset
     );
 
     ControlUnit : entity work.AVRControl
     port map (
         clock                  => clock,
         IR                     => IR,
+        ProgDB                 => (others => 'X'),
+        MemRegAddr             => MemRegAddr,
+
         ALUStatusMask          => ALUStatusMask,
         ALUStatusBitChangeEn   => ALUStatusBitChangeEn,
         ALUBitClrSet           => ALUBitClrSet,
@@ -97,10 +122,20 @@ begin
         ImmediateOut           => ImmediateOut,
         ALUBlockSel            => ALUBlockSel,
         ALUBlockInstructionSel => ALUBlockInstructionSel,
+
         EnableIn               => EnableIn,
         SelIn                  => SelIn,
         SelA                   => SelA,
-        SelB                   => SelB
+        SelB                   => SelB,
+
+        DataIOSel              => DataIOSel,
+        AddrOffset             => AddrOffset,
+        SpecAddr               => SpecAddr,
+        SpecWr                 => SpecWr,
+
+        RegDataInSel           => RegDataInSel,
+        MemAddr                => open
+
     );
 
 end Stuctural;

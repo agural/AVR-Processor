@@ -38,30 +38,28 @@ entity AVRRegisters is
         SelB     : in  std_logic_vector(6 downto 0); -- register to read from
 
         ALUIn        : in std_logic_vector(7 downto 0); -- ALU output
-        DataIn       : in std_logic_vector(7 downto 0); -- DMA output
         RegDataImm   : in std_logic_vector(7 downto 0); -- Control logic output
-        RegDataInSel : in std_logic_vector(2 downto 0); -- select value to update registers
+        RegDataInSel : in std_logic_vector(1 downto 0); -- select value to update registers
 
         RegAOut  : buffer std_logic_vector(7 downto 0); -- first output
         RegBOut  : out    std_logic_vector(7 downto 0); -- second output
 
-        SpecIn   : in  std_logic_vector(15 downto 0); -- Input to X, Y, Z, SP
         SpecOut  : out std_logic_vector(15 downto 0); -- Address Output (no offset)
-        SpecAddr : in  std_logic_vector(2 downto 0);  -- Select X, Y, Z, SP
+        SpecAddr : in  std_logic_vector(1 downto 0);  -- Select X, Y, Z, SP
         SpecWr   : in  std_logic;                     -- Write to X, Y, Z, SP
 
-        MemRegData : inout std_logic_vector(7 downto 0);  -- data bus
-        AddrOffset : in    std_logic_vector(15 downto 0); -- offset for address
-        MemRegAddr : out   std_logic_vector(15 downto 0); -- updated value for Control
-        DataIOSel  : in    std_logic;                     -- specifies input/output
-                                                          -- 0 - input from DB
-                                                          -- 1 - output from DB
+        MemRegData : inout  std_logic_vector(7 downto 0);  -- data bus
+        AddrOffset : in     std_logic_vector(15 downto 0); -- offset for address
+        MemRegAddr : buffer std_logic_vector(15 downto 0); -- updated value for Control
+        DataIOSel  : in     std_logic;                     -- specifies input/output
+                                                           -- 0 - input from DB
+                                                           -- 1 - output from DB
         Reset      : in std_logic -- reset signal for SP
     );
 end AVRRegisters;
 
 architecture DataFlow of AVRRegisters is
-    constant NUM_REGS : integer := 32; -- number of registers
+    constant NUM_REGS : integer := 96; -- number of registers (including IO)
 
     -- define the registers
     type REG_ARRAY is array (0 to NUM_REGS-1) of std_logic_vector(7 downto 0);
@@ -79,8 +77,9 @@ begin
                (others => 'X'); -- output for addr (before offset)
 
     RegIn <= ALUIn      when (RegDataInSel = "00") else
-             DataIn     when (RegDataInSel = "01") else
+             MemRegData when (RegDataInSel = "01") else
              RegDataImm when (RegDataInSel = "10") else
+             RegAOut    when (RegDataInSel = "11") else
              (others => 'X');
     MemRegAddr <= std_logic_vector(signed(RegIn) + signed(AddrOffset));
 
@@ -99,16 +98,16 @@ begin
             end if;
             if (SpecWr = '1') then
                 if    (SpecAddr = "00") then
-                    Registers(26) <= SpecIn(7 downto 0);
-                    Registers(27) <= SpecIn(15 downto 8);
+                    Registers(26) <= MemRegAddr(7 downto 0);
+                    Registers(27) <= MemRegAddr(15 downto 8);
                 elsif (SpecAddr = "01") then
-                    Registers(28) <= SpecIn(7 downto 0);
-                    Registers(29) <= SpecIn(15 downto 8);
+                    Registers(28) <= MemRegAddr(7 downto 0);
+                    Registers(29) <= MemRegAddr(15 downto 8);
                 elsif (SpecAddr = "10") then
-                    Registers(30) <= SpecIn(7 downto 0);
-                    Registers(31) <= SpecIn(15 downto 8);
+                    Registers(30) <= MemRegAddr(7 downto 0);
+                    Registers(31) <= MemRegAddr(15 downto 8);
                 elsif (SpecAddr = "11") then
-                    SP <= SpecIn;
+                    SP <= MemRegAddr;
                 end if;
             end if;
             if (Reset = '0') then

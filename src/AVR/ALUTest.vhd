@@ -112,6 +112,9 @@ begin
     port map (
         clock                  => clock,
         IR                     => IR,
+        ProgDB                 => (others => 'X'),
+        MemRegAddr             => (others => 'X'),
+
         ALUStatusMask          => ALUStatusMask,
         ALUStatusBitChangeEn   => ALUStatusBitChangeEn,
         ALUBitClrSet           => ALUBitClrSet,
@@ -120,10 +123,19 @@ begin
         ImmediateOut           => ImmediateOut,
         ALUBlockSel            => ALUBlockSel,
         ALUBlockInstructionSel => ALUBlockInstructionSel,
+        
         EnableIn               => EnableIn,
         SelIn                  => SelIn,
         SelA                   => SelA,
-        SelB                   => SelB
+        SelB                   => SelB,
+        
+        DataIOSel              => open,
+        AddrOffset             => open,
+        SpecAddr               => open,
+        SpecWr                 => open,
+
+        RegDataInSel           => open,
+        MemAddr                => open
     );
 
 end Structural;
