@@ -1,5 +1,0 @@
-set -tmpdir "/home/bryanhe/AVR-Processor/src/AVR/xst/projnav.tmp"
-set -xsthdpdir "/home/bryanhe/AVR-Processor/src/AVR/xst"
-elaborate
--ifn ALU_TEST.prj
--ifmt mixed

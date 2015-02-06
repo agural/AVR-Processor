@@ -1,3 +1,0 @@
-vhdl opcodes "opcodes.vhd"
-vhdl ALUCommands "ALUCommands.vhd"
-vhdl work "ALUMulBlock.vhd"

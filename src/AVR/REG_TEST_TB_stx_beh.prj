@@ -1,6 +1,0 @@
-vhdl opcodes "opcodes.vhd"
-vhdl ALUCommands "ALUCommands.vhd"
-vhdl isim_temp "AVRRegisters.vhd"
-vhdl isim_temp "AVRControl.vhd"
-vhdl isim_temp "RegTest.vhd"
-vhdl isim_temp "REG_TEST_TB.vhd"
