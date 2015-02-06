@@ -29,10 +29,10 @@ library ALUCommands;
 use ALUCommands.ALUCommands.all;
 
 
-entity testbench is
-end testbench;
+entity ALU_TEST_TB is
+end ALU_TEST_TB;
 
-architecture TB_ARCHITECTURE of testbench is
+architecture TB_ARCHITECTURE of ALU_TEST_TB is
     signal IR       : opcode_word;                       -- Instruction Register
     signal OperandA : std_logic_vector(7 downto 0);      -- first operand
     signal OperandB : std_logic_vector(7 downto 0);      -- second operand
