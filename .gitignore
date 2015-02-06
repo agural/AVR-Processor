@@ -41,6 +41,10 @@ impact_impact.xwbt
 *.xst
 *.spl
 *.sym
+*.syr
+*.xrpt
+*.xml
+src/AVR/xst
  
 #ignore OS noise
  
