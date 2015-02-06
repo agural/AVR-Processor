@@ -557,6 +557,20 @@ begin
                 end if;
             end if;
             
+            if ( std_match(IR, OpLDI) ) then
+                SelIn        <= "001" & IR(7 downto 4); -- Missing top bit
+                EnableIn     <= '1';                    -- we need to input into registers
+                ImmediateOut <= IR(11 downto 8) & IR(3 downto 0);
+                RegDataInSel <= "10";                   -- take data from immediate out
+            end if;
+            
+            if ( std_match(IR, OpMOV) ) then
+                -- SelIn default is correct (register d)
+                SelA         <= "00" & IR(9) & IR(3 downto 0);  -- Register r
+                EnableIn     <= '1';                    -- we need to input into registers
+                RegDataInSel <= "11";                   -- take data from registers
+            end if;
+            
         end if;
     end process DecodeInstruction;
 
