@@ -25,16 +25,22 @@ use ALUCommands.ALUCommands.all;
 
 entity DMAUnit is
     port (
-        clock                   : in  std_logic;                    -- system clock
-        MemAddr                 : in  std_logic_vector(15 downto 0);-- memory address to access (input)
-
-        MemAB                   : out std_logic_vector(15 downto 0) -- memory address (latched output)
+        clock       : in  std_logic;                        -- system clock
+        MemAddr     : in  std_logic_vector(15 downto 0);    -- memory address to access (input)
+        InRd        : in  std_logic;                        -- when to read from memory
+        InWr        : in  std_logic;                        -- when to write to memory
+        
+        OutRd       : out std_logic;                        -- timed output for when to read from memory
+        OutWr       : out std_logic;                        -- timed output for when to write to memory
+        MemAB       : out std_logic_vector(15 downto 0)     -- memory address (latched output)
     );
 end DMAUnit;
 
 architecture DataFlow of DMAUnit is
 begin
-
+    OutRd <= InRd or clock;
+    OutWr <= InWr or clock;
+    
     -- process to latch the address output
     UpdateAddress: process(clock)
     begin
