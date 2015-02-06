@@ -130,7 +130,7 @@ begin
         SpecAddr => SpecAddr,
         SpecWr   => SpecWr,
 
-        MemRegData => open,
+        MemRegData => DataDB,
         AddrOffset => AddrOffset,
         MemRegAddr => MemRegAddr,
         DataIOSel  => DataIOSel,
