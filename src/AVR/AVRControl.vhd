@@ -60,16 +60,21 @@ entity AVRControl is
         SpecAddr                : out std_logic_vector(1 downto 0); -- selects X, Y, Z, or SP
         SpecWr                  : out std_logic;                    -- whether to write to the special addresses
                                                                     -- (this is independent of the normal write to registers)
-        ReadOut                 : out std_logic;                    -- whether to read from memory
-        WriteOut                : out std_logic;                    -- whether to write to memory
+        OutRd                   : out std_logic;                    -- whether to read from memory
+        OutWr                   : out std_logic;                    -- whether to write to memory
         RegDataInSel            : out std_logic_vector(1 downto 0); -- selects which input goes to register in
         MemAddr                 : out std_logic_vector(15 downto 0) -- memory address (16 bits)
     );
 end AVRControl;
 
 architecture DataFlow of AVRControl is
-    signal CycleCount  :   std_logic_vector(1 downto 0) := "00"; -- which clock of instruction (for multi-clock instructions)
+    signal CycleCount  : std_logic_vector(1 downto 0) := "00"; -- which clock of instruction (for multi-clock instructions)
+    signal MemRegAddrM : std_logic; -- '1' when address outputs to memory; '0' when it outputs to the registers / IO
+    signal ProgDBM     : std_logic; -- '1' when address outputs to memory; '0' when it outputs to the registers / IO
 begin
+
+    MemRegAddrM <= '0' when to_integer(unsigned(MemRegAddr)) <= 95 else '1';
+    ProgDBM     <= '0' when to_integer(unsigned(ProgDB)) <= 95 else '1';
 
     -- Decode new instructions on clock edge
     DecodeInstruction: process (clock)
@@ -87,6 +92,9 @@ begin
             AddrOffset <= std_logic_vector(to_unsigned(0,16));-- default address offset is 0
             ImmediateOut <= IR(11 downto 8) & IR(3 downto 0); -- normal immediate value
             MemAddr <= MemRegAddr;          -- default use registers for indirect memory addressing
+            
+            OutRd  <= '1';                  -- default off (active low)
+            OutWr  <= '1';                  -- default off (active low)
 
             ALUBitClrSet <= StatusBitClear; -- arbitrary value (changed in cases where needed)
             ALUStatusBitChangeEn <= '0';    -- by default, do not change status bits
@@ -465,7 +473,7 @@ begin
                         AddrOffset <= std_logic_vector(to_signed(-1,16));
                         SpecWr <= '1';
                     
-                        if to_integer(unsigned(MemRegAddr)) <= 95 and IR(9) = '0' then
+                        if MemRegAddrM = '1' and IR(9) = '0' then
                             -- Send to registers instead of memory
                             RegDataInSel <= "11";   -- data from output of registers
                             SelA <= MemRegAddr(6 downto 0);
@@ -473,6 +481,11 @@ begin
                     end if;
                 end if;
                 if CycleCount(0) = '1' then
+                    if MemRegAddrM = '1' then
+                        OutRd  <= IR(9);        -- Read
+                        OutWr  <= not IR(9);    -- Write
+                    end if;
+                    
                     if IR(1 downto 0) = "00" then   -- no inc/dec
                         -- No action
                     end if;
@@ -480,7 +493,7 @@ begin
                         AddrOffset <= std_logic_vector(to_signed(1,16));
                         SpecWr <= '1';
                     
-                        if to_integer(unsigned(MemRegAddr)) <= 95 and IR(9) = '0' then
+                        if MemRegAddrM = '1' and IR(9) = '0' then
                             -- Send to registers instead of memory
                             RegDataInSel <= "11";   -- data from output of registers
                             SelA <= MemRegAddr(6 downto 0);
@@ -517,11 +530,16 @@ begin
                     -- No action
                 end if;
                 if CycleCount(0) = '1' then
+                    if MemRegAddrM = '1' then
+                        OutRd  <= IR(9);        -- Read
+                        OutWr  <= not IR(9);    -- Write
+                    end if;
+                    
                     AddrOffset <= std_logic_vector(to_signed(0,10)) &
                         IR(13) & IR(11 downto 10) & IR(2 downto 0);
                     SpecWr <= '1';
                     
-                    if to_integer(unsigned(MemRegAddr)) <= 95 and IR(9) = '0' then
+                    if MemRegAddrM = '1' and IR(9) = '0' then
                         -- Send to registers instead of memory
                         RegDataInSel <= "11";   -- data from output of registers
                         SelA <= MemRegAddr(6 downto 0);
@@ -544,7 +562,12 @@ begin
                     -- No action (waiting for m)
                 end if;
                 if CycleCount = "01" then
-                    if to_integer(unsigned(ProgDB)) <= 95 and IR(9) = '0' then
+                    if ProgDBM = '1' then
+                        OutRd  <= IR(9);        -- Read
+                        OutWr  <= not IR(9);    -- Write
+                    end if;
+                    
+                    if ProgDBM = '1' and IR(9) = '0' then
                         -- Send to registers instead of memory
                         RegDataInSel <= "11";   -- data from output of registers
                         SelA <= progDB(6 downto 0);
