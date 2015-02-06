@@ -59,7 +59,7 @@ entity AVRRegisters is
 end AVRRegisters;
 
 architecture DataFlow of AVRRegisters is
-    constant NUM_REGS : integer := 32; -- number of registers
+    constant NUM_REGS : integer := 96; -- number of registers (including IO)
 
     -- define the registers
     type REG_ARRAY is array (0 to NUM_REGS-1) of std_logic_vector(7 downto 0);
