@@ -59,3 +59,85 @@ entity  MEM_TEST  is
     );
 
 end  MEM_TEST;
+
+architecture Structural of MEM_TEST is
+
+    signal MemRegAddr   : std_logic_vector(15 downto 0);-- register-based indirect memory access
+
+    signal ImmediateOut : std_logic_vector(7 downto 0); -- value of immediate
+
+    signal EnableIn     : std_logic;                    -- whether or not to write to register
+    signal SelIn        : std_logic_vector(6 downto 0); -- register to write to
+    signal SelA         : std_logic_vector(6 downto 0); -- first register to read
+    signal SelB         : std_logic_vector(6 downto 0); -- second register to read
+
+    signal DataIOSel    : std_logic;                    -- selects whether data is input or output
+    signal AddrOffset   : std_logic_vector(15 downto 0);-- offset of address
+    signal SpecAddr     : std_logic_vector(1 downto 0); -- selects X, Y, Z, or SP
+    signal SpecWr       : std_logic;                    -- whether to write to the special addresses
+
+    signal RegDataInSel : std_logic_vector(1 downto 0); -- selects which input goes to register in
+    signal MemAddr      : std_logic_vector(15 downto 0);-- memory address (16 bits)
+
+begin
+    ControlUnit : entity work.AVRControl
+    port map (
+        clock                  => clock,
+        IR                     => IR,
+        ProgDB                 => ProgDB,
+        MemRegAddr             => MemRegAddr,
+
+
+        -- ALUStatusMask          => 
+        -- ALUStatusBitChangeEn   => 
+        -- ALUBitClrSet           => 
+        -- ALUBitTOp              => 
+        -- ALUOp2Sel              => 
+        ImmediateOut           => ImmediateOut,
+        -- ALUBlockSel            => 
+        -- ALUBlockInstructionSel => 
+
+        EnableIn               => EnableIn,
+        SelIn                  => SelIn,
+        SelA                   => SelA,
+        SelB                   => SelB,
+
+        DataIOSel              => DataIOSel,
+        AddrOffset             => AddrOffset,
+        SpecAddr               => SpecAddr,
+        SpecWr                 => SpecWr,
+
+        RegDataInSel           => RegDataInSel,
+        MemAddr                => MemAddr
+    );
+
+    Registers : entity work.AVRRegisters
+    port map (
+        clock    => clock,
+        EnableIn => EnableIn,
+        SelIn    => SelIn,
+        SelA     => SelA,
+        SelB     => SelB,
+
+        ALUIn        => (others => 'X'),
+        RegDataImm   => ImmediateOut,
+        RegDataInSel => RegDataInSel,
+
+        RegAOut  => open,
+        RegBOut  => open,
+
+        SpecOut  => open,
+        SpecAddr => SpecAddr,
+        SpecWr   => SpecWr,
+
+        MemRegData => open,
+        AddrOffset => AddrOffset,
+        MemRegAddr => MemRegAddr,
+        DataIOSel  => DataIOSel,
+
+        Reset      => Reset
+    );
+
+
+end Structural;
+
