@@ -75,13 +75,13 @@ begin
         if (rising_edge(clock)) then
             ALUOp2Sel <= RegOp2;            -- default second operand is from register
             EnableIn <= '1';                -- enable write to register by default
-            SelA <= IR(8 downto 4);         -- bits specifying first register
-            SelB <= IR(9) & IR(3 downto 0); -- bits specifying second register
-            SelIn <= IR(8 downto 4);        -- normally write to first register
+            SelA  <= "00" & IR(8 downto 4);         -- bits specifying first register
+            SelB  <= "00" & IR(9) & IR(3 downto 0); -- bits specifying second register
+            SelIn <= "00" & IR(8 downto 4);         -- normally write to first register
             SpecWr <= '0';                  -- default don't write to the special registers
             RegDataInSel <= "00";           -- default input from ALUResult
             DataIOSel <= '0';               -- default input mode for data (leave DB high-Z)
-            AddrOffset <= std_logic_vector(to_unsigned(0,16); -- default address offset is 0
+            AddrOffset <= std_logic_vector(to_unsigned(0,16));-- default address offset is 0
             ImmediateOut <= IR(11 downto 8) & IR(3 downto 0); -- normal immediate value
 
             ALUBitClrSet <= StatusBitClear; -- arbitrary value (changed in cases where needed)
@@ -298,11 +298,11 @@ begin
                 ALUBlockSel <= ALUMulBlock; -- specify multiply block
                 if (CycleCount(0) = '0') then -- first cycle
                     ALUBlockInstructionSel <= MulBlockLowByte;
-                    SelIn <= "00000"; -- write to register 0
+                    SelIn <= "0000000"; -- write to register 0
                 end if;
                 if (CycleCount(0) = '1') then -- second cycle
                     ALUBlockInstructionSel <= MulBlockHighByte;
-                    SelIn <= "00001"; -- write to register 1
+                    SelIn <= "0000001"; -- write to register 1
                 end if;
             end if;
 
@@ -422,7 +422,7 @@ begin
                  std_match(IR, OpLDYI) or std_match(IR, OpLDYD) or
                  std_match(IR, OpLDZI) or std_match(IR, OpLDZD) ) then
                 -- SelIn already selected properly
-                RegDataInSel <= "01"    -- take data into Rd from the memory data bus
+                RegDataInSel <= "01";   -- take data into Rd from the memory data bus
                 
                 -- Select the special register
                 if IR(3 downto 2) = "11" then
@@ -433,6 +433,13 @@ begin
                 end if;
                 if IR(3 downto 2) = "00" then
                     SpecAddr <= "10";
+                end if;
+                
+                -- Clock dependent stuff
+                if CycleCount(0) = '0' then
+                    
+                end if;
+                if CycleCount(0) = '1' then
                 end if;
             end if;
         end if;
