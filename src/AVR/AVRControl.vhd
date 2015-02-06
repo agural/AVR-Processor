@@ -421,28 +421,87 @@ begin
             
             if ( std_match(IR, OpLDX)  or std_match(IR, OpLDXI) or std_match(IR, OpLDXD) or
                  std_match(IR, OpLDYI) or std_match(IR, OpLDYD) or
-                 std_match(IR, OpLDZI) or std_match(IR, OpLDZD) ) then
-                -- SelIn already selected properly
-                RegDataInSel <= "01";   -- take data into Rd from the memory data bus
+                 std_match(IR, OpLDZI) or std_match(IR, OpLDZD) or
+                 std_match(IR, OpSTX)  or std_match(IR, OpSTXI) or std_match(IR, OpSTXD) or
+                 std_match(IR, OpSTYI) or std_match(IR, OpSTYD) or
+                 std_match(IR, OpSTZI) or std_match(IR, OpSTZD) ) then
+                
+                if IR(9) = '0' then
+                    -- SelIn already selected properly
+                    RegDataInSel <= "01";   -- take data into Rd from the memory data bus
+                else
+                    -- SelA already selected properly
+                    DataIOSel <= '1'; -- output data from Rr to memory data bus
+                end if;
                 
                 -- Select the special register
-                if IR(3 downto 2) = "11" then
+                if IR(3 downto 2) = "11" then   -- X
                     SpecAddr <= "00";
                 end if;
-                if IR(3 downto 2) = "10" then
+                if IR(3 downto 2) = "10" then   -- Y
                     SpecAddr <= "01";
                 end if;
-                if IR(3 downto 2) = "00" then
+                if IR(3 downto 2) = "00" then   -- Z
                     SpecAddr <= "10";
                 end if;
                 
                 -- Clock dependent stuff
                 if CycleCount(0) = '0' then
-                    
+                    if IR(1 downto 0) = "00" then   -- no inc/dec
+                        -- No action
+                    end if;
+                    if IR(1 downto 0) = "01" then   -- post-increment
+                        -- No action
+                    end if;
+                    if IR(1 downto 0) = "10" then   -- pre-decrement
+                        AddrOffset <= std_logic_vector(to_signed(-1,16));
+                        SpecWr <= '1';
+                    end if;
                 end if;
                 if CycleCount(0) = '1' then
+                    if IR(1 downto 0) = "00" then   -- no inc/dec
+                        -- No action
+                    end if;
+                    if IR(1 downto 0) = "01" then   -- post-increment
+                        AddrOffset <= std_logic_vector(to_signed(1,16));
+                        SpecWr <= '1';
+                    end if;
+                    if IR(1 downto 0) = "10" then   -- pre-decrement
+                        -- No action
+                    end if;
                 end if;
             end if;
+            
+            if ( std_match(IR, OpLDDY) or std_match(IR, OpLDDZ) or
+                 std_match(IR, OpSTDY) or std_match(IR, OpSTDZ) ) then
+                
+                if IR(9) = '0' then
+                    -- SelIn already selected properly
+                    RegDataInSel <= "01";   -- take data into Rd from the memory data bus
+                else
+                    -- SelA already selected properly
+                    DataIOSel <= '1'; -- output data from Rr to memory data bus
+                end if;
+                
+                -- Select the special register
+                if IR(3) = '1' then -- Y
+                    SpecAddr <= "01";
+                end if;
+                if IR(3) = '0' then -- Z
+                    SpecAddr <= "10";
+                end if;
+                
+                -- Clock dependent stuff
+                if CycleCount(0) = '0' then
+                    -- No action
+                end if;
+                if CycleCount(0) = '1' then
+                    AddrOffset <= std_logic_vector(to_signed(0,10)) &
+                        IR(13) & IR(11 downto 10) & IR(2 downto 0);
+                    SpecWr <= '1';
+                end if;
+            end if;
+            
         end if;
     end process DecodeInstruction;
 
