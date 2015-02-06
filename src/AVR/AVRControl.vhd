@@ -36,25 +36,36 @@ use ALUCommands.ALUCommands.all;
 -- Entity that controls the registers and ALU
 entity AVRControl is
     port (
-        clock                  : in  std_logic;                    -- system clock
-        IR                     : in  opcode_word;                  -- instruction register
-        ALUStatusMask          : out std_logic_vector(7 downto 0); -- status bits that can be changed
-        ALUStatusBitChangeEn   : out std_logic;                    -- instruction to change status
-        ALUBitClrSet           : out std_logic;                    -- set the selected bit
-        ALUBitTOp              : out std_logic;                    -- instruction to change flag T
-        ALUOp2Sel              : out std_logic;                    -- second argument is register/immediate
-        ImmediateOut           : out std_logic_vector(7 downto 0); -- value of immediate
-        ALUBlockSel            : out std_logic_vector(1 downto 0); -- which ALU block is used
-        ALUBlockInstructionSel : out std_logic_vector(3 downto 0); -- which instruction for ALU block
-        EnableIn : out std_logic;                                  -- whether or not to write to register
-        SelIn    : out std_logic_vector(4 downto 0);               -- register to write to
-        SelA     : out std_logic_vector(4 downto 0);               -- first register to read
-        SelB     : out std_logic_vector(4 downto 0)                -- second register to read
+        clock                   : in  std_logic;                    -- system clock
+        IR                      : in  opcode_word;                  -- instruction register
+        ProgDB                  : in  std_logic_vector(15 downto 0);-- immediate memory address
+        
+        ALUStatusMask           : out std_logic_vector(7 downto 0); -- status bits that can be changed
+        ALUStatusBitChangeEn    : out std_logic;                    -- instruction to change status
+        ALUBitClrSet            : out std_logic;                    -- set the selected bit
+        ALUBitTOp               : out std_logic;                    -- instruction to change flag T
+        ALUOp2Sel               : out std_logic;                    -- second argument is register/immediate
+        ImmediateOut            : out std_logic_vector(7 downto 0); -- value of immediate
+        ALUBlockSel             : out std_logic_vector(1 downto 0); -- which ALU block is used
+        ALUBlockInstructionSel  : out std_logic_vector(3 downto 0); -- which instruction for ALU block
+        
+        EnableIn                : out std_logic;                    -- whether or not to write to register
+        SelIn                   : out std_logic_vector(6 downto 0); -- register to write to
+        SelA                    : out std_logic_vector(6 downto 0); -- first register to read
+        SelB                    : out std_logic_vector(6 downto 0); -- second register to read
+        
+        DataIOSel               : out std_logic;                    -- selects whether data is input or output
+        AddrOffset              : out std_logic_vector(15 downto 0);-- offset of address
+        SpecAddr                : out std_logic_vector(1 downto 0); -- selects X, Y, Z, or SP
+        SpecWr                  : out std_logic;                    -- whether to write to the special addresses
+                                                                    -- (this is independent of the normal write to registers)
+        RegDataInSel            : out std_logic_vector(1 downto 0); -- selects which input goes to register in
+        MemAddr                 : out std_logic_vector(15 downto 0);-- memory address (16 bits)
     );
 end AVRControl;
 
 architecture DataFlow of AVRControl is
-    signal CycleCount  :   std_logic := '0'; -- which clock of instruction (for 2-clock instructions)
+    signal CycleCount  :   std_logic_vector(1 downto 0) := "00"; -- which clock of instruction (for multi-clock instructions)
 begin
 
     -- Decode new instructions on clock edge
@@ -62,11 +73,15 @@ begin
     begin
         -- only decode on the rising edge of clock
         if (rising_edge(clock)) then
-            ALUOp2Sel <= RegOp2; -- default second operand is from register
-            EnableIn <= '1';     -- enable write to register by default
+            ALUOp2Sel <= RegOp2;            -- default second operand is from register
+            EnableIn <= '1';                -- enable write to register by default
             SelA <= IR(8 downto 4);         -- bits specifying first register
             SelB <= IR(9) & IR(3 downto 0); -- bits specifying second register
             SelIn <= IR(8 downto 4);        -- normally write to first register
+            SpecWr <= '0';                  -- default don't write to the special registers
+            RegDataInSel <= "00";           -- default input from ALUResult
+            DataIOSel <= '0';               -- default input mode for data (leave DB high-Z)
+            AddrOffset <= std_logic_vector(to_unsigned(0,16); -- default address offset is 0
             ImmediateOut <= IR(11 downto 8) & IR(3 downto 0); -- normal immediate value
 
             ALUBitClrSet <= StatusBitClear; -- arbitrary value (changed in cases where needed)
@@ -91,7 +106,7 @@ begin
                 ALUBlockSel <= ALUAddBlock;       -- specify add block used
                 ImmediateOut(7 downto 6) <= "00"; -- top 2 immediate bits are forced 0
 
-                if (CycleCount = '0') then -- first clock of 2
+                if (CycleCount(0) = '0') then -- first clock of 2
                     ALUBlockInstructionSel <= AddBlockAdd;
                     -- select the first register of the two
                     if (IR(5 downto 4) = "00") then
@@ -111,7 +126,7 @@ begin
                         SelIn <= std_logic_vector(to_unsigned(30, SelIn'length));
                     end if;
                 end if;
-                if (CycleCount = '1') then -- second clock of 2
+                if (CycleCount(0) = '0') then -- second clock of 2
                     ALUBlockInstructionSel <= AddBlockAddCarry; -- only process the remaining carry
                     ImmediateOut <= "00000000"; -- nothing new added
                     -- select the second register of the two
@@ -281,11 +296,11 @@ begin
             if std_match(IR, OpMUL   ) then -- multiply
                 ALUStatusMask <= flag_mask_ZC; -- specify which bits can be changed
                 ALUBlockSel <= ALUMulBlock; -- specify multiply block
-                if (CycleCount = '0') then -- first cycle
+                if (CycleCount(0) = '0') then -- first cycle
                     ALUBlockInstructionSel <= MulBlockLowByte;
                     SelIn <= "00000"; -- write to register 0
                 end if;
-                if (CycleCount = '1') then -- second cycle
+                if (CycleCount(0) = '1') then -- second cycle
                     ALUBlockInstructionSel <= MulBlockHighByte;
                     SelIn <= "00001"; -- write to register 1
                 end if;
@@ -339,7 +354,7 @@ begin
                 ALUBlockSel <= ALUAddBlock; -- specify add block
                 ImmediateOut(7 downto 6) <= "00"; -- top 2 bits in immediate set to 0
 
-                if (CycleCount = '0') then -- first cycle
+                if (CycleCount(0) = '0') then -- first cycle
                     ALUBlockInstructionSel <= AddBlockSub;
                     -- select the first register of the two
                     if (IR(5 downto 4) = "00") then
@@ -359,7 +374,7 @@ begin
                         SelIn <= std_logic_vector(to_unsigned(30, SelIn'length));
                     end if;
                 end if;
-                if (CycleCount = '1') then -- second cycle
+                if (CycleCount(0) = '1') then -- second cycle
                     ALUBlockInstructionSel <= AddBlockSubCarry; -- only process the carry
                     ImmediateOut <= "00000000"; -- do not subtract anything else
                     -- select the second register of the two
@@ -402,6 +417,24 @@ begin
                 ALUBlockSel <= ALUShiftBlock; -- specify shift block
                 ALUBlockInstructionSel <= ShiftBlockSwap; -- specify swap instruction
             end if;
+            
+            if ( std_match(IR, OpLDX)  or std_match(IR, OpLDXI) or std_match(IR, OpLDXD) or
+                 std_match(IR, OpLDYI) or std_match(IR, OpLDYD) or
+                 std_match(IR, OpLDZI) or std_match(IR, OpLDZD) ) then
+                -- SelIn already selected properly
+                RegDataInSel <= "01"    -- take data into Rd from the memory data bus
+                
+                -- Select the special register
+                if IR(3 downto 2) = "11" then
+                    SpecAddr <= "00";
+                end if;
+                if IR(3 downto 2) = "10" then
+                    SpecAddr <= "01";
+                end if;
+                if IR(3 downto 2) = "00" then
+                    SpecAddr <= "10";
+                end if;
+            end if;
         end if;
     end process DecodeInstruction;
 
@@ -410,10 +443,22 @@ begin
     begin
         -- only update on rising clock
         if rising_edge(clock) then
-            CycleCount <= '0'; -- default to 0 (not two-clock instruction)
-            if CycleCount = '0' and ( std_match(IR, OpMUL) or std_match(IR, OpADIW) or std_match(IR, OpSBIW) ) then
+            CycleCount <= "00"; -- default to 0 (not two-clock instruction)
+            if CycleCount = "00" and ( std_match(IR, OpMUL)  or std_match(IR, OpADIW) or std_match(IR, OpSBIW) or
+                                       std_match(IR, OpLDX)  or std_match(IR, OpLDXI) or std_match(IR, OpLDXD) or
+                                       std_match(IR, OpLDYI) or std_match(IR, OpLDYD) or std_match(IR, OpLDDY) or
+                                       std_match(IR, OpLDZI) or std_match(IR, OpLDZD) or std_match(IR, OpLDDZ) or
+                                       std_match(IR, OpSTX)  or std_match(IR, OpSTXI) or std_match(IR, OpSTXD) or
+                                       std_match(IR, OpSTYI) or std_match(IR, OpSTYD) or std_match(IR, OpSTDY) or
+                                       std_match(IR, OpSTZI) or std_match(IR, OpSTZD) or std_match(IR, OpSTDZ) or
+                                       std_match(IR, OpPOP)  or std_match(IR, OpPUSH) or
+                                       std_match(IR, OpLDS)  or std_match(IR, OpSTS) ) then
                 -- update if in first clock of two clock instruction
-                CycleCount <= '1';
+                CycleCount <= "01";
+            end if;
+            if CycleCount = "01" and ( std_match(IR, OpLDS) or std_match(IR, OpSTS) ) then
+                -- update if in second clock of three clock instruction
+                CycleCount <= "10";
             end if;
         end if;
     end process UpdateCycleCount;
