@@ -38,8 +38,34 @@ begin
     
     -- Main testing procedure
     process
+        procedure run_LDI (
+            d : std_logic_vector(3 downto 0);
+            k : std_logic_vector(7 downto 0)) is
+        begin
+                -- 1110kkkkddddkkkk
+            IR <= "1110XXXXXXXXXXXX";
+            IR(11 downto 8) <= k(7 downto 4);
+            IR( 3 downto 0) <= k(3 downto 0);
+            IR( 7 downto 4) <= d;
+            wait until (clock = '1');
+            wait until (clock = '1');
+        end procedure;
+
+        procedure run_LDX (
+            d : std_logic_vector(4 downto 0)) is
+        begin
+                -- 1001000ddddd1100
+            IR <= "1001000XXXXX1100";
+            IR(8 downto 4) <= d;
+            wait until (clock = '1');
+            wait until (clock = '1');
+            wait until (clock = '1');
+        end procedure;
     begin
         wait for 25 ns;
+
+        run_LDI("0000", "00000000");
+        run_LDX("00000");
 
 
         report "DONE WITH SIMULATIONS";
