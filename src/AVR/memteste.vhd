@@ -79,6 +79,8 @@ architecture Structural of MEM_TEST is
     signal RegDataInSel : std_logic_vector(1 downto 0); -- selects which input goes to register in
     signal MemAddr      : std_logic_vector(15 downto 0);-- memory address (16 bits)
 
+    signal DMARead      : std_logic;
+    signal DMAWrite     : std_logic;
 begin
     ControlUnit : entity work.AVRControl
     port map (
@@ -107,8 +109,8 @@ begin
         SpecAddr               => SpecAddr,
         SpecWr                 => SpecWr,
 
-        ReadOut                => DataRd,
-        WriteOut               => DataWr,
+        OutRd                  => DMARead,
+        OutWr                  => DMAWrite,
         RegDataInSel           => RegDataInSel,
         MemAddr                => MemAddr
     );
@@ -144,7 +146,11 @@ begin
     port map (
         clock   => clock,
         MemAddr => MemAddr,
-        MemAB   => DataAB
+        MemAB   => DataAB,
+        InRd    => DMARead,
+        InWr    => DMAWrite,
+        OutRd   => DataRd,
+        OutWr   => DataWr
     );
 
 
