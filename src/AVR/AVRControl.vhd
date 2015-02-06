@@ -39,7 +39,8 @@ entity AVRControl is
         clock                   : in  std_logic;                    -- system clock
         IR                      : in  opcode_word;                  -- instruction register
         ProgDB                  : in  std_logic_vector(15 downto 0);-- immediate memory address
-        
+        MemRegAddr              : in  std_logic_vector(15 downto 0);-- register-based indirect memory access
+
         ALUStatusMask           : out std_logic_vector(7 downto 0); -- status bits that can be changed
         ALUStatusBitChangeEn    : out std_logic;                    -- instruction to change status
         ALUBitClrSet            : out std_logic;                    -- set the selected bit
