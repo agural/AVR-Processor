@@ -107,6 +107,8 @@ begin
         SpecAddr               => SpecAddr,
         SpecWr                 => SpecWr,
 
+        ReadOut                => DataRd,
+        WriteOut               => DataWr,
         RegDataInSel           => RegDataInSel,
         MemAddr                => MemAddr
     );
@@ -136,6 +138,13 @@ begin
         DataIOSel  => DataIOSel,
 
         Reset      => Reset
+    );
+
+    DMA : entity work.DMAUnit
+    port map (
+        clock   => clock,
+        MemAddr => MemAddr,
+        MemAB   => DataAB
     );
 
 
