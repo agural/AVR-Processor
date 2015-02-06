@@ -1,1 +1,0 @@
--intstyle "ise" -incremental -o "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/testbench_isim_beh.exe" -prj "C:/Users/Albert/Documents/GitHub/AVR-Processor/src/AVR/testbench_beh.prj" "testbench" 
