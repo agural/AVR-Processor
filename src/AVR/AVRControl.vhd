@@ -60,6 +60,8 @@ entity AVRControl is
         SpecAddr                : out std_logic_vector(1 downto 0); -- selects X, Y, Z, or SP
         SpecWr                  : out std_logic;                    -- whether to write to the special addresses
                                                                     -- (this is independent of the normal write to registers)
+        ReadOut                 : out std_logic;                    -- whether to read from memory
+        WriteOut                : out std_logic;                    -- whether to write to memory
         RegDataInSel            : out std_logic_vector(1 downto 0); -- selects which input goes to register in
         MemAddr                 : out std_logic_vector(15 downto 0) -- memory address (16 bits)
     );
@@ -84,6 +86,7 @@ begin
             DataIOSel <= '0';               -- default input mode for data (leave DB high-Z)
             AddrOffset <= std_logic_vector(to_unsigned(0,16));-- default address offset is 0
             ImmediateOut <= IR(11 downto 8) & IR(3 downto 0); -- normal immediate value
+            MemAddr <= MemRegAddr;          -- default use registers for indirect memory addressing
 
             ALUBitClrSet <= StatusBitClear; -- arbitrary value (changed in cases where needed)
             ALUStatusBitChangeEn <= '0';    -- by default, do not change status bits
@@ -424,11 +427,13 @@ begin
                  std_match(IR, OpLDZI) or std_match(IR, OpLDZD) or
                  std_match(IR, OpSTX)  or std_match(IR, OpSTXI) or std_match(IR, OpSTXD) or
                  std_match(IR, OpSTYI) or std_match(IR, OpSTYD) or
-                 std_match(IR, OpSTZI) or std_match(IR, OpSTZD) ) then
+                 std_match(IR, OpSTZI) or std_match(IR, OpSTZD) or
+                 std_match(IR, OpPOP)  or std_match(IR, OpPUSH) ) then
                 
                 if IR(9) = '0' then
                     -- SelIn already selected properly
                     RegDataInSel <= "01";   -- take data into Rd from the memory data bus
+                    EnableIn     <= '1';    -- we need to input into registers
                 else
                     -- SelA already selected properly
                     DataIOSel <= '1'; -- output data from Rr to memory data bus
@@ -444,27 +449,42 @@ begin
                 if IR(3 downto 2) = "00" then   -- Z
                     SpecAddr <= "10";
                 end if;
+                if IR(3 downto 0) = "1111" then -- SP (PUSH/POP)
+                    SpecAddr <= "11";
+                end if;
                 
                 -- Clock dependent stuff
                 if CycleCount(0) = '0' then
                     if IR(1 downto 0) = "00" then   -- no inc/dec
                         -- No action
                     end if;
-                    if IR(1 downto 0) = "01" then   -- post-increment
+                    if IR(1 downto 0) = "01" or IR(3 downto 0) = "1111" then   -- post-increment
                         -- No action
                     end if;
                     if IR(1 downto 0) = "10" then   -- pre-decrement
                         AddrOffset <= std_logic_vector(to_signed(-1,16));
                         SpecWr <= '1';
+                    
+                        if to_integer(unsigned(MemRegAddr)) <= 95 and IR(9) = '0' then
+                            -- Send to registers instead of memory
+                            RegDataInSel <= "11";   -- data from output of registers
+                            SelA <= MemRegAddr(6 downto 0);
+                        end if;
                     end if;
                 end if;
                 if CycleCount(0) = '1' then
                     if IR(1 downto 0) = "00" then   -- no inc/dec
                         -- No action
                     end if;
-                    if IR(1 downto 0) = "01" then   -- post-increment
+                    if IR(1 downto 0) = "01" or IR(3 downto 0) = "1111" then   -- post-increment
                         AddrOffset <= std_logic_vector(to_signed(1,16));
                         SpecWr <= '1';
+                    
+                        if to_integer(unsigned(MemRegAddr)) <= 95 and IR(9) = '0' then
+                            -- Send to registers instead of memory
+                            RegDataInSel <= "11";   -- data from output of registers
+                            SelA <= MemRegAddr(6 downto 0);
+                        end if;
                     end if;
                     if IR(1 downto 0) = "10" then   -- pre-decrement
                         -- No action
@@ -478,6 +498,7 @@ begin
                 if IR(9) = '0' then
                     -- SelIn already selected properly
                     RegDataInSel <= "01";   -- take data into Rd from the memory data bus
+                    EnableIn     <= '1';    -- we need to input into registers
                 else
                     -- SelA already selected properly
                     DataIOSel <= '1'; -- output data from Rr to memory data bus
@@ -499,6 +520,40 @@ begin
                     AddrOffset <= std_logic_vector(to_signed(0,10)) &
                         IR(13) & IR(11 downto 10) & IR(2 downto 0);
                     SpecWr <= '1';
+                    
+                    if to_integer(unsigned(MemRegAddr)) <= 95 and IR(9) = '0' then
+                        -- Send to registers instead of memory
+                        RegDataInSel <= "11";   -- data from output of registers
+                        SelA <= MemRegAddr(6 downto 0);
+                    end if;
+                end if;
+            end if;
+            
+            if ( std_match(IR, OpLDS) or std_match(IR, OpSTS) ) then
+                if IR(9) = '0' then
+                    -- SelIn already selected properly
+                    RegDataInSel <= "01";   -- take data into Rd from the memory data bus
+                    EnableIn     <= '1';    -- we need to input into registers
+                else
+                    -- SelA already selected properly
+                    DataIOSel <= '1'; -- output data from Rr to memory data bus
+                end if;
+                
+                -- Clock dependent stuff
+                if CycleCount = "00" then
+                    -- No action (waiting for m)
+                end if;
+                if CycleCount = "01" then
+                    if to_integer(unsigned(ProgDB)) <= 95 and IR(9) = '0' then
+                        -- Send to registers instead of memory
+                        RegDataInSel <= "11";   -- data from output of registers
+                        SelA <= progDB(6 downto 0);
+                    else
+                        MemAddr <= ProgDB;  -- Address is m
+                    end if;
+                end if;
+                if CycleCount = "10" then
+                    -- No action (data comes in / goes out)
                 end if;
             end if;
             
