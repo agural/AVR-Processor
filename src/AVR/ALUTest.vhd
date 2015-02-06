@@ -74,9 +74,9 @@ architecture Structural of ALU_TEST is
 
     -- Unused signals from Control Unit (should go to registers)
     signal EnableIn : std_logic;
-    signal SelIn    : std_logic_vector(4 downto 0);
-    signal SelA     : std_logic_vector(4 downto 0);
-    signal SelB     : std_logic_vector(4 downto 0);
+    signal SelIn    : std_logic_vector(6 downto 0);
+    signal SelA     : std_logic_vector(6 downto 0);
+    signal SelB     : std_logic_vector(6 downto 0);
 
 
 
