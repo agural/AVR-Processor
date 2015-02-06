@@ -33,13 +33,30 @@ entity AVRRegisters is
     port (
         clock    : in  std_logic;                    -- system clock
         EnableIn : in  std_logic;                    -- specifies write
-        SelIn    : in  std_logic_vector(4 downto 0); -- register to write to
-        SelA     : in  std_logic_vector(4 downto 0); -- register to read from
-        SelB     : in  std_logic_vector(4 downto 0); -- register to read from
-        RegIn    : in  std_logic_vector(7 downto 0); -- value to write to register
+        SelIn    : in  std_logic_vector(6 downto 0); -- register to write to
+        SelA     : in  std_logic_vector(6 downto 0); -- register to read from
+        SelB     : in  std_logic_vector(6 downto 0); -- register to read from
 
-        RegAOut  : out std_logic_vector(7 downto 0); -- first output
-        RegBOut  : out std_logic_vector(7 downto 0)  -- second output
+        ALUIn        : in std_logic_vector(7 downto 0); -- ALU output
+        DataIn       : in std_logic_vector(7 downto 0); -- DMA output
+        RegDataImm   : in std_logic_vector(7 downto 0); -- Control logic output
+        RegDataInSel : in std_logic_vector(2 downto 0); -- select value to update registers
+
+        RegAOut  : buffer std_logic_vector(7 downto 0); -- first output
+        RegBOut  : out    std_logic_vector(7 downto 0); -- second output
+
+        SpecIn   : in  std_logic_vector(15 downto 0); -- Input to X, Y, Z, SP
+        SpecOut  : out std_logic_vector(15 downto 0); -- Address Output (no offset)
+        SpecAddr : in  std_logic_vector(2 downto 0);  -- Select X, Y, Z, SP
+        SpecWr   : in  std_logic;                     -- Write to X, Y, Z, SP
+
+        MemRegData : inout std_logic_vector(7 downto 0);  -- data bus
+        AddrOffset : in    std_logic_vector(15 downto 0); -- offset for address
+        MemRegAddr : out   std_logic_vector(15 downto 0); -- updated value for Control
+        DataIOSel  : in    std_logic;                     -- specifies input/output
+                                                          -- 0 - input from DB
+                                                          -- 1 - output from DB
+        Reset      : in std_logic -- reset signal for SP
     );
 end AVRRegisters;
 
@@ -49,18 +66,54 @@ architecture DataFlow of AVRRegisters is
     -- define the registers
     type REG_ARRAY is array (0 to NUM_REGS-1) of std_logic_vector(7 downto 0);
     signal Registers : REG_ARRAY;
+    signal SP : std_logic_vector(15 downto 0);
+    signal RegIn : std_logic_vector(7 downto 0); -- mux ALU, data, and regdata
 begin
 
     RegAOut <= Registers(to_integer(unsigned(SelA))); -- report value of first register
     RegBOut <= Registers(to_integer(unsigned(SelB))); -- report value of second register
+    SpecOut <= Registers(27) & Registers(26) when (SpecAddr = "00") else
+               Registers(29) & Registers(28) when (SpecAddr = "01") else
+               Registers(31) & Registers(30) when (SpecAddr = "01") else
+               SP                            when (SpecAddr = "11") else
+               (others => 'X'); -- output for addr (before offset)
+
+    RegIn <= ALUIn      when (RegDataInSel = "00") else
+             DataIn     when (RegDataInSel = "01") else
+             RegDataImm when (RegDataInSel = "10") else
+             (others => 'X');
+    MemRegAddr <= std_logic_vector(signed(RegIn) + signed(AddrOffset));
+
+    MemRegData <= (others => 'Z') when (DataIOSel = '0') else
+                  RegAOut         when (DataIOSel = '1') else
+                  (others => 'X');
 
     -- process to update value in one register if requested
     WriteRegister: process (clock)
     begin
         -- write on rising edge of clock when update is requested
-        if rising_edge(clock) and EnableIn = '1' then
-            -- write value to selected register
-            Registers(to_integer(unsigned(SelIn))) <= RegIn;
+        if rising_edge(clock) then
+            if (EnableIn = '1') then
+                -- write value to selected register
+                Registers(to_integer(unsigned(SelIn))) <= RegIn;
+            end if;
+            if (SpecWr = '1') then
+                if    (SpecAddr = "00") then
+                    Registers(26) <= SpecIn(7 downto 0);
+                    Registers(27) <= SpecIn(15 downto 8);
+                elsif (SpecAddr = "01") then
+                    Registers(28) <= SpecIn(7 downto 0);
+                    Registers(29) <= SpecIn(15 downto 8);
+                elsif (SpecAddr = "10") then
+                    Registers(30) <= SpecIn(7 downto 0);
+                    Registers(31) <= SpecIn(15 downto 8);
+                elsif (SpecAddr = "11") then
+                    SP <= SpecIn;
+                end if;
+            end if;
+            if (Reset = '0') then
+                SP <= (others => '1');
+            end if;
         end if;
     end process WriteRegister;
 end DataFlow;
