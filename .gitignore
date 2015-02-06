@@ -38,6 +38,9 @@ impact.xsl
 impact_impact.xwbt
 *.prj
 *.projectmgr
+*.xst
+*.spl
+*.sym
  
 #ignore OS noise
  
