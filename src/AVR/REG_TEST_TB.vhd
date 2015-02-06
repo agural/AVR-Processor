@@ -10124,7 +10124,9 @@ begin
         assert(RegAOut = "01101101");
         wait for 10 ns;
 
-        
+
+        report "DONE WITH SIMULATIONS";
+
         END_SIM <= TRUE;    --end of stimulus events
         wait;               --wait for the simulation to end
     end process;
