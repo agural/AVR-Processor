@@ -60,7 +60,7 @@ entity AVRControl is
         SpecWr                  : out std_logic;                    -- whether to write to the special addresses
                                                                     -- (this is independent of the normal write to registers)
         RegDataInSel            : out std_logic_vector(1 downto 0); -- selects which input goes to register in
-        MemAddr                 : out std_logic_vector(15 downto 0);-- memory address (16 bits)
+        MemAddr                 : out std_logic_vector(15 downto 0) -- memory address (16 bits)
     );
 end AVRControl;
 
