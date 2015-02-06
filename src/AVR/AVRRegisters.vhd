@@ -41,7 +41,7 @@ entity AVRRegisters is
         RegDataImm   : in std_logic_vector(7 downto 0); -- Control logic output
         RegDataInSel : in std_logic_vector(1 downto 0); -- select value to update registers
 
-        RegAOut  : buffer std_logic_vector(7 downto 0); -- first output
+        RegAOut  : out    std_logic_vector(7 downto 0); -- first output
         RegBOut  : out    std_logic_vector(7 downto 0); -- second output
 
         SpecOut  : out std_logic_vector(15 downto 0); -- Address Output (no offset)
@@ -66,25 +66,27 @@ architecture DataFlow of AVRRegisters is
     signal Registers : REG_ARRAY;
     signal SP : std_logic_vector(15 downto 0);
     signal RegIn : std_logic_vector(7 downto 0); -- mux ALU, data, and regdata
+    signal RegAInternal : std_logic_vector(7 downto 0);
 begin
 
-    RegAOut <= Registers(to_integer(unsigned(SelA))); -- report value of first register
-    RegBOut <= Registers(to_integer(unsigned(SelB))); -- report value of second register
+    RegAInternal <= Registers(to_integer(unsigned(SelA))); -- report value of first register
+    RegAOut      <= RegAInternal;
+    RegBOut      <= Registers(to_integer(unsigned(SelB))); -- report value of second register
     SpecOut <= Registers(27) & Registers(26) when (SpecAddr = "00") else
                Registers(29) & Registers(28) when (SpecAddr = "01") else
                Registers(31) & Registers(30) when (SpecAddr = "01") else
                SP                            when (SpecAddr = "11") else
                (others => 'X'); -- output for addr (before offset)
 
-    RegIn <= ALUIn      when (RegDataInSel = "00") else
-             MemRegData when (RegDataInSel = "01") else
-             RegDataImm when (RegDataInSel = "10") else
-             RegAOut    when (RegDataInSel = "11") else
+    RegIn <= ALUIn        when (RegDataInSel = "00") else
+             MemRegData   when (RegDataInSel = "01") else
+             RegDataImm   when (RegDataInSel = "10") else
+             RegAInternal when (RegDataInSel = "11") else
              (others => 'X');
     MemRegAddr <= std_logic_vector(signed(RegIn) + signed(AddrOffset));
 
     MemRegData <= (others => 'Z') when (DataIOSel = '0') else
-                  RegAOut         when (DataIOSel = '1') else
+                  RegAInternal    when (DataIOSel = '1') else
                   (others => 'X');
 
     -- process to update value in one register if requested
