@@ -36,6 +36,8 @@ webtalk_impact.xml
 pepExtractor.prj
 impact.xsl
 impact_impact.xwbt
+*.prj
+*.projectmgr
  
 #ignore OS noise
  
