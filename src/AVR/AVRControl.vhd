@@ -130,7 +130,7 @@ begin
                         SelIn <= std_logic_vector(to_unsigned(30, SelIn'length));
                     end if;
                 end if;
-                if (CycleCount(0) = '0') then -- second clock of 2
+                if (CycleCount(0) = '1') then -- second clock of 2
                     ALUBlockInstructionSel <= AddBlockAddCarry; -- only process the remaining carry
                     ImmediateOut <= "00000000"; -- nothing new added
                     -- select the second register of the two
