@@ -63,12 +63,13 @@ begin
         wait for 25 ns;
 
         run_LDI("0000", "00000000");
-        for i in 0 to 15 loop
+        for i in 0 to 16 loop
             run_LDI(std_logic_vector(to_unsigned(i, 4)), "0000" & std_logic_vector(to_unsigned(i, 4)));
         end loop;
         run_LDX("00000");
 
-
+        wait until (clock = '1');
+        wait until (clock = '1');
         report "DONE WITH SIMULATIONS";
 
         end_sim <= true;    --end of stimulus events
