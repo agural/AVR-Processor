@@ -51,3 +51,5 @@ src/AVR/xst
 Thumbs.db
 .DS_Store
 
+*.o
+
