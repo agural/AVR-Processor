@@ -42,29 +42,30 @@ begin
             d : std_logic_vector(3 downto 0);
             k : std_logic_vector(7 downto 0)) is
         begin
+            wait until (clock = '1');
                 -- 1110kkkkddddkkkk
             IR <= "1110XXXXXXXXXXXX";
             IR(11 downto 8) <= k(7 downto 4);
             IR( 3 downto 0) <= k(3 downto 0);
             IR( 7 downto 4) <= d;
-            wait until (clock = '1');
-            wait until (clock = '1');
         end procedure;
 
         procedure run_LDX (
             d : std_logic_vector(4 downto 0)) is
         begin
+            wait until (clock = '1');
                 -- 1001000ddddd1100
             IR <= "1001000XXXXX1100";
             IR(8 downto 4) <= d;
-            wait until (clock = '1');
-            wait until (clock = '1');
             wait until (clock = '1');
         end procedure;
     begin
         wait for 25 ns;
 
         run_LDI("0000", "00000000");
+        for i in 0 to 15 loop
+            run_LDI(std_logic_vector(to_unsigned(i, 4)), "0000" & std_logic_vector(to_unsigned(i, 4)));
+        end loop;
         run_LDX("00000");
 
 
@@ -94,8 +95,4 @@ begin
         end if;
    end process;
 end TB_ARCHITECTURE;
-
-
-
-
 
