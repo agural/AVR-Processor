@@ -141,14 +141,17 @@ BST     1111101     -
 void op_bit2(string op, int ra, int rb) {
     cout << "IR <= \"111110" << op << to_bin(ra, 5) << ((op == "1")?rand()%2:0) << to_bin(rb, 3) << "\";" << endl;
 
+    string out = to_bin(rand() % 256, 8);
     if(op == "0") {
-        string out = to_bin(rand() % 256, 8);
         cout << "RegIn <= \"" << out << "\";" << endl;
-        regs[ra] = out;
     }
 
     cout << "wait until (clock = '1');" << endl;
     cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
+
+    if(op == "0") {
+        regs[ra] = out;
+    }
 }
 
 /*
