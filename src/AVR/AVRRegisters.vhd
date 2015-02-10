@@ -44,7 +44,7 @@ entity AVRRegisters is
         RegAOut  : out    std_logic_vector(7 downto 0); -- first output
         RegBOut  : out    std_logic_vector(7 downto 0); -- second output
 
-        SpecOut  : out std_logic_vector(15 downto 0); -- Address Output (no offset)
+        SpecOut  : buffer std_logic_vector(15 downto 0); -- Address Output (no offset)
         SpecAddr : in  std_logic_vector(1 downto 0);  -- Select X, Y, Z, SP
         SpecWr   : in  std_logic;                     -- Write to X, Y, Z, SP
 
@@ -83,7 +83,7 @@ begin
              RegDataImm   when (RegDataInSel = "10") else
              RegAInternal when (RegDataInSel = "11") else
              (others => 'X');
-    MemRegAddr <= std_logic_vector(signed(RegIn) + signed(AddrOffset));
+    MemRegAddr <= std_logic_vector(signed(SpecOut) + signed(AddrOffset));
 
     MemRegData <= (others => 'Z') when (DataIOSel = '0') else
                   RegAInternal    when (DataIOSel = '1') else
