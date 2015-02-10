@@ -225,11 +225,11 @@ int main () {
         int ra = i;
         int rb = i;
         cout << "IR <= \"" << codes["ADD"].second << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";" << endl;
-        cout << "wait until (clock = '1');" << endl;
-        cout << "wait for 10 ns;" << endl;
+
         string out = to_bin(i, 8);
         cout << "RegIn <= \"" << out << "\";" << endl;
-        cout << "wait for 10 ns;" << endl;
+
+        cout << "wait until (clock = '1');" << endl;
         regs[ra] = out;
     }
 
