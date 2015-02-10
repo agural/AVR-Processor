@@ -25,6 +25,19 @@ string to_bin(int r, int n) {
 
 string regs[32];
 
+/* Prints out the generic stuff */
+void generic_print(string instruction, int ra, int rb, string out) {
+    cout << instruction << " -- New instruction after clock edge" << endl;
+
+    cout << "wait until (clock = '0'); -- Combinational Logic should be complete by this point" << endl;
+
+    if(ra >= 0) cout << "assert(RegAOut = \"" << regs[ra] << "\");" << " -- Check that RegA is correct" << endl;
+    if(rb >= 0) cout << "assert(RegBOut = \"" << regs[rb] << "\");" << " -- Check that RegB is correct" << endl;
+    cout << "RegIn <= \"" << out << "\"; -- New input to the registers" << endl;
+
+    cout << "wait until (clock = '1'); -- All updates at clock edge" << endl;
+}
+
 /*
 standard:  xxxxxx r ddddd rrrr
 ADC     000111
@@ -38,14 +51,11 @@ SBC     000010
 SUB     000110
 */
 void op_standard(string op, int ra, int rb) {
-    cout << "IR <= \"" << op << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";" << endl;
+    stringstream ins;
+    ins << "IR <= \"" << op << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";";
 
     string out = to_bin(rand() % 256, 8);
-    cout << "RegIn <= \"" << out << "\";" << endl;
-
-    cout << "wait until (clock = '1');" << endl;
-    cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
-    cout << "assert(RegBOut = \"" << regs[rb] << "\");" << endl;
+    generic_print(ins.str(), ra, rb, out);
 
     if(op != "000101" && op != "000001") regs[ra] = out; // no result for CP, CPC
 }
@@ -62,13 +72,11 @@ ROR     1001010     0111
 SWAP    1001010     0010
 */
 void op_onearg(string op, int ra, int rb) {
-    cout << "IR <= \"1001010" << to_bin(ra, 5) << op << "\";" << endl;
+    stringstream ins;
+    ins << "IR <= \"1001010" << to_bin(ra, 5) << op << "\";";
 
     string out = to_bin(rand() % 256, 8);
-    cout << "RegIn <= \"" << out << "\";" << endl;
-
-    cout << "wait until (clock = '1');" << endl;
-    cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
+    generic_print(ins.str(), ra, -1, out);
 
     regs[ra] = out;
 }
@@ -82,14 +90,12 @@ SBCI    0100
 SUBI    0101
 */
 void op_const(string op, int ra, int rb) {
+    stringstream ins;
     if(ra < 16) ra += 16;
-    cout << "IR <= \"" << op << "0000" << to_bin(ra-16, 4) << "0000\";" << endl;
+    ins << "IR <= \"" << op << "0000" << to_bin(ra-16, 4) << "0000\";";
 
     string out = to_bin(rand() % 256, 8);
-    cout << "RegIn <= \"" << out << "\";" << endl;
-
-    cout << "wait until (clock = '1');" << endl;
-    cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
+    generic_print(ins.str(), ra, -1, out);
 
     if(op != "0011") regs[ra] = out; // no result for CPI
 }
@@ -100,24 +106,19 @@ ADIW    10010110
 SBIW    10010111
 */
 void op_constw(string op, int ra, int rb) {
-    cout << "IR <= \"1001011" << op << "00" << to_bin(ra, 2) << "0000\";" << endl;
+    stringstream ins1, ins2;
+    ins1 << "IR <= \"1001011" << op << "00" << to_bin(ra, 2) << "0000\";";
 
     string out = to_bin(rand() % 256, 8);
-    cout << "RegIn <= \"" << out << "\";" << endl;
-
-    cout << "wait until (clock = '1');" << endl;
-    cout << "assert(RegAOut = \"" << regs[24 + 2 * ra] << "\");" << endl;
+    generic_print(ins1.str(), 24 + 2 * ra, -1, out);
 
     regs[24 + 2 * ra] = out;
 
 
-    cout << "IR <= \"1001011" << op << "00" << to_bin(ra, 2) << "0000\";" << endl;
+    ins2 << "IR <= \"1001011" << op << "00" << to_bin(ra, 2) << "0000\";";
 
     out = to_bin(rand() % 256, 8);
-    cout << "RegIn <= \"" << out << "\";" << endl;
-
-    cout << "wait until (clock = '1');" << endl;
-    cout << "assert(RegAOut = \"" << regs[25 + 2 * ra] << "\");" << endl;
+    generic_print(ins2.str(), 25 + 2 * ra, -1, out);
 
     regs[25 + 2 * ra] = out;
 }
@@ -155,26 +156,19 @@ mul in a class of its own: xxxxxx r dddd rrrr
 MUL     100111
 */
 void op_mult(string op, int ra, int rb) {
-    cout << "IR <= \"" << op << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";" << endl;
+    stringstream ins1, ins2;
+    ins1 << "IR <= \"" << op << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";";
 
     string out = to_bin(rand() % 256, 8);
-    cout << "RegIn <= \"" << out << "\";" << endl;
-
-    cout << "wait until (clock = '1');" << endl;
-    cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
-    cout << "assert(RegBOut = \"" << regs[rb] << "\");" << endl;
+    generic_print(ins1.str(), ra, rb, out);
 
     regs[0] = out;
 
 
-    cout << "IR <= \"" << op << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";" << endl;
+    ins2 << "IR <= \"" << op << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";";
 
     out = to_bin(rand() % 256, 8);
-    cout << "RegIn <= \"" << out << "\";" << endl;
-
-    cout << "wait until (clock = '1');" << endl;
-    cout << "assert(RegAOut = \"" << regs[ra] << "\");" << endl;
-    cout << "assert(RegBOut = \"" << regs[rb] << "\");" << endl;
+    generic_print(ins1.str(), ra, rb, out);
 
     regs[1] = out;
 }
@@ -224,12 +218,12 @@ int main () {
     for(int i = 0; i < 32; i++) {
         int ra = i;
         int rb = i;
-        cout << "IR <= \"" << codes["ADD"].second << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";" << endl;
+        stringstream ins;
+        ins << "IR <= \"" << codes["ADD"].second << to_bin(rb, 5)[0] << to_bin(ra, 5) << to_bin(rb, 5).substr(1) << "\";";
 
         string out = to_bin(i, 8);
-        cout << "RegIn <= \"" << out << "\";" << endl;
+        generic_print(ins.str(), -1, -1, out);
 
-        cout << "wait until (clock = '1');" << endl;
         regs[ra] = out;
     }
 
