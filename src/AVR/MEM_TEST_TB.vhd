@@ -141,7 +141,7 @@ begin
         wait for 25 ns;
 
         wait until (clock = '1');
-        run_LDI(std_logic_vector(to_unsigned(27, 4)), "00000000");
+        run_LDI(std_logic_vector(to_unsigned(27, 5)), "00000000");
         for i in 0 to 255 loop
             run_LDI(std_logic_vector(to_unsigned(26, 5)), std_logic_vector(to_unsigned(i, 8)));
             run_LDX("00000", "00000000");
