@@ -145,13 +145,16 @@ begin
         wait until (clock = '1');
         report "START SIMULATIONS";
 
-        for i in 0 to 255 loop
-            -- Set register 27 (high byte of X)
-            run_LDI("1011", "00000000");
-            -- Set register 26 (low byte of X)
-            run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
-            run_LDX("00000", "00000000");
-            run_STX("00000");
+        for reg in 0 to 31 loop
+            report integer'image(reg);
+            for i in 0 to 255 loop
+                -- Set register 27 (high byte of X)
+                run_LDI("1011", "00000000");
+                -- Set register 26 (low byte of X)
+                run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
+                run_LDX(std_logic_vector(to_unsigned(reg, 5)), "00000000");
+                run_STX(std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
         end loop;
 
         wait until (clock = '1');
