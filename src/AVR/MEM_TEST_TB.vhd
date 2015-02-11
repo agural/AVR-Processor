@@ -100,6 +100,52 @@ begin
 
         end procedure;
 
+        procedure run_LDXI (
+            d : std_logic_vector(4 downto 0);
+            k : std_logic_vector(7 downto 0)) is
+            variable address : std_logic_vector(15 downto 0);
+        begin
+            address := (Registers(27) & Registers(26));
+                -- 1001000ddddd1101
+            IR <= "1001000XXXXX1101";
+            IR(8 downto 4) <= d;
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDXI 1";
+            assert (DataWr = '1') report "LDXI 2";
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDXI 3";
+            assert (DataWr = '1') report "LDXI 4";
+            if (conv_integer(address) > 95) then
+                assert (DataAB = address);
+            end if;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataWr = '1') report "LDXI 5";
+            if (conv_integer(address) > 95) then
+                Registers(conv_integer(d)) <= k;
+                assert (DataRd = '0') report "LDXI 6";
+                assert (DataAB = address) report "LDXI 7";
+                DataDB <= k;
+            else
+                Registers(conv_integer(d)) <= Registers(conv_integer(address));
+                assert (DataRd = '1') report "LDXI 8";
+            end if;
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDXI 9";
+            assert (DataWr = '1') report "LDXI 10";
+            DataDB <= (others => 'Z');
+            address := std_logic_vector(unsigned(address) + 1);
+            Registers(27) <= address(15 downto 8);
+            Registers(26) <= address(7 downto 0);
+            wait for 1 ns;
+        end procedure;
+
         procedure run_STX (
             d : std_logic_vector(4 downto 0)) is
             variable address : std_logic_vector(15 downto 0);
@@ -120,7 +166,6 @@ begin
             if (conv_integer(address) > 95) then
                 assert (DataAB = address);
             end if;
-
             wait until (clock = '0');
             wait for 1 ns;
             assert (DataRd = '1');
@@ -132,7 +177,6 @@ begin
                 Registers(conv_integer(address)) <= Registers(conv_integer(d));
                 assert (DataWr = '1');
             end if;
-
             wait until (clock = '1');
             wait for 1 ns;
             assert (DataRd = '1');
@@ -145,13 +189,30 @@ begin
         wait until (clock = '1');
         report "START SIMULATIONS";
 
+        -- Set register 27 (high byte of X)
+        run_LDI("1011", "00000000");
+        -- Set register 26 (low byte of X)
+        run_LDI("1010", "01011111");
+        for reg in 0 to 31 loop
+            for i in 0 to 62 loop -- go through Registers, IO, and Memory, and inc upper byte
+                report integer'image(reg) & " " & integer'image(i);
+                run_LDXI(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
+                run_STX (std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+            for i in 63 to 1000 loop -- go through Registers, IO, and Memory, and inc upper byte
+                report integer'image(reg) & " " & integer'image(i);
+                run_LDXI(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
+                run_STX (std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+        end loop;
+
         for reg in 0 to 31 loop
             for i in 0 to 255 loop -- go through enough to check Registers, IO, and Memory
                 -- Set register 27 (high byte of X)
                 run_LDI("1011", "00000000");
                 -- Set register 26 (low byte of X)
                 run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
-                run_LDX(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(reg, 8)));
+                run_LDX(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
                 run_STX(std_logic_vector(to_unsigned(reg, 5)));
             end loop;
 
@@ -160,7 +221,7 @@ begin
                 run_LDI("1011", std_logic_vector(to_unsigned(i, 8)));
                 -- Set register 26 (low byte of X)
                 run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
-                run_LDX(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(reg, 8)));
+                run_LDX(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
                 run_STX(std_logic_vector(to_unsigned(reg, 5)));
             end loop;
         end loop;
