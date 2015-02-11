@@ -443,6 +443,7 @@ begin
             else
                 -- SelA already selected properly
                 DataIOSel <= '1'; -- output data from Rr to memory data bus
+                EnableIn  <= '0'; -- no input into registers
             end if;
             
             -- Select the special register
