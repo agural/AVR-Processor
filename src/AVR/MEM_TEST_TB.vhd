@@ -63,39 +63,39 @@ begin
             variable address : std_logic_vector(15 downto 0);
         begin
             address := (Registers(27) & Registers(26));
-                -- 1001000ddddd1100
+                -- 1001000ddddd1100 report integer'image(reg);
             IR <= "1001000XXXXX1100";
             IR(8 downto 4) <= d;
             wait until (clock = '0');
             wait for 1 ns;
-            assert (DataRd = '1');
-            assert (DataWr = '1');
+            assert (DataRd = '1') report "DataRd error 1";
+            assert (DataWr = '1') report "DataWr error 1";
 
             wait until (clock = '1');
             wait for 1 ns;
-            assert (DataRd = '1');
-            assert (DataWr = '1');
+            assert (DataRd = '1') report "DataRd error 2";
+            assert (DataWr = '1') report "DataWr error 2";
             if (conv_integer(address) > 95) then
-                assert (DataAB = address);
+                assert (DataAB = address) report "AB error 1";
             end if;
 
             wait until (clock = '0');
             wait for 1 ns;
-            assert (DataWr = '1');
+            assert (DataWr = '1') report "DataWr error 3";
             if (conv_integer(address) > 95) then
                 Registers(conv_integer(d)) <= k;
-                assert (DataRd = '0');
-                assert (DataAB = address);
+                assert (DataRd = '0') report "DataRd error 3a";
+                assert (DataAB = address) report "AB error 2";
                 DataDB <= k;
             else
                 Registers(conv_integer(d)) <= Registers(conv_integer(address));
-                assert (DataRd = '1');
+                assert (DataRd = '1') report "DataRd error 3b";
             end if;
 
             wait until (clock = '1');
             wait for 1 ns;
-            assert (DataRd = '1');
-            assert (DataWr = '1');
+            assert (DataRd = '1') report "DataRd error 4";
+            assert (DataWr = '1') report "DataWr error 4";
             DataDB <= (others => 'Z');
 
         end procedure;

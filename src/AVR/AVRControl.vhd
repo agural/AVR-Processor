@@ -436,13 +436,14 @@ begin
              std_match(IR, OpSTZI) or std_match(IR, OpSTZD) or
              std_match(IR, OpPOP)  or std_match(IR, OpPUSH) ) then
             
-            if IR(9) = '0' then
+            
+            EnableIn  <= '0'; -- no input into registers (at least for the first clock)
+            if IR(9) = '0' then -- LOAD vs STORE
                 -- SelIn already selected properly
                 RegDataInSel <= "01";   -- take data into Rd from the memory data bus
             else
                 -- SelA already selected properly
                 DataIOSel <= '1'; -- output data from Rr to memory data bus
-                EnableIn  <= '0'; -- no input into registers
             end if;
             
             -- Select the special register
@@ -484,6 +485,10 @@ begin
                     OutWr  <= not IR(9);    -- Write
                 end if;
                 
+                if IR(9) = '0' then -- (STORE)
+                    EnableIn  <= '1'; -- input into registers
+                end if;
+                
                 if IR(1 downto 0) = "00" then   -- no inc/dec
                     -- No action
                 end if;
@@ -506,13 +511,13 @@ begin
         if ( std_match(IR, OpLDDY) or std_match(IR, OpLDDZ) or
              std_match(IR, OpSTDY) or std_match(IR, OpSTDZ) ) then
             
+            EnableIn  <= '0'; -- no input into registers (at least for the first clock)
             if IR(9) = '0' then
                 -- SelIn already selected properly
                 RegDataInSel <= "01";   -- take data into Rd from the memory data bus
             else
                 -- SelA already selected properly
                 DataIOSel <= '1'; -- output data from Rr to memory data bus
-                EnableIn  <= '0'; -- no input into registers
             end if;
             
             -- Select the special register
@@ -533,6 +538,10 @@ begin
                     OutWr  <= not IR(9);    -- Write
                 end if;
                 
+                if IR(9) = '0' then -- (STORE)
+                    EnableIn  <= '1'; -- input into registers
+                end if;
+                
                 AddrOffset <= std_logic_vector(to_signed(0,10)) &
                     IR(13) & IR(11 downto 10) & IR(2 downto 0);
                 SpecWr <= '1';
@@ -546,13 +555,13 @@ begin
         end if;
         
         if ( std_match(IR, OpLDS) or std_match(IR, OpSTS) ) then
+            EnableIn  <= '0'; -- no input into registers (at least for the first clock)
             if IR(9) = '0' then
                 -- SelIn already selected properly
                 RegDataInSel <= "01";   -- take data into Rd from the memory data bus
             else
                 -- SelA already selected properly
                 DataIOSel <= '1'; -- output data from Rr to memory data bus
-                EnableIn  <= '0'; -- no input into registers
             end if;
             
             -- Clock dependent stuff
@@ -563,6 +572,10 @@ begin
                 if ProgDBM = '1' then
                     OutRd  <= IR(9);        -- Read
                     OutWr  <= not IR(9);    -- Write
+                end if;
+                
+                if IR(9) = '0' then -- (STORE)
+                    EnableIn  <= '1'; -- input into registers
                 end if;
                 
                 if ProgDBM = '1' and IR(9) = '0' then
