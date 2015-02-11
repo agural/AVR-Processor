@@ -156,31 +156,31 @@ begin
             IR(8 downto 4) <= d;
             wait until (clock = '0');
             wait for 1 ns;
-            assert (DataRd = '1');
-            assert (DataWr = '1');
+            assert (DataRd = '1') report "STX 1";
+            assert (DataWr = '1') report "STX 2";
 
             wait until (clock = '1');
             wait for 1 ns;
-            assert (DataRd = '1');
-            assert (DataWr = '1');
+            assert (DataRd = '1') report "STX 3";
+            assert (DataWr = '1') report "STX 4";
             if (conv_integer(address) > 95) then
-                assert (DataAB = address);
+                assert (DataAB = address) report "STX 5";
             end if;
             wait until (clock = '0');
             wait for 1 ns;
-            assert (DataRd = '1');
+            assert (DataRd = '1') report "STX 6";
             if (conv_integer(address) > 95) then
-                assert (DataWr = '0');
-                assert (DataAB = address);
-                assert (DataDB = Registers(conv_integer(d)));
+                assert (DataWr = '0') report "STX 7";
+                assert (DataAB = address) report "STX 8";
+                assert (DataDB = Registers(conv_integer(d))) report "STX 9";
             else
                 Registers(conv_integer(address)) <= Registers(conv_integer(d));
-                assert (DataWr = '1');
+                assert (DataWr = '1') report "STX 10";
             end if;
             wait until (clock = '1');
             wait for 1 ns;
-            assert (DataRd = '1');
-            assert (DataWr = '1');
+            assert (DataRd = '1') report "STX 11";
+            assert (DataWr = '1') report "STX 12";
         end procedure;
     begin
         IR <= (others => '0');
