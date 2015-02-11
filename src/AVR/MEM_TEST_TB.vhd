@@ -85,7 +85,7 @@ begin
             if (conv_integer(address) > 95) then
                 Registers(conv_integer(d)) <= k;
                 assert (DataRd = '0');
-                assert (DataAB = (Registers(27) & Registers(26)));
+                assert (DataAB = address);
                 DataDB <= k;
             else
                 Registers(conv_integer(d)) <= Registers(conv_integer(address));
@@ -126,7 +126,7 @@ begin
             assert (DataRd = '1');
             if (conv_integer(address) > 95) then
                 assert (DataWr = '0');
-                assert (DataAB = (Registers(27) & Registers(26)));
+                assert (DataAB = address);
                 assert (DataDB = Registers(conv_integer(d)));
             else
                 Registers(conv_integer(address)) <= Registers(conv_integer(d));
@@ -146,13 +146,21 @@ begin
         report "START SIMULATIONS";
 
         for reg in 0 to 31 loop
-            report integer'image(reg);
-            for i in 0 to 255 loop
+            for i in 0 to 255 loop -- go through enough to check Registers, IO, and Memory
                 -- Set register 27 (high byte of X)
                 run_LDI("1011", "00000000");
                 -- Set register 26 (low byte of X)
                 run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
-                run_LDX(std_logic_vector(to_unsigned(reg, 5)), "00000000");
+                run_LDX(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(reg, 8)));
+                run_STX(std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+
+            for i in 0 to 255 loop -- check non-zero values for upper byte
+                -- Set register 27 (high byte of X)
+                run_LDI("1011", std_logic_vector(to_unsigned(i, 8)));
+                -- Set register 26 (low byte of X)
+                run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
+                run_LDX(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(reg, 8)));
                 run_STX(std_logic_vector(to_unsigned(reg, 5)));
             end loop;
         end loop;
