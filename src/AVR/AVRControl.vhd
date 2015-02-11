@@ -439,7 +439,6 @@ begin
             if IR(9) = '0' then
                 -- SelIn already selected properly
                 RegDataInSel <= "01";   -- take data into Rd from the memory data bus
-                EnableIn     <= '1';    -- we need to input into registers
             else
                 -- SelA already selected properly
                 DataIOSel <= '1'; -- output data from Rr to memory data bus
@@ -510,10 +509,10 @@ begin
             if IR(9) = '0' then
                 -- SelIn already selected properly
                 RegDataInSel <= "01";   -- take data into Rd from the memory data bus
-                EnableIn     <= '1';    -- we need to input into registers
             else
                 -- SelA already selected properly
                 DataIOSel <= '1'; -- output data from Rr to memory data bus
+                EnableIn  <= '0'; -- no input into registers
             end if;
             
             -- Select the special register
@@ -550,10 +549,10 @@ begin
             if IR(9) = '0' then
                 -- SelIn already selected properly
                 RegDataInSel <= "01";   -- take data into Rd from the memory data bus
-                EnableIn     <= '1';    -- we need to input into registers
             else
                 -- SelA already selected properly
                 DataIOSel <= '1'; -- output data from Rr to memory data bus
+                EnableIn  <= '0'; -- no input into registers
             end if;
             
             -- Clock dependent stuff
@@ -581,7 +580,6 @@ begin
         
         if ( std_match(IR, OpLDI) ) then
             SelIn        <= "001" & IR(7 downto 4); -- Missing top bit
-            EnableIn     <= '1';                    -- we need to input into registers
             ImmediateOut <= IR(11 downto 8) & IR(3 downto 0);
             RegDataInSel <= "10";                   -- take data from immediate out
         end if;
@@ -589,7 +587,6 @@ begin
         if ( std_match(IR, OpMOV) ) then
             -- SelIn default is correct (register d)
             SelA         <= "00" & IR(9) & IR(3 downto 0);  -- Register r
-            EnableIn     <= '1';                    -- we need to input into registers
             RegDataInSel <= "11";                   -- take data from registers
         end if;
     end process DecodeInstruction;
