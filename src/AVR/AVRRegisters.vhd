@@ -20,6 +20,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use ieee.std_logic_unsigned.all;
 
 library opcodes;
 use opcodes.opcodes.all;
@@ -68,10 +69,14 @@ architecture DataFlow of AVRRegisters is
     signal RegIn : std_logic_vector(7 downto 0); -- mux ALU, data, and regdata
     signal RegAInternal : std_logic_vector(7 downto 0);
 begin
-
-    RegAInternal <= Registers(to_integer(unsigned(SelA))); -- report value of first register
+    -- report value of first register
+    RegAInternal <= Registers(conv_integer(SelA)) when (conv_integer(SelA) < NUM_REGS) else
+                    (others => 'X');
     RegAOut      <= RegAInternal;
-    RegBOut      <= Registers(to_integer(unsigned(SelB))); -- report value of second register
+    -- report value of second register
+    RegBOut      <= Registers(conv_integer(SelB)) when (conv_integer(SelB) < NUM_REGS) else
+                    (others => 'X');
+ 
     SpecOut <= Registers(27) & Registers(26) when (SpecAddr = "00") else
                Registers(29) & Registers(28) when (SpecAddr = "01") else
                Registers(31) & Registers(30) when (SpecAddr = "01") else
