@@ -96,6 +96,7 @@ begin
             wait for 1 ns;
             assert (DataRd = '1');
             assert (DataWr = '1');
+            DataDB <= (others => 'Z');
 
         end procedure;
 
@@ -104,8 +105,8 @@ begin
             variable address : std_logic_vector(15 downto 0);
         begin
             address := (Registers(27) & Registers(26));
-                -- 1001000ddddd1100
-            IR <= "1001000XXXXX1100";
+                -- 1001001rrrrr1100
+            IR <= "1001001XXXXX1100";
             IR(8 downto 4) <= d;
             wait until (clock = '0');
             wait for 1 ns;
@@ -138,12 +139,17 @@ begin
             assert (DataWr = '1');
         end procedure;
     begin
+        IR <= (others => '0');
         wait for 25 ns;
 
         wait until (clock = '1');
-        run_LDI(std_logic_vector(to_unsigned(27, 5)), "00000000");
+        report "START SIMULATIONS";
+
         for i in 0 to 255 loop
-            run_LDI(std_logic_vector(to_unsigned(26, 5)), std_logic_vector(to_unsigned(i, 8)));
+            -- Set register 27 (high byte of X)
+            run_LDI("1011", "00000000");
+            -- Set register 26 (low byte of X)
+            run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
             run_LDX("00000", "00000000");
             run_STX("00000");
         end loop;
