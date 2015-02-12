@@ -197,6 +197,103 @@ begin
             assert (DataWr = '1') report "LDXD 10";
         end procedure;
 
+        procedure run_LDYI (
+            d : std_logic_vector(4 downto 0);
+            k : std_logic_vector(7 downto 0)) is
+            variable address : std_logic_vector(15 downto 0);
+        begin
+            address := (Registers(29) & Registers(28));
+                -- 1001000ddddd1001
+            IR <= "1001000XXXXX1001";
+            IR(8 downto 4) <= d;
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDYI 1";
+            assert (DataWr = '1') report "LDYI 2";
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDYI 3";
+            assert (DataWr = '1') report "LDYI 4";
+            if (conv_integer(address) > 95) then
+                assert (DataAB = address);
+            end if;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataWr = '1') report "LDYI 5";
+            if (conv_integer(address) > 95) then
+                Registers(conv_integer(d)) <= k;
+                assert (DataRd = '0') report "LDYI 6";
+                assert (DataAB = address) report "LDYI 7";
+                DataDB <= k;
+            else
+                Registers(conv_integer(d)) <= Registers(conv_integer(address));
+                assert (DataRd = '1') report "LDYI 8";
+            end if;
+
+            wait until (clock = '1');
+            DataDB <= (others => 'Z');
+            address := std_logic_vector(unsigned(address) + 1);
+            if (conv_integer(d) /= 29) then
+                Registers(29) <= address(15 downto 8);
+            end if;
+            if (conv_integer(d) /= 28) then
+                Registers(28) <= address(7 downto 0);
+            end if;
+
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDYI 9";
+            assert (DataWr = '1') report "LDYI 10";
+        end procedure;
+
+        procedure run_LDYD (
+            d : std_logic_vector(4 downto 0);
+            k : std_logic_vector(7 downto 0)) is
+            variable address : std_logic_vector(15 downto 0);
+        begin
+            address := (Registers(29) & Registers(28));
+            address := std_logic_vector(unsigned(address) - 1);
+            Registers(29) <= address(15 downto 8);
+            Registers(28) <= address(7 downto 0);
+
+                -- 1001000ddddd1010
+            IR <= "1001000XXXXX1010";
+            IR(8 downto 4) <= d;
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDYD 1";
+            assert (DataWr = '1') report "LDYD 2";
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDYD 3";
+            assert (DataWr = '1') report "LDYD 4";
+            if (conv_integer(address) > 95) then
+                assert (DataAB = address);
+            end if;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataWr = '1') report "LDYD 5";
+            if (conv_integer(address) > 95) then
+                Registers(conv_integer(d)) <= k;
+                assert (DataRd = '0') report "LDYD 6";
+                assert (DataAB = address) report "LDYD 7";
+                DataDB <= k;
+            else
+                Registers(conv_integer(d)) <= Registers(conv_integer(address));
+                assert (DataRd = '1') report "LDYD 8";
+            end if;
+
+            wait until (clock = '1');
+            DataDB <= (others => 'Z');
+
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDYD 9";
+            assert (DataWr = '1') report "LDYD 10";
+        end procedure;
+
         procedure run_STX (
             d : std_logic_vector(4 downto 0)) is
             variable address : std_logic_vector(15 downto 0);
@@ -313,6 +410,32 @@ begin
             end loop;
         end loop;
         report "Done with LDXD";
+
+        -- test LDYI
+        -- Set register 29 (high byte of Y)
+        run_LDI("1101", "00000000");
+        -- Set register 28 (low byte of Y)
+        run_LDI("1100", "00000000");
+        for reg in 0 to 31 loop
+            for i in 0 to 10 loop -- go through Registers, IO, and Memory, and inc upper byte
+                run_LDYI(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
+                run_STX (std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+        end loop;
+        report "Done with LDYI";
+
+        -- test LDYD
+        -- Set register 29 (high byte of Y)
+        run_LDI("1101", "00000001");
+        -- Set register 28 (low byte of Y)
+        run_LDI("1100", "00000000");
+        for reg in 0 to 10 loop
+            for i in 0 to 9 loop -- go through Registers, IO, and Memory, and inc upper byte
+                run_LDYD(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
+                run_STX (std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+        end loop;
+        report "Done with LDYD";
 
         wait until (clock = '1');
         wait until (clock = '1');
