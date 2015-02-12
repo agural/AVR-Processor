@@ -449,7 +449,13 @@ begin
                 end if;
             else
                 -- SelA already selected properly
-                DataIOSel <= '1'; -- output data from Rr to memory data bus
+                if MemRegAddrM = '0' then
+                    -- Send to registers instead of memory
+                    RegDataInSel <= "11";   -- data from output of registers
+                    SelIn <= MemRegAddr(6 downto 0);
+                else
+                    DataIOSel <= '1'; -- output data from Rr to memory data bus
+                end if;
             end if;
             
             -- Select the special register
