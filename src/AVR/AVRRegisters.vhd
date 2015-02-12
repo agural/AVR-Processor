@@ -99,10 +99,6 @@ begin
     begin
         -- write on rising edge of clock when update is requested
         if rising_edge(clock) then
-            if (EnableIn = '1') then
-                -- write value to selected register
-                Registers(to_integer(unsigned(SelIn))) <= RegIn;
-            end if;
             if (SpecWr = '1') then
                 if    (SpecAddr = "00") then
                     Registers(26) <= MemRegAddr(7 downto 0);
@@ -116,6 +112,10 @@ begin
                 elsif (SpecAddr = "11") then
                     SP <= MemRegAddr;
                 end if;
+            end if;
+            if (EnableIn = '1') then
+                -- write value to selected register
+                Registers(to_integer(unsigned(SelIn))) <= RegIn;
             end if;
             if (Reset = '0') then
                 SP <= (others => '1');
