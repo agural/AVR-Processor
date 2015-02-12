@@ -438,7 +438,7 @@ begin
             
             
             EnableIn  <= '0'; -- no input into registers (at least for the first clock)
-            if IR(9) = '0' then -- LOAD vs STORE
+            if IR(9) = '0' then -- LOAD vs STORE (load)
                 -- SelIn already selected properly
                 RegDataInSel <= "01";   -- take data into Rd from the memory data bus
             else
