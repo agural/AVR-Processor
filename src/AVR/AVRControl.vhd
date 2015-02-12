@@ -485,7 +485,7 @@ begin
                     OutWr  <= not IR(9);    -- Write
                 end if;
                 
-                if IR(9) = '0' then -- (STORE)
+                if IR(9) = '0' then -- (LOAD)
                     EnableIn  <= '1'; -- input into registers
                 end if;
                 
@@ -538,7 +538,7 @@ begin
                     OutWr  <= not IR(9);    -- Write
                 end if;
                 
-                if IR(9) = '0' then -- (STORE)
+                if IR(9) = '0' then -- (LOAD)
                     EnableIn  <= '1'; -- input into registers
                 end if;
                 
@@ -574,7 +574,7 @@ begin
                     OutWr  <= not IR(9);    -- Write
                 end if;
                 
-                if IR(9) = '0' then -- (STORE)
+                if IR(9) = '0' then -- (LOAD)
                     EnableIn  <= '1'; -- input into registers
                 end if;
                 
