@@ -71,6 +71,8 @@ architecture DataFlow of AVRControl is
     signal CycleCount  : std_logic_vector(1 downto 0) := "00"; -- which clock of instruction (for multi-clock instructions)
     signal MemRegAddrM : std_logic; -- '1' when address outputs to memory; '0' when it outputs to the registers / IO
     signal ProgDBM     : std_logic; -- '1' when address outputs to memory; '0' when it outputs to the registers / IO
+    
+    signal MemStore    : std_logic_vector(6 downto 0);  -- stores the first cycle of memory for registers to use
 begin
 
     MemRegAddrM <= '0' when to_integer(unsigned(MemRegAddr)) <= 95 else '1';
@@ -445,6 +447,9 @@ begin
                     RegDataInSel <= "11";   -- data from output of registers
                     if CycleCount(0) = '0' then
                         SelA <= MemRegAddr(6 downto 0);
+                        MemStore <= MemRegAddr(6 downto 0);
+                    else
+                        SelA <= MemStore;
                     end if;
                 else
                     RegDataInSel <= "01";   -- take data into Rd from the memory data bus
@@ -456,6 +461,9 @@ begin
                     RegDataInSel <= "11";   -- data from output of registers
                     if CycleCount(0) = '0' then
                         SelIn <= MemRegAddr(6 downto 0);
+                        MemStore <= MemRegAddr(6 downto 0);
+                    else
+                        SelIn <= MemStore;
                     end if;
                 else
                     DataIOSel <= '1'; -- output data from Rr to memory data bus
