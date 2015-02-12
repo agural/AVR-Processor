@@ -440,7 +440,13 @@ begin
             EnableIn  <= '0'; -- no input into registers (at least for the first clock)
             if IR(9) = '0' then -- LOAD vs STORE (load)
                 -- SelIn already selected properly
-                RegDataInSel <= "01";   -- take data into Rd from the memory data bus
+                if MemRegAddrM = '0' then
+                    -- Send to registers instead of memory
+                    RegDataInSel <= "11";   -- data from output of registers
+                    SelA <= MemRegAddr(6 downto 0);
+                else
+                    RegDataInSel <= "01";   -- take data into Rd from the memory data bus
+                end if;
             else
                 -- SelA already selected properly
                 DataIOSel <= '1'; -- output data from Rr to memory data bus
@@ -471,12 +477,6 @@ begin
                 if IR(1 downto 0) = "10" then   -- pre-decrement
                     AddrOffset <= std_logic_vector(to_signed(-1,16));
                     SpecWr <= '1';
-                
-                    if MemRegAddrM = '0' and IR(9) = '0' then
-                        -- Send to registers instead of memory
-                        RegDataInSel <= "11";   -- data from output of registers
-                        SelA <= MemRegAddr(6 downto 0);
-                    end if;
                 end if;
             end if;
             if CycleCount(0) = '1' then
@@ -495,12 +495,6 @@ begin
                 if IR(1 downto 0) = "01" or IR(3 downto 0) = "1111" then   -- post-increment
                     AddrOffset <= std_logic_vector(to_signed(1,16));
                     SpecWr <= '1';
-                
-                    if MemRegAddrM = '0' and IR(9) = '0' then
-                        -- Send to registers instead of memory
-                        RegDataInSel <= "11";   -- data from output of registers
-                        SelA <= MemRegAddr(6 downto 0);
-                    end if;
                 end if;
                 if IR(1 downto 0) = "10" then   -- pre-decrement
                     -- No action
