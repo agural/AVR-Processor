@@ -136,14 +136,18 @@ begin
             end if;
 
             wait until (clock = '1');
+            DataDB <= (others => 'Z');
+            address := std_logic_vector(unsigned(address) + 1);
+            if (conv_integer(d) /= 27) then
+                Registers(27) <= address(15 downto 8);
+            end if;
+            if (conv_integer(d) /= 26) then
+                Registers(26) <= address(7 downto 0);
+            end if;
+
             wait for 1 ns;
             assert (DataRd = '1') report "LDXI 9";
             assert (DataWr = '1') report "LDXI 10";
-            DataDB <= (others => 'Z');
-            address := std_logic_vector(unsigned(address) + 1);
-            Registers(27) <= address(15 downto 8);
-            Registers(26) <= address(7 downto 0);
-            wait for 1 ns;
         end procedure;
 
         procedure run_STX (
@@ -184,6 +188,8 @@ begin
         end procedure;
     begin
         IR <= (others => '0');
+        Reset <= '1'; -- No reset
+        DataDB <= (others => 'Z');
         wait for 25 ns;
 
         wait until (clock = '1');
@@ -200,6 +206,15 @@ begin
 
             -- Copy from register 16 to each register
             run_STX("10000");
+
+            if (i < 32) then
+                -- Set register 27 (high byte of X)
+                run_LDI("1011", "00000000");
+                -- Set register 26 (low byte of X)
+                run_LDI("1010", "11111111"); -- somewhere in memory
+                -- Test store (check value in register)
+                run_STX(std_logic_vector(to_unsigned(i, 5)));
+            end if;
         end loop;
         -- all registers and I/O have a valid value now
 
@@ -226,17 +241,18 @@ begin
         end loop;
         report "Done with LDX";
 
-        ---- Set register 27 (high byte of X)
-        --run_LDI("1011", "00000000");
-        ---- Set register 26 (low byte of X)
-        --run_LDI("1010", "00000000");
-        --for reg in 0 to 31 loop
-        --    for i in 0 to 255 loop -- go through Registers, IO, and Memory, and inc upper byte
-        --        run_LDXI(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
-        --        run_STX (std_logic_vector(to_unsigned(reg, 5)));
-        --    end loop;
-        --end loop;
-        --report "Done with LDXI";
+        -- test LDXI
+        -- Set register 27 (high byte of X)
+        run_LDI("1011", "00000000");
+        -- Set register 26 (low byte of X)
+        run_LDI("1010", "00000000");
+        for reg in 0 to 31 loop
+            for i in 0 to 255 loop -- go through Registers, IO, and Memory, and inc upper byte
+                run_LDXI(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
+                run_STX (std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+        end loop;
+        report "Done with LDXI";
 
         wait until (clock = '1');
         wait until (clock = '1');
