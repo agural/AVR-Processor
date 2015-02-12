@@ -443,7 +443,9 @@ begin
                 if MemRegAddrM = '0' then
                     -- Send to registers instead of memory
                     RegDataInSel <= "11";   -- data from output of registers
-                    SelA <= MemRegAddr(6 downto 0);
+                    if CycleCount(0) = '0' then
+                        SelA <= MemRegAddr(6 downto 0);
+                    end if;
                 else
                     RegDataInSel <= "01";   -- take data into Rd from the memory data bus
                 end if;
@@ -452,7 +454,9 @@ begin
                 if MemRegAddrM = '0' then
                     -- Send to registers instead of memory
                     RegDataInSel <= "11";   -- data from output of registers
-                    SelIn <= MemRegAddr(6 downto 0);
+                    if CycleCount(0) = '0' then
+                        SelIn <= MemRegAddr(6 downto 0);
+                    end if;
                 else
                     DataIOSel <= '1'; -- output data from Rr to memory data bus
                 end if;
