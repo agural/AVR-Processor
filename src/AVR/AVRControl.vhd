@@ -79,7 +79,7 @@ begin
     ProgDBM     <= '0' when to_integer(unsigned(ProgDB)) <= 95 else '1';
 
     -- Decode new instructions on clock edge
-    DecodeInstruction: process (IR, CycleCount, MemRegAddr, ProgDB)
+    DecodeInstruction: process (IR, CycleCount, MemRegAddr, ProgDB, MemRegAddrM)
     begin
         ALUOp2Sel <= RegOp2;            -- default second operand is from register
         EnableIn <= '1';                -- enable write to register by default
