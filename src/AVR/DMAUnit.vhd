@@ -45,7 +45,7 @@ begin
     UpdateAddress: process(clock)
     begin
         -- only update on falling clock
-        if falling_edge(clock) then
+        if rising_edge(clock) then
             MemAB <= MemAddr;
         end if;
     end process UpdateAddress;
