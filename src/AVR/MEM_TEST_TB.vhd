@@ -189,19 +189,22 @@ begin
         wait until (clock = '1');
         report "START SIMULATIONS";
 
-        -- clear register 16
-        run_LDI("0000", "00000000");
         for i in 0 to 95 loop
             -- Set register 27 (high byte of X)
             run_LDI("1011", "00000000");
             -- Set register 26 (low byte of X)
             run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
 
+            -- Put value in register 16
+            run_LDI("0000", std_logic_vector(to_unsigned(i, 8)));
+
             -- Copy from register 16 to each register
             run_STX("10000");
         end loop;
         -- all registers and I/O have a valid value now
 
+        -- test LDX
+        -- loads value into each register and then stores to make sure value is correct
         for reg in 0 to 31 loop
             for i in 0 to 100 loop -- go through enough to check Registers, IO, and Memory
                 -- Set register 27 (high byte of X)
