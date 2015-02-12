@@ -494,6 +494,9 @@ begin
                 if IR(9) = '0' then -- (LOAD)
                     EnableIn  <= '1'; -- input into registers
                 end if;
+                if IR(9) = '1' and MemRegAddrM = '0' then -- Store into register
+                    EnableIn <= '1';
+                end if;
                 
                 if IR(1 downto 0) = "00" then   -- no inc/dec
                     -- No action
