@@ -189,25 +189,22 @@ begin
         wait until (clock = '1');
         report "START SIMULATIONS";
 
-        -- Set register 27 (high byte of X)
-        run_LDI("1011", "00000000");
-        -- Set register 26 (low byte of X)
-        run_LDI("1010", "01011111");
-        for reg in 0 to 31 loop
-            for i in 0 to 62 loop -- go through Registers, IO, and Memory, and inc upper byte
-                report integer'image(reg) & " " & integer'image(i);
-                run_LDXI(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
-                run_STX (std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-            for i in 63 to 1000 loop -- go through Registers, IO, and Memory, and inc upper byte
-                report integer'image(reg) & " " & integer'image(i);
-                run_LDXI(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
-                run_STX (std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
+        -- clear register 16
+        run_LDI("0000", "00000000");
+        for i in 0 to 95 loop
+            -- Set register 27 (high byte of X)
+            run_LDI("1011", "00000000");
+            -- Set register 26 (low byte of X)
+            run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
 
-        for reg in 0 to 31 loop
-            for i in 0 to 255 loop -- go through enough to check Registers, IO, and Memory
+            -- Copy from register 16 to each register
+            run_STX("10000");
+        end loop;
+        -- all registers and I/O have a valid value now
+
+        for reg in 0 to 25 loop
+            for i in 0 to 100 loop -- go through enough to check Registers, IO, and Memory
+                report integer'image(reg) & " " & integer'image(i);
                 -- Set register 27 (high byte of X)
                 run_LDI("1011", "00000000");
                 -- Set register 26 (low byte of X)
@@ -216,7 +213,7 @@ begin
                 run_STX(std_logic_vector(to_unsigned(reg, 5)));
             end loop;
 
-            for i in 0 to 255 loop -- check non-zero values for upper byte
+            for i in 1 to 10 loop -- check non-zero values for upper byte
                 -- Set register 27 (high byte of X)
                 run_LDI("1011", std_logic_vector(to_unsigned(i, 8)));
                 -- Set register 26 (low byte of X)
@@ -225,6 +222,39 @@ begin
                 run_STX(std_logic_vector(to_unsigned(reg, 5)));
             end loop;
         end loop;
+		  for reg in 26 to 31 loop
+            for i in 0 to 100 loop -- go through enough to check Registers, IO, and Memory
+                report integer'image(reg) & " " & integer'image(i);
+                -- Set register 27 (high byte of X)
+                run_LDI("1011", "00000000");
+                -- Set register 26 (low byte of X)
+                run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
+                run_LDX(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
+                run_STX(std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+
+            for i in 1 to 10 loop -- check non-zero values for upper byte
+                -- Set register 27 (high byte of X)
+                run_LDI("1011", std_logic_vector(to_unsigned(i, 8)));
+                -- Set register 26 (low byte of X)
+                run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
+                run_LDX(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
+                run_STX(std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+        end loop;
+        report "Done with LDX";
+
+        ---- Set register 27 (high byte of X)
+        --run_LDI("1011", "00000000");
+        ---- Set register 26 (low byte of X)
+        --run_LDI("1010", "00000000");
+        --for reg in 0 to 31 loop
+        --    for i in 0 to 255 loop -- go through Registers, IO, and Memory, and inc upper byte
+        --        run_LDXI(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
+        --        run_STX (std_logic_vector(to_unsigned(reg, 5)));
+        --    end loop;
+        --end loop;
+        --report "Done with LDXI";
 
         wait until (clock = '1');
         wait until (clock = '1');
