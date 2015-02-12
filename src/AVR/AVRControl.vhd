@@ -472,7 +472,7 @@ begin
                     AddrOffset <= std_logic_vector(to_signed(-1,16));
                     SpecWr <= '1';
                 
-                    if MemRegAddrM = '1' and IR(9) = '0' then
+                    if MemRegAddrM = '0' and IR(9) = '0' then
                         -- Send to registers instead of memory
                         RegDataInSel <= "11";   -- data from output of registers
                         SelA <= MemRegAddr(6 downto 0);
@@ -496,7 +496,7 @@ begin
                     AddrOffset <= std_logic_vector(to_signed(1,16));
                     SpecWr <= '1';
                 
-                    if MemRegAddrM = '1' and IR(9) = '0' then
+                    if MemRegAddrM = '0' and IR(9) = '0' then
                         -- Send to registers instead of memory
                         RegDataInSel <= "11";   -- data from output of registers
                         SelA <= MemRegAddr(6 downto 0);
@@ -546,7 +546,7 @@ begin
                     IR(13) & IR(11 downto 10) & IR(2 downto 0);
                 SpecWr <= '1';
                 
-                if MemRegAddrM = '1' and IR(9) = '0' then
+                if MemRegAddrM = '0' and IR(9) = '0' then
                     -- Send to registers instead of memory
                     RegDataInSel <= "11";   -- data from output of registers
                     SelA <= MemRegAddr(6 downto 0);
@@ -578,7 +578,7 @@ begin
                     EnableIn  <= '1'; -- input into registers
                 end if;
                 
-                if ProgDBM = '1' and IR(9) = '0' then
+                if ProgDBM = '0' and IR(9) = '0' then
                     -- Send to registers instead of memory
                     RegDataInSel <= "11";   -- data from output of registers
                     SelA <= progDB(6 downto 0);
