@@ -75,8 +75,12 @@ architecture DataFlow of AVRControl is
     signal MemStore    : std_logic_vector(6 downto 0);  -- stores the first cycle of memory for registers to use
 begin
 
-    MemRegAddrM <= '0' when to_integer(unsigned(MemRegAddr)) <= 95 else '1';
-    ProgDBM     <= '0' when to_integer(unsigned(ProgDB)) <= 95 else '1';
+    MemRegAddrM <= '0' when CycleCount = "00" and to_integer(unsigned(MemRegAddr)) <= 95 else
+                   '1' when CycleCount = "00" else
+                   MemRegAddrM;
+    ProgDBM     <= '0' when CycleCount = "00" and to_integer(unsigned(ProgDB)) <= 95 else
+                   '1' when CycleCount = "00" else
+                   ProgDBM;
 
     -- Decode new instructions on clock edge
     DecodeInstruction: process (IR, CycleCount, MemRegAddr, ProgDB, MemRegAddrM)
