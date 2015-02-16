@@ -69,18 +69,15 @@ end AVRControl;
 
 architecture DataFlow of AVRControl is
     signal CycleCount  : std_logic_vector(1 downto 0) := "00"; -- which clock of instruction (for multi-clock instructions)
-    signal MemRegAddrM : std_logic; -- '1' when address outputs to memory; '0' when it outputs to the registers / IO
-    signal ProgDBM     : std_logic; -- '1' when address outputs to memory; '0' when it outputs to the registers / IO
+    signal MemRegAddrM : std_logic := '0'; -- '1' when address outputs to memory; '0' when it outputs to the registers / IO
+    signal ProgDBM     : std_logic := '0'; -- '1' when address outputs to memory; '0' when it outputs to the registers / IO
     
     signal MemStore    : std_logic_vector(6 downto 0);  -- stores the first cycle of memory for registers to use
 begin
-
-    MemRegAddrM <= '0' when CycleCount = "00" and to_integer(unsigned(MemRegAddr)) <= 95 else
+    MemRegAddrM <= '0' when (CycleCount = "00") and (to_integer(unsigned(MemRegAddr)) <= 95) else
                    '1' when CycleCount = "00" else
                    MemRegAddrM;
-    ProgDBM     <= '0' when CycleCount = "00" and to_integer(unsigned(ProgDB)) <= 95 else
-                   '1' when CycleCount = "00" else
-                   ProgDBM;
+    ProgDBM     <= '0' when (to_integer(unsigned(ProgDB)) <= 95) else '1';
 
     -- Decode new instructions on clock edge
     DecodeInstruction: process (IR, CycleCount, MemRegAddr, ProgDB, MemRegAddrM)
