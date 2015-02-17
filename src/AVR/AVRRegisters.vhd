@@ -79,7 +79,7 @@ begin
  
     SpecOut <= Registers(27) & Registers(26) when (SpecAddr = "00") else
                Registers(29) & Registers(28) when (SpecAddr = "01") else
-               Registers(31) & Registers(30) when (SpecAddr = "01") else
+               Registers(31) & Registers(30) when (SpecAddr = "10") else
                SP                            when (SpecAddr = "11") else
                (others => 'X'); -- output for addr (before offset)
 
