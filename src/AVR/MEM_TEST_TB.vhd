@@ -614,17 +614,18 @@ begin
         -- fill registers with distinct values to make errors easier to detect
         for i in 0 to 31 loop
             -- Set register i to i (fill with distinct values)
-            run_LDI(std_logic_vector(to_unsigned(i, 4)), std_logic_vector(to_unsigned(i, 8)));
+            run_LDI(std_logic_vector(to_unsigned(i, 5)), std_logic_vector(to_unsigned(i, 8)));
         end loop;
 
         -- test LDDY
         for reg in 0 to 31 loop
             for start in 94 to 96 loop -- values near IO to mem border
-                -- Set register 31 (high byte of Y)
-                run_LDI("1111", "00000000");
-                -- Set register 30 (low byte of Y)
-                run_LDI("1110", std_logic_vector(to_unsigned(start, 8)));
+                -- Set register 29 (high byte of Y)
+                run_LDI("1101", "00000000");
+                -- Set register 28 (low byte of Y)
+                run_LDI("1100", std_logic_vector(to_unsigned(start, 8)));
                 for i in 0 to 10 loop
+                    report integer'image(reg) & " " & integer'image(start) & " " & integer'image(i);
                     run_LDDY(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)), std_logic_vector(to_unsigned(i, 8)));
                     run_STX (std_logic_vector(to_unsigned(reg, 5)));
                 end loop;
