@@ -1,16 +1,16 @@
-[ ] LDX
-[ ] LDX+
-[ ] LD-X
-[ ] LDY+
-[ ] LD-Y
-[ ] LDZ+
-[ ] LD-Z
+[X] LDX
+[X] LDX+
+[X] LD-X
+[X] LDY+
+[X] LD-Y
+[X] LDZ+
+[X] LD-Z
 [ ] LDDY
 [ ] LDDZ
 [ ] LDI
 [ ] LDS
 [ ] MOV
-[ ] STX
+[X] STX
 [ ] STX+
 [ ] ST-X
 [ ] STY+
