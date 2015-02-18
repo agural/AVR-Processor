@@ -558,6 +558,7 @@ begin
             IR(8 downto 4) <= d;
             IR(9) <= r(4);
             IR(3 downto 0) <= r(3 downto 0);
+            Registers(conv_integer(d)) <= Registers(conv_integer(r));
 
             wait until (clock = '0');
             wait for 1 ns;
@@ -568,7 +569,6 @@ begin
             wait for 1 ns;
             assert (DataRd = '1') report "MOV 3";
             assert (DataWr = '1') report "MOV 4";
-            Registers(conv_integer(d)) <= Registers(conv_integer(r));
         end procedure;
 
         procedure run_STX (
@@ -795,6 +795,12 @@ begin
         for i in 0 to 31 loop
             for j in 0 to 31 loop
                 run_MOV(std_logic_vector(to_unsigned(i, 5)), std_logic_vector(to_unsigned(j, 5)));
+
+                -- Set register 27 (high byte of X)
+                run_LDI("1011", "00000000");
+                -- Set register 26 (low byte of X)
+                run_LDI("1010", "11111111"); -- somewhere in memory
+                -- try to store (and check value in register)
                 run_STX(std_logic_vector(to_unsigned(i, 5)));
             end loop;
         end loop;
