@@ -586,9 +586,9 @@ begin
         report "Done with LDYD";
 
         -- test LDZI
-        -- Set register 31 (high byte of Y)
+        -- Set register 31 (high byte of Z)
         run_LDI("1111", "00000000");
-        -- Set register 30 (low byte of Y)
+        -- Set register 30 (low byte of Z)
         run_LDI("1110", "00000000");
         for reg in 0 to 31 loop
             for i in 0 to 10 loop -- go through Registers, IO, and Memory, and inc upper byte
