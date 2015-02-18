@@ -72,12 +72,20 @@ architecture DataFlow of AVRControl is
     signal MemRegAddrM : std_logic := '0'; -- '1' when address outputs to memory; '0' when it outputs to the registers / IO
     signal ProgDBM     : std_logic := '0'; -- '1' when address outputs to memory; '0' when it outputs to the registers / IO
     
-    signal MemStore    : std_logic_vector(6 downto 0);  -- stores the first cycle of memory for registers to use
+    signal RegAddr     : std_logic_vector(6 downto 0)  := "0000000";            -- stores the first cycle of memory for registers to use
+    signal MemAStore   : std_logic_vector(15 downto 0) := "0000000000000000";   -- stores the first cycle value of MemRegAddr
+    signal ProgStore   : std_logic_vector(15 downto 0) := "0000000000000000";   -- stores the second cycle value of ProgDB
 begin
-    MemRegAddrM <= '0' when (CycleCount = "00") and (to_integer(unsigned(MemRegAddr)) <= 95) else
+    MemAStore   <= MemRegAddr when (CycleCount = "00") and (clock = '0') else MemAStore;
+    MemRegAddrM <= '0' when (CycleCount = "00") and (to_integer(unsigned(MemAStore)) <= 95) else
                    '1' when CycleCount = "00" else
                    MemRegAddrM;
-    ProgDBM     <= '0' when (to_integer(unsigned(ProgDB)) <= 95) else '1';
+    
+    ProgStore   <= ProgDB when (CycleCount = "01") and (std_match(IR, OpLDS) or std_match(IR, OpSTS)) and (clock = '0') else ProgStore;
+    ProgDBM     <= '0' when (to_integer(unsigned(ProgStore)) <= 95) else '1';
+    
+    RegAddr     <= ProgStore(6 downto 0) when (std_match(IR, OpLDS) or std_match(IR, OpSTS)) else MemAStore(6 downto 0); -- output address based on instruction
+    MemAddr     <= ProgStore when (std_match(IR, OpLDS) or std_match(IR, OpSTS)) else MemAStore; -- output address based on instruction
 
     -- Decode new instructions on clock edge
     DecodeInstruction: process (IR, CycleCount, MemRegAddr, ProgDB, MemRegAddrM)
@@ -92,7 +100,6 @@ begin
         DataIOSel <= '0';               -- default input mode for data (leave DB high-Z)
         AddrOffset <= std_logic_vector(to_unsigned(0,16));-- default address offset is 0
         ImmediateOut <= IR(11 downto 8) & IR(3 downto 0); -- normal immediate value
-        MemAddr <= MemRegAddr;          -- default use registers for indirect memory addressing
         
         OutRd  <= '1';                  -- default off (active low)
         OutWr  <= '1';                  -- default off (active low)
@@ -446,12 +453,7 @@ begin
                 if MemRegAddrM = '0' then
                     -- Send to registers instead of memory
                     RegDataInSel <= "11";   -- data from output of registers
-                    if CycleCount(0) = '0' then
-                        SelA <= MemRegAddr(6 downto 0);
-                        MemStore <= MemRegAddr(6 downto 0);
-                    else
-                        SelA <= MemStore;
-                    end if;
+                    SelA <= RegAddr;
                 else
                     RegDataInSel <= "01";   -- take data into Rd from the memory data bus
                 end if;
@@ -460,12 +462,7 @@ begin
                 if MemRegAddrM = '0' then
                     -- Send to registers instead of memory
                     RegDataInSel <= "11";   -- data from output of registers
-                    if CycleCount(0) = '0' then
-                        SelIn <= MemRegAddr(6 downto 0);
-                        MemStore <= MemRegAddr(6 downto 0);
-                    else
-                        SelIn <= MemStore;
-                    end if;
+                    SelIn <= RegAddr;
                 else
                     DataIOSel <= '1'; -- output data from Rr to memory data bus
                 end if;
@@ -528,12 +525,24 @@ begin
              std_match(IR, OpSTDY) or std_match(IR, OpSTDZ) ) then
             
             EnableIn  <= '0'; -- no input into registers (at least for the first clock)
-            if IR(9) = '0' then
+            if IR(9) = '0' then -- LOAD vs STORE (load)
                 -- SelIn already selected properly
-                RegDataInSel <= "01";   -- take data into Rd from the memory data bus
+                if MemRegAddrM = '0' then
+                    -- Send to registers instead of memory
+                    RegDataInSel <= "11";   -- data from output of registers
+                    SelA <= RegAddr;
+                else
+                    RegDataInSel <= "01";   -- take data into Rd from the memory data bus
+                end if;
             else
                 -- SelA already selected properly
-                DataIOSel <= '1'; -- output data from Rr to memory data bus
+                if MemRegAddrM = '0' then
+                    -- Send to registers instead of memory
+                    RegDataInSel <= "11";   -- data from output of registers
+                    SelIn <= RegAddr;
+                else
+                    DataIOSel <= '1'; -- output data from Rr to memory data bus
+                end if;
             end if;
             
             -- Select the special register
@@ -561,11 +570,8 @@ begin
                 if IR(9) = '0' then -- (LOAD)
                     EnableIn  <= '1'; -- input into registers
                 end if;
-                
-                if MemRegAddrM = '0' and IR(9) = '0' then
-                    -- Send to registers instead of memory
-                    RegDataInSel <= "11";   -- data from output of registers
-                    SelA <= MemRegAddr(6 downto 0);
+                if IR(9) = '1' and MemRegAddrM = '0' then -- Store into register
+                    EnableIn <= '1';
                 end if;
             end if;
         end if;
@@ -585,6 +591,14 @@ begin
                 -- No action (waiting for m)
             end if;
             if CycleCount = "01" then
+--                if ProgDBM = '0' and IR(9) = '0' then
+--                    -- Send to registers instead of memory
+--                    RegDataInSel <= "11";   -- data from output of registers
+--                    --SelA <= RegAddr;
+--                end if;
+            end if;
+            if CycleCount = "10" then
+                -- Keep everything the same (data comes in / goes out)
                 if ProgDBM = '1' then
                     OutRd  <= IR(9);        -- Read
                     OutWr  <= not IR(9);    -- Write
@@ -597,13 +611,10 @@ begin
                 if ProgDBM = '0' and IR(9) = '0' then
                     -- Send to registers instead of memory
                     RegDataInSel <= "11";   -- data from output of registers
-                    SelA <= progDB(6 downto 0);
+                    SelA <= RegAddr;
                 else
-                    MemAddr <= ProgDB;  -- Address is m
+                    --MemAddr   <= ProgStore;  -- Address is m
                 end if;
-            end if;
-            if CycleCount = "10" then
-                -- No action (data comes in / goes out)
             end if;
         end if;
         
