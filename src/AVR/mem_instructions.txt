@@ -15,8 +15,8 @@
 [X] ST-X
 [X] STY+
 [X] ST-Y
-[ ] STZ+
-[ ] ST-Z
+[X] STZ+
+[X] ST-Z
 [ ] STDY
 [ ] STDZ
 [ ] STS

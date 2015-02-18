@@ -790,6 +790,96 @@ begin
             assert (DataWr = '1') report "STYD 13";
         end procedure;
 
+        procedure run_STZI (
+            d : std_logic_vector(4 downto 0)) is
+            variable address : std_logic_vector(15 downto 0);
+        begin
+            address := (Registers(31) & Registers(30));
+                -- 1001001rrrrr0001
+            IR <= "1001001XXXXX0001";
+            IR(8 downto 4) <= d;
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STZI 1";
+            assert (DataWr = '1') report "STZI 2";
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STZI 3";
+            assert (DataWr = '1') report "STZI 4";
+            if (conv_integer(address) > 95) then
+                assert (DataAB = address) report "STZI 6";
+            end if;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STZI 7";
+            if (conv_integer(address) > 95) then
+                assert (DataWr = '0') report "STZI 8";
+                assert (DataAB = address) report "STZI 9";
+                assert (DataDB = Registers(conv_integer(d))) report "STZI 10";
+            else
+                Registers(conv_integer(address)) <= Registers(conv_integer(d));
+                assert (DataWr = '1') report "STZI 11";
+            end if;
+
+            wait until (clock = '1');
+            address := std_logic_vector(unsigned(address) + 1);
+            if (conv_integer(d) /= 31) then
+                Registers(31) <= address(15 downto 8);
+            end if;
+            if (conv_integer(d) /= 30) then
+                Registers(30) <= address(7 downto 0);
+            end if;
+
+            wait for 1 ns;
+            assert (DataRd = '1') report "STZI 12";
+            assert (DataWr = '1') report "STZI 13";
+        end procedure;
+
+        procedure run_STZD (
+            d : std_logic_vector(4 downto 0)) is
+            variable address : std_logic_vector(15 downto 0);
+        begin
+            address := (Registers(31) & Registers(30));
+            address := std_logic_vector(unsigned(address) - 1);
+            Registers(31) <= address(15 downto 8);
+            Registers(30) <= address(7 downto 0);
+
+                -- 1001001rrrrr0010
+            IR <= "1001001XXXXX0010";
+            IR(8 downto 4) <= d;
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STZD 1";
+            assert (DataWr = '1') report "STZD 2";
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STZD 3";
+            assert (DataWr = '1') report "STZD 4";
+            if (conv_integer(address) > 95) then
+                assert (DataAB = address) report "STZD 6";
+            end if;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STZD 7";
+            if (conv_integer(address) > 95) then
+                assert (DataWr = '0') report "STZD 8";
+                assert (DataAB = address) report "STZD 9";
+                assert (DataDB = Registers(conv_integer(d))) report "STZD 10";
+            else
+                Registers(conv_integer(address)) <= Registers(conv_integer(d));
+                assert (DataWr = '1') report "STZD 11";
+            end if;
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STZD 12";
+            assert (DataWr = '1') report "STZD 13";
+        end procedure;
+
     begin
         IR <= (others => '0');
         Reset <= '1'; -- No reset
@@ -1037,6 +1127,30 @@ begin
             end loop;
         end loop;
         report "Done with STYD";
+        
+        -- test STZI
+        for reg in 0 to 5 loop
+            -- Set register 31 (high byte of Z)
+            run_LDI("1111", "00000000");
+            -- Set register 30 (low byte of Z)
+            run_LDI("1110", "00100000"); -- start after Z registers
+            for i in 0 to 100 loop
+                run_STZI(std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+        end loop;
+        report "Done with STZI";
+
+        -- test STZD
+        for reg in 0 to 5 loop
+            -- Set register 31 (high byte of Z)
+            run_LDI("1111", "00000000");
+            -- Set register 30 (low byte of Z)
+            run_LDI("1110", std_logic_vector(to_unsigned(150, 8))); -- start in memory
+            for i in 0 to 100 loop
+                run_STZD(std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+        end loop;
+        report "Done with STZD";
         
         wait until (clock = '1');
         wait until (clock = '1');
