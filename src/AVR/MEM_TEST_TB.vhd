@@ -549,6 +549,28 @@ begin
             assert (DataWr = '1') report "LDS 16";
         end procedure;
 
+        procedure run_MOV (
+            d : std_logic_vector(4 downto 0);
+            r : std_logic_vector(4 downto 0)) is
+        begin
+                -- 001011rdddddrrrr
+            IR <= "001011XXXXXXXXXX";
+            IR(8 downto 4) <= d;
+            IR(9) <= r(4);
+            IR(3 downto 0) <= r(3 downto 0);
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "MOV 1";
+            assert (DataWr = '1') report "MOV 2";
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "MOV 3";
+            assert (DataWr = '1') report "MOV 4";
+            Registers(conv_integer(d)) <= Registers(conv_integer(r));
+        end procedure;
+
         procedure run_STX (
             d : std_logic_vector(4 downto 0)) is
             variable address : std_logic_vector(15 downto 0);
@@ -765,6 +787,15 @@ begin
             for i in 0 to 100 loop -- go through Registers, IO, and Memory
                 run_LDS(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)), std_logic_vector(to_unsigned(i, 16)));
                 run_STX(std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+        end loop;
+        report "Done with LDS";
+
+        -- test LDS
+        for i in 0 to 31 loop
+            for j in 0 to 31 loop
+                run_MOV(std_logic_vector(to_unsigned(i, 5)), std_logic_vector(to_unsigned(j, 5)));
+                run_STX(std_logic_vector(to_unsigned(i, 5)));
             end loop;
         end loop;
         report "Done with LDS";
