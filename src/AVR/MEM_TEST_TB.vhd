@@ -491,6 +491,64 @@ begin
             assert (DataWr = '1') report "LDDZ 11";
         end procedure;
 
+        procedure run_LDS (
+            d : std_logic_vector(4 downto 0);
+            k : std_logic_vector(7 downto 0);
+            m : std_logic_vector(15 downto 0)) is
+        begin
+                -- 1001000ddddd0000
+            IR <= "1001000XXXXX0000";
+            IR(8 downto 4) <= d;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDS 1";
+            assert (DataWr = '1') report "LDS 2";
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDS 3";
+            assert (DataWr = '1') report "LDS 4";
+            ProgDB <= m;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDS 5";
+            assert (DataWr = '1') report "LDS 6";
+            if (conv_integer(m) > 95) then
+                assert (DataAB = m) report "LDS 7";
+            end if;
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDS 8";
+            assert (DataWr = '1') report "LDS 9";
+            if (conv_integer(m) > 95) then
+                assert (DataAB = m) report "LDS 10";
+            end if;
+            ProgDB <= (others => 'Z');
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataWr = '1') report "LDS 11";
+            if (conv_integer(m) > 95) then
+                Registers(conv_integer(d)) <= k;
+                assert (DataRd = '0') report "LDS 12";
+                assert (DataAB = m) report "LDS 13";
+                DataDB <= k;
+            else
+                Registers(conv_integer(d)) <= Registers(conv_integer(m));
+                assert (DataRd = '1') report "LDS 14";
+            end if;
+
+            wait until (clock = '1');
+            DataDB <= (others => 'Z');
+
+            wait for 1 ns;
+            assert (DataRd = '1') report "LDS 15";
+            assert (DataWr = '1') report "LDS 16";
+        end procedure;
+
         procedure run_STX (
             d : std_logic_vector(4 downto 0)) is
             variable address : std_logic_vector(15 downto 0);
@@ -702,7 +760,15 @@ begin
         end loop;
         report "Done with LDDZ";
 
-
+        -- test LDS
+        for reg in 0 to 31 loop
+            for i in 0 to 100 loop -- go through Registers, IO, and Memory
+                run_LDS(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)), std_logic_vector(to_unsigned(i, 16)));
+                run_STX(std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+        end loop;
+        report "Done with LDS";
+        
         wait until (clock = '1');
         wait until (clock = '1');
         report "DONE WITH SIMULATIONS"; 
