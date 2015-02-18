@@ -591,6 +591,7 @@ begin
             if (conv_integer(address) > 95) then
                 assert (DataAB = address) report "STX 5";
             end if;
+
             wait until (clock = '0');
             wait for 1 ns;
             assert (DataRd = '1') report "STX 6";
@@ -602,11 +603,103 @@ begin
                 Registers(conv_integer(address)) <= Registers(conv_integer(d));
                 assert (DataWr = '1') report "STX 10";
             end if;
+
             wait until (clock = '1');
             wait for 1 ns;
             assert (DataRd = '1') report "STX 11";
             assert (DataWr = '1') report "STX 12";
         end procedure;
+
+        procedure run_STXI (
+            d : std_logic_vector(4 downto 0)) is
+            variable address : std_logic_vector(15 downto 0);
+        begin
+            address := (Registers(27) & Registers(26));
+                -- 1001001rrrrr1101
+            IR <= "1001001XXXXX1101";
+            IR(8 downto 4) <= d;
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STXI 1";
+            assert (DataWr = '1') report "STXI 2";
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STXI 3";
+            assert (DataWr = '1') report "STXI 4";
+            if (conv_integer(address) > 95) then
+                assert (DataAB = address) report "STXI 6";
+            end if;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STXI 7";
+            if (conv_integer(address) > 95) then
+                assert (DataWr = '0') report "STXI 8";
+                assert (DataAB = address) report "STXI 9";
+                assert (DataDB = Registers(conv_integer(d))) report "STXI 10";
+            else
+                Registers(conv_integer(address)) <= Registers(conv_integer(d));
+                assert (DataWr = '1') report "STXI 11";
+            end if;
+
+            wait until (clock = '1');
+            address := std_logic_vector(unsigned(address) + 1);
+            if (conv_integer(d) /= 27) then
+                Registers(27) <= address(15 downto 8);
+            end if;
+            if (conv_integer(d) /= 26) then
+                Registers(26) <= address(7 downto 0);
+            end if;
+
+            wait for 1 ns;
+            assert (DataRd = '1') report "STXI 12";
+            assert (DataWr = '1') report "STXI 13";
+        end procedure;
+
+        procedure run_STXD (
+            d : std_logic_vector(4 downto 0)) is
+            variable address : std_logic_vector(15 downto 0);
+        begin
+            address := (Registers(27) & Registers(26));
+            address := std_logic_vector(unsigned(address) - 1);
+            Registers(27) <= address(15 downto 8);
+            Registers(26) <= address(7 downto 0);
+
+                -- 1001001rrrrr1110
+            IR <= "1001001XXXXX1110";
+            IR(8 downto 4) <= d;
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STXD 1";
+            assert (DataWr = '1') report "STXD 2";
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STXD 3";
+            assert (DataWr = '1') report "STXD 4";
+            if (conv_integer(address) > 95) then
+                assert (DataAB = address) report "STXD 6";
+            end if;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STXD 7";
+            if (conv_integer(address) > 95) then
+                assert (DataWr = '0') report "STXD 8";
+                assert (DataAB = address) report "STXD 9";
+                assert (DataDB = Registers(conv_integer(d))) report "STXD 10";
+            else
+                Registers(conv_integer(address)) <= Registers(conv_integer(d));
+                assert (DataWr = '1') report "STXD 11";
+            end if;
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STXD 12";
+            assert (DataWr = '1') report "STXD 13";
+        end procedure;
+
     begin
         IR <= (others => '0');
         Reset <= '1'; -- No reset
@@ -805,6 +898,30 @@ begin
             end loop;
         end loop;
         report "Done with MOV";
+
+        -- test STXI
+        for reg in 0 to 5 loop
+            -- Set register 27 (high byte of X)
+            run_LDI("1011", "00000000");
+            -- Set register 26 (low byte of X)
+            run_LDI("1010", "00011100"); -- start after X registers
+            for i in 0 to 100 loop
+                run_STXI(std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+        end loop;
+        report "Done with STXI";
+
+        -- test STXD
+        for reg in 0 to 5 loop
+            -- Set register 27 (high byte of X)
+            run_LDI("1011", "00000000");
+            -- Set register 26 (low byte of X)
+            run_LDI("1010", std_logic_vector(to_unsigned(150, 8))); -- start in memory
+            for i in 0 to 100 loop
+                run_STXD(std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+        end loop;
+        report "Done with STXD";
         
         wait until (clock = '1');
         wait until (clock = '1');
