@@ -1198,6 +1198,7 @@ begin
         end loop;
         report "Done with LDZD";
 
+
         -- fill registers with distinct values to make errors easier to detect
         for i in 0 to 31 loop
             -- Set register i to i (fill with distinct values)
@@ -1248,8 +1249,9 @@ begin
             end loop;
         end loop;
         report "Done with LDS";
+ 
 
-        -- test LDS
+        -- test MOV
         for i in 0 to 31 loop
             for j in 0 to 31 loop
                 run_MOV(std_logic_vector(to_unsigned(i, 5)), std_logic_vector(to_unsigned(j, 5)));
@@ -1336,6 +1338,37 @@ begin
             end loop;
         end loop;
         report "Done with STZD";
+
+        -- test STDY
+        for reg in 0 to 31 loop
+            for start in 90 to 96 loop -- values near IO to mem border
+                -- Set register 29 (high byte of Y)
+                run_LDI("1101", "00000000");
+                -- Set register 28 (low byte of Y)
+                run_LDI("1100", std_logic_vector(to_unsigned(start, 8)));
+                for i in 0 to 10 loop
+                    report integer'image(reg) & " " & integer'image(start) & " " & integer'image(i);
+                    run_STDY(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 6)), std_logic_vector(to_unsigned(i, 8)));
+                    run_STX (std_logic_vector(to_unsigned(reg, 5)));
+                end loop;
+            end loop;
+        end loop;
+        report "Done with STDY";
+ 
+        -- test STDZ
+        for reg in 0 to 31 loop
+            for start in 90 to 96 loop -- values near IO to mem border
+                -- Set register 31 (high byte of Z)
+                run_LDI("1111", "00000000");
+                -- Set register 30 (low byte of Z)
+                run_LDI("1110", std_logic_vector(to_unsigned(start, 8)));
+                for i in 0 to 10 loop
+                    run_STDZ(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 6)), std_logic_vector(to_unsigned(i, 8)));
+                    run_STX (std_logic_vector(to_unsigned(reg, 5)));
+                end loop;
+            end loop;
+        end loop;
+        report "Done with STDZ";
 
          -- fill registers with distinct values to make errors easier to detect
          for i in 0 to 31 loop
