@@ -11,10 +11,10 @@
 [-] LDS
 [X] MOV
 [X] STX
-[ ] STX+
-[ ] ST-X
-[ ] STY+
-[ ] ST-Y
+[X] STX+
+[X] ST-X
+[X] STY+
+[X] ST-Y
 [ ] STZ+
 [ ] ST-Z
 [ ] STDY
