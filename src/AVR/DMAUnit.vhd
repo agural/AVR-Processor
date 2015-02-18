@@ -41,14 +41,5 @@ begin
     OutRd <= InRd or clock;
     OutWr <= InWr or clock;
     MemAB <= MemAddr;
-    
-    -- process to latch the address output
---    UpdateAddress: process(clock)
---    begin
---        -- only update on falling clock
---        if rising_edge(clock) then
---            MemAB <= MemAddr;
---        end if;
---    end process UpdateAddress;
 end DataFlow;
 

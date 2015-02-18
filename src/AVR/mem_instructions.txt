@@ -8,7 +8,7 @@
 [X] LDDY
 [X] LDDZ
 [X] LDI
-[-] LDS
+[X] LDS
 [X] MOV
 [X] STX
 [X] STX+
@@ -17,8 +17,8 @@
 [X] ST-Y
 [X] STZ+
 [X] ST-Z
-[-] STDY
-[-] STDZ
-[ ] STS
-[-] POP
-[-] PUSH
+[X] STDY
+[X] STDZ
+[X] STS
+[X] POP
+[X] PUSH

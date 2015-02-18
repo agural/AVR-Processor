@@ -1,3 +1,17 @@
+----------------------------------------------------------------------------
+--
+--  Atmel AVR Memory Test Bench
+--
+--  This test bench checks each memory instruction for all possible input values.
+--  The register values, address/data buses, and timings are all verified.
+--
+--  Revision History:
+--      02/05/15    Bryan He        initial version
+--      02/10/15    Bryan He        added tests for LD*
+--      02/17/15    Bryan He        finished writing all tests; everything passes
+--
+----------------------------------------------------------------------------
+
 -- bring in the necessary packages
 library ieee;
 use ieee.std_logic_1164.all;

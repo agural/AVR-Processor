@@ -1,16 +1,9 @@
 ----------------------------------------------------------------------------
 --
---  Atmel AVR Register Array Test Bench
+--  Atmel AVR ALU Test Bench
 --
---  Because of the nature of the tests required, it was seen as a lot
---  simpler to create a C++ program to generate the tests.
---  This allows us to use smart data structures that prevent excessive
---  code duplication.
---  
---  The C++ generator code can be found in:
---      ../../test_gen/reg_test_generator.cpp
---  And the associated generated tests are in:
---      ../../test_gen/reg_test.txt
+--  This test bench checks each ALU instruction for all possible input values.
+--  The results, status registers, and timings are all verified.
 --
 --  Revision History:
 --      01/28/15    Bryan He        initial version
