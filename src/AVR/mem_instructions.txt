@@ -17,8 +17,8 @@
 [X] ST-Y
 [X] STZ+
 [X] ST-Z
-[ ] STDY
-[ ] STDZ
+[-] STDY
+[-] STDZ
 [ ] STS
 [ ] POP
 [ ] PUSH
