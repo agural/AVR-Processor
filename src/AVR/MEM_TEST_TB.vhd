@@ -27,6 +27,7 @@ architecture TB_ARCHITECTURE of MEM_TEST_TB is
     constant NUM_REGS : integer := 96; -- number of registers (including IO)
     type REG_ARRAY is array (0 to NUM_REGS-1) of std_logic_vector(7 downto 0);
     signal Registers : REG_ARRAY;
+    signal SP        : std_logic_vector(7 downto 0);
 
     signal end_sim :  boolean := false;                 -- end simulation flag
 begin
@@ -976,12 +977,101 @@ begin
             assert (DataWr = '1') report "STDZ 12";
         end procedure;
 
+        procedure run_POP (
+            d : std_logic_vector(4 downto 0);
+            k : std_logic_vector(7 downto 0)) is
+            variable address : std_logic_vector(15 downto 0);
+        begin
+            address := SP;
+                -- 1001000ddddd1111
+            IR <= "1001000XXXXX1111";
+            IR(8 downto 4) <= d;
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "POP 1";
+            assert (DataWr = '1') report "POP 2";
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "POP 3";
+            assert (DataWr = '1') report "POP 4";
+            if (conv_integer(address) > 95) then
+                assert (DataAB = address);
+            end if;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataWr = '1') report "POP 5";
+            if (conv_integer(address) > 95) then
+                Registers(conv_integer(d)) <= k;
+                assert (DataRd = '0') report "POP 6";
+                assert (DataAB = address) report "POP 7";
+                DataDB <= k;
+            else
+                Registers(conv_integer(d)) <= Registers(conv_integer(address));
+                assert (DataRd = '1') report "POP 8";
+            end if;
+
+            wait until (clock = '1');
+            DataDB <= (others => 'Z');
+            address := std_logic_vector(unsigned(address) + 1);
+            SP <= address;
+
+            wait for 1 ns;
+            assert (DataRd = '1') report "POP 9";
+            assert (DataWr = '1') report "POP 10";
+        end procedure;
+
+        procedure run_PUSH (
+            d : std_logic_vector(4 downto 0)) is
+            variable address : std_logic_vector(15 downto 0);
+        begin
+            address := SP;
+            address := std_logic_vector(unsigned(address) - 1);
+            SP <= address;
+
+                -- 1001001rrrrr1111
+            IR <= "1001001XXXXX1111";
+            IR(8 downto 4) <= d;
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "PUSH 1";
+            assert (DataWr = '1') report "PUSH 2";
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "PUSH 3";
+            assert (DataWr = '1') report "PUSH 4";
+            if (conv_integer(address) > 95) then
+                assert (DataAB = address) report "PUSH 6";
+            end if;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "PUSH 7";
+            if (conv_integer(address) > 95) then
+                assert (DataWr = '0') report "PUSH 8";
+                assert (DataAB = address) report "PUSH 9";
+                assert (DataDB = Registers(conv_integer(d))) report "PUSH 10";
+            else
+                Registers(conv_integer(address)) <= Registers(conv_integer(d));
+                assert (DataWr = '1') report "PUSH 11";
+            end if;
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "PUSH 12";
+            assert (DataWr = '1') report "PUSH 13";
+        end procedure;
+
     begin
         IR <= (others => '0');
-        Reset <= '1'; -- No reset
+        Reset <= '0'; -- reset
         DataDB <= (others => 'Z');
         wait for 25 ns;
 
+        Reset <= '1'; -- stop reset
+        SP <= (others => '1');
         wait until (clock = '1');
         report "START SIMULATIONS";
 
@@ -1285,12 +1375,28 @@ begin
          end loop;
          report "Done with STDZ";
 
-        
-        wait until (clock = '1');
-        wait until (clock = '1');
-        report "DONE WITH SIMULATIONS"; 
-        end_sim <= true;    --end of stimulus events
-        wait;               --wait for the simulation to end
+         -- test PUSH
+         for i in 0 to 100 loop
+             run_PUSH(std_logic_vector(to_unsigned(i, 8)));
+         end loop;
+        report "Done with PUSH";
+
+         -- test POP
+         -- Set register 27 (high byte of X)
+         run_LDI("1011", "00000000");
+         -- Set register 26 (low byte of X)
+         run_LDI("1010", "11111111"); -- somewhere in memory
+         for i in 0 to 100 loop
+             run_POP("00000", std_logic_vector(to_unsigned(i, 8)));
+             run_STX("00000");
+         end loop;
+        report "Done with POP";
+
+         wait until (clock = '1');
+         wait until (clock = '1');
+         report "DONE WITH SIMULATIONS"; 
+         end_sim <= true;    --end of stimulus events
+         wait;               --wait for the simulation to end
     end process;
     
     -- Clock process definitions
