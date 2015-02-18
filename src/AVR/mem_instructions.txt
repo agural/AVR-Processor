@@ -7,7 +7,7 @@
 [X] LD-Z
 [X] LDDY
 [X] LDDZ
-[ ] LDI
+[X] LDI
 [ ] LDS
 [ ] MOV
 [X] STX
