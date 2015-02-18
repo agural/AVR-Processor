@@ -8,8 +8,8 @@
 [X] LDDY
 [X] LDDZ
 [X] LDI
-[ ] LDS
-[ ] MOV
+[-] LDS
+[X] MOV
 [X] STX
 [ ] STX+
 [ ] ST-X
