@@ -625,7 +625,6 @@ begin
                 -- Set register 28 (low byte of Y)
                 run_LDI("1100", std_logic_vector(to_unsigned(start, 8)));
                 for i in 0 to 10 loop
-                    report integer'image(reg) & " " & integer'image(start) & " " & integer'image(i);
                     run_LDDY(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 6)), std_logic_vector(to_unsigned(i, 8)));
                     run_STX (std_logic_vector(to_unsigned(reg, 5)));
                 end loop;
