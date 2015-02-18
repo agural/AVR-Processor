@@ -5,8 +5,8 @@
 [X] LD-Y
 [X] LDZ+
 [X] LD-Z
-[-] LDDY
-[ ] LDDZ
+[X] LDDY
+[X] LDDZ
 [ ] LDI
 [ ] LDS
 [ ] MOV
