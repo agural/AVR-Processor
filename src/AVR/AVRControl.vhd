@@ -543,6 +543,10 @@ begin
             if IR(3) = '0' then -- Z
                 SpecAddr <= "10";
             end if;
+
+            -- specify how much to shift Y/Z
+            AddrOffset <= std_logic_vector(to_signed(0,10)) &
+                IR(13) & IR(11 downto 10) & IR(2 downto 0);
             
             -- Clock dependent stuff
             if CycleCount(0) = '0' then
@@ -557,10 +561,6 @@ begin
                 if IR(9) = '0' then -- (LOAD)
                     EnableIn  <= '1'; -- input into registers
                 end if;
-                
-                AddrOffset <= std_logic_vector(to_signed(0,10)) &
-                    IR(13) & IR(11 downto 10) & IR(2 downto 0);
-                SpecWr <= '1';
                 
                 if MemRegAddrM = '0' and IR(9) = '0' then
                     -- Send to registers instead of memory
