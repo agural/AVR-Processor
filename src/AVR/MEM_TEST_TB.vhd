@@ -977,6 +977,63 @@ begin
             assert (DataWr = '1') report "STDZ 12";
         end procedure;
 
+        procedure run_STS (
+            d : std_logic_vector(4 downto 0);
+            k : std_logic_vector(7 downto 0);
+            m : std_logic_vector(15 downto 0)) is
+        begin
+                -- 1001001rrrrr0000
+            IR <= "1001001XXXXX0000";
+            IR(8 downto 4) <= d;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STS 1";
+            assert (DataWr = '1') report "STS 2";
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STS 3";
+            assert (DataWr = '1') report "STS 4";
+            ProgDB <= m;
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STS 5";
+            assert (DataWr = '1') report "STS 6";
+            if (conv_integer(m) > 95) then
+                assert (DataAB = m) report "STS 7";
+            end if;
+
+            wait until (clock = '1');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STS 8";
+            assert (DataWr = '1') report "STS 9";
+            if (conv_integer(m) > 95) then
+                assert (DataAB = m) report "STS 10";
+            end if;
+            ProgDB <= (others => 'Z');
+
+            wait until (clock = '0');
+            wait for 1 ns;
+            assert (DataRd = '1') report "STS 11";
+            if (conv_integer(m) > 95) then
+                assert (DataDB = Registers(conv_integer(d))) report "STS 12";
+                assert (DataWr = '0') report "STS 13";
+                assert (DataAB = m) report "STS 14";
+            else
+                Registers(conv_integer(m)) <= Registers(conv_integer(d));
+                assert (DataWr = '1') report "STS 15";
+            end if;
+
+            wait until (clock = '1');
+            DataDB <= (others => 'Z');
+
+            wait for 1 ns;
+            assert (DataRd = '1') report "STS 16";
+            assert (DataWr = '1') report "STS 17";
+        end procedure;
+
         procedure run_POP (
             d : std_logic_vector(4 downto 0);
             k : std_logic_vector(7 downto 0)) is
@@ -1347,7 +1404,6 @@ begin
                 -- Set register 28 (low byte of Y)
                 run_LDI("1100", std_logic_vector(to_unsigned(start, 8)));
                 for i in 0 to 10 loop
-                    report integer'image(reg) & " " & integer'image(start) & " " & integer'image(i);
                     run_STDY(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 6)), std_logic_vector(to_unsigned(i, 8)));
                     run_STX (std_logic_vector(to_unsigned(reg, 5)));
                 end loop;
@@ -1370,12 +1426,20 @@ begin
         end loop;
         report "Done with STDZ";
 
-         -- fill registers with distinct values to make errors easier to detect
-         for i in 0 to 31 loop
-             -- Set register i to i (fill with distinct values)
-             run_LDI(std_logic_vector(to_unsigned(i, 5)), std_logic_vector(to_unsigned(i, 8)));
-         end loop;
+        -- fill registers with distinct values to make errors easier to detect
+        for i in 0 to 31 loop
+            -- Set register i to i (fill with distinct values)
+            run_LDI(std_logic_vector(to_unsigned(i, 5)), std_logic_vector(to_unsigned(i, 8)));
+        end loop;
  
+        -- test STS
+        for reg in 0 to 31 loop
+            for i in 0 to 100 loop -- go through Registers, IO, and Memory
+                run_STS(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)), std_logic_vector(to_unsigned(i, 16)));
+                run_STX(std_logic_vector(to_unsigned(reg, 5)));
+            end loop;
+        end loop;
+        report "Done with STS";
 
          -- test PUSH
          for i in 0 to 100 loop
