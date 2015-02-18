@@ -917,7 +917,7 @@ begin
                 assert (DataAB = address) report "STDY 8";
                 assert (DataDB = Registers(conv_integer(d))) report "STDY 9";
             else
-                Registers(conv_integer(d)) <= Registers(conv_integer(address));
+                Registers(conv_integer(address)) <= Registers(conv_integer(d));
                 assert (DataWr = '1') report "STDY 10";
             end if;
 
@@ -965,7 +965,7 @@ begin
                 assert (DataAB = address) report "STDZ 8";
                 assert (DataDB = Registers(conv_integer(d))) report "STDZ 9";
             else
-                Registers(conv_integer(d)) <= Registers(conv_integer(address));
+                Registers(conv_integer(address)) <= Registers(conv_integer(d));
                 assert (DataWr = '1') report "STDZ 10";
             end if;
 
