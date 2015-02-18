@@ -979,7 +979,6 @@ begin
 
         procedure run_STS (
             d : std_logic_vector(4 downto 0);
-            k : std_logic_vector(7 downto 0);
             m : std_logic_vector(15 downto 0)) is
         begin
                 -- 1001001rrrrr0000
@@ -1435,7 +1434,7 @@ begin
         -- test STS
         for reg in 0 to 31 loop
             for i in 0 to 100 loop -- go through Registers, IO, and Memory
-                run_STS(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)), std_logic_vector(to_unsigned(i, 16)));
+                run_STS(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 16)));
                 run_STX(std_logic_vector(to_unsigned(reg, 5)));
             end loop;
         end loop;
