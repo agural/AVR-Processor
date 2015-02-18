@@ -798,7 +798,7 @@ begin
                 run_STX(std_logic_vector(to_unsigned(i, 5)));
             end loop;
         end loop;
-        report "Done with LDS";
+        report "Done with MOV";
         
         wait until (clock = '1');
         wait until (clock = '1');
