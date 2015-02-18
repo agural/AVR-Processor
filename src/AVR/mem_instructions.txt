@@ -20,5 +20,5 @@
 [-] STDY
 [-] STDZ
 [ ] STS
-[ ] POP
-[ ] PUSH
+[X] POP
+[X] PUSH

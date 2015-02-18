@@ -27,7 +27,7 @@ architecture TB_ARCHITECTURE of MEM_TEST_TB is
     constant NUM_REGS : integer := 96; -- number of registers (including IO)
     type REG_ARRAY is array (0 to NUM_REGS-1) of std_logic_vector(7 downto 0);
     signal Registers : REG_ARRAY;
-    signal SP        : std_logic_vector(7 downto 0);
+    signal SP        : std_logic_vector(15 downto 0);
 
     signal end_sim :  boolean := false;                 -- end simulation flag
 begin
@@ -982,7 +982,9 @@ begin
             k : std_logic_vector(7 downto 0)) is
             variable address : std_logic_vector(15 downto 0);
         begin
-            address := SP;
+            address := std_logic_vector(unsigned(SP) + 1);
+            SP <= address;
+
                 -- 1001000ddddd1111
             IR <= "1001000XXXXX1111";
             IR(8 downto 4) <= d;
@@ -1014,8 +1016,6 @@ begin
 
             wait until (clock = '1');
             DataDB <= (others => 'Z');
-            address := std_logic_vector(unsigned(address) + 1);
-            SP <= address;
 
             wait for 1 ns;
             assert (DataRd = '1') report "POP 9";
@@ -1027,8 +1027,6 @@ begin
             variable address : std_logic_vector(15 downto 0);
         begin
             address := SP;
-            address := std_logic_vector(unsigned(address) - 1);
-            SP <= address;
 
                 -- 1001001rrrrr1111
             IR <= "1001001XXXXX1111";
@@ -1059,6 +1057,7 @@ begin
             end if;
 
             wait until (clock = '1');
+            SP <= std_logic_vector(unsigned(SP) - 1);
             wait for 1 ns;
             assert (DataRd = '1') report "PUSH 12";
             assert (DataWr = '1') report "PUSH 13";
@@ -1344,42 +1343,12 @@ begin
              run_LDI(std_logic_vector(to_unsigned(i, 5)), std_logic_vector(to_unsigned(i, 8)));
          end loop;
  
-         -- test STDY
-         for reg in 0 to 31 loop
-             for start in 90 to 96 loop -- values near IO to mem border
-                 -- Set register 29 (high byte of Y)
-                 run_LDI("1101", "00000000");
-                 -- Set register 28 (low byte of Y)
-                 run_LDI("1100", std_logic_vector(to_unsigned(start, 8)));
-                 for i in 0 to 10 loop
-                     report integer'image(reg) & " " & integer'image(start) & " " & integer'image(i);
-                     run_STDY(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 6)), std_logic_vector(to_unsigned(i, 8)));
-                     run_STX (std_logic_vector(to_unsigned(reg, 5)));
-                 end loop;
-             end loop;
-         end loop;
-         report "Done with STDY";
- 
-         -- test STDZ
-         for reg in 0 to 31 loop
-             for start in 90 to 96 loop -- values near IO to mem border
-                 -- Set register 31 (high byte of Z)
-                 run_LDI("1111", "00000000");
-                 -- Set register 30 (low byte of Z)
-                 run_LDI("1110", std_logic_vector(to_unsigned(start, 8)));
-                 for i in 0 to 10 loop
-                     run_STDZ(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 6)), std_logic_vector(to_unsigned(i, 8)));
-                     run_STX (std_logic_vector(to_unsigned(reg, 5)));
-                 end loop;
-             end loop;
-         end loop;
-         report "Done with STDZ";
 
          -- test PUSH
          for i in 0 to 100 loop
              run_PUSH(std_logic_vector(to_unsigned(i, 8)));
          end loop;
-        report "Done with PUSH";
+         report "Done with PUSH";
 
          -- test POP
          -- Set register 27 (high byte of X)
@@ -1390,7 +1359,7 @@ begin
              run_POP("00000", std_logic_vector(to_unsigned(i, 8)));
              run_STX("00000");
          end loop;
-        report "Done with POP";
+         report "Done with POP";
 
          wait until (clock = '1');
          wait until (clock = '1');
