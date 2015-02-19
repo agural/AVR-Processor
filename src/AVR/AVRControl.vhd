@@ -671,6 +671,17 @@ begin
             SelA         <= "00" & IR(9) & IR(3 downto 0);  -- Register r
             RegDataInSel <= "11";                   -- take data from registers
         end if;
+        
+        if ( std_match(IR, OpJMP) ) then
+            PCUUpdateSel <= "01";   -- next PC taken from ProgDB
+            
+            if CycleCount = "00" then
+            end if;
+            if CycleCount = "01" then
+            end if;
+            if CycleCount = "10" then
+            end if;
+        end if;
     end process DecodeInstruction;
 
     -- process to keep track of which step in a two-clock instruction is being run
