@@ -113,7 +113,7 @@ begin
         clock                  => clock,
         IR                     => IR,
         ProgDB                 => (others => 'X'),
-        MemRegAddr             => (others => 'X'),
+        MemRegAddr             => (others => '0'),
 
         ALUStatusMask          => ALUStatusMask,
         ALUStatusBitChangeEn   => ALUStatusBitChangeEn,
