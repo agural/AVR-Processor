@@ -58,6 +58,12 @@ begin
        variable temp     : std_logic_vector(7 downto 0);
        constant max_value : integer := ((2 ** 8) - 1); -- maximum possible input
     begin
+        -- give a valid value
+        IR <= (others => '0');
+        wait for 20 ns;
+        wait until (clock = '1');
+        report "START SIMULATION";
+
         -- initially status is unknown (so do not check values)
         status := (others => '-');
         
