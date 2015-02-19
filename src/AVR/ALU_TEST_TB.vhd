@@ -95,7 +95,6 @@ begin
             --    "1001010ddddd0001";
             wait until (clock = '1');
             IR <= "1001010XXXXX0001";
-            wait until (clock = '1');
             OperandA <= std_logic_vector(to_unsigned(i, 8));
             OperandB <= "00000000";
             wait until (clock = '1');
@@ -140,13 +139,14 @@ begin
 
         -- Test Mul
         --    "100111rdddddrrrr";
-        IR <= "100111XXXXXXXXXX";
         wait until (clock = '1');
+        IR <= "100111XXXXXXXXXX";
         for i in 0 to max_value loop
             for j in 0 to max_value loop
                 OperandA <= std_logic_vector(to_unsigned(i, 8));
                 OperandB <= std_logic_vector(to_unsigned(j, 8));
                 answer15 := std_logic_vector(to_unsigned(i * j, 16));
+
                 wait until (clock = '1');
 
                 -- verify that result matches
