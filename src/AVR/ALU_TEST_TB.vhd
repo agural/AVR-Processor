@@ -58,8 +58,10 @@ begin
        variable temp     : std_logic_vector(7 downto 0);
        constant max_value : integer := ((2 ** 8) - 1); -- maximum possible input
     begin
-        -- give a valid value
+        -- give valid values
         IR <= (others => '0');
+        OperandA <= (others => '0');
+        OperandB <= (others => '0');
         wait for 20 ns;
         wait until (clock = '1');
         report "START SIMULATION";
