@@ -68,6 +68,7 @@ entity AVRControl is
         DataOutSel              : out std_logic;                    -- selects whether to output to DataDB from the registers or control
         CtrlDataOut             : out std_logic_vector(7 downto 0); -- control data to output to DataDB
         CtrlDataIn              : in  std_logic_vector(7 downto 0); -- control data input from DataDB
+        RegAIn                  : in  std_logic_vector(7 downto 0); -- input from registers output (for skip instructions)
         SpecRegIn               : in  std_logic_vector(15 downto 0);-- input from the special registers
         
         StatusReg               : in  std_logic_vector(7 downto 0); -- status flags; used for conditional branching
@@ -75,9 +76,9 @@ entity AVRControl is
         
         NextPC                  : in  std_logic_vector(15 downto 0);-- value of the next PC (after adding the offset)
         NewPC                   : out std_logic_vector(15 downto 0);-- control register-set PC value
-        PCOffset                : in  std_logic_vector(11 downto 0);-- signed offset to add to PC
-        PCUUpdateSel            : in  std_logic_vector( 1 downto 0);-- selects which input source to use to update PC
-        newIns                  : in  std_logic                     -- signal to latch the instruction register output
+        PCOffset                : out std_logic_vector(11 downto 0);-- signed offset to add to PC
+        PCUUpdateSel            : out std_logic_vector( 1 downto 0);-- selects which input source to use to update PC
+        newIns                  : out std_logic                     -- signal to latch the instruction register output
     );
 end AVRControl;
 
@@ -90,41 +91,57 @@ architecture DataFlow of AVRControl is
     signal MemAStore   : std_logic_vector(15 downto 0) := "0000000000000000";   -- stores the first cycle value of MemRegAddr
     signal ProgStore   : std_logic_vector(15 downto 0) := "0000000000000000";   -- stores the second cycle value of ProgDB
     
+    signal oneWordNext : std_logic;                     -- stores number of words of following instruction
     signal CallRetStore: std_logic_vector(15 downto 0); -- temporary storage for the program counter when CALLing/RETurning
 begin
     -- latches the memory input
     MemAStore   <= MemRegAddr when (CycleCount = "00") and (clock = '0') else MemAStore;
+    -- determines whether registers (0) or memory (1)
     MemRegAddrM <= '0' when (CycleCount = "00") and (to_integer(unsigned(MemAStore)) <= 95) else
                    '1' when CycleCount = "00" else
-                   MemRegAddrM; -- determines whether registers (0) or memory (1)
-    
+                   MemRegAddrM;
     -- latches the ProgDB input
     ProgStore   <= ProgDB when (CycleCount = "01") and (std_match(IR, OpLDS) or std_match(IR, OpSTS)) and (clock = '0') else ProgStore;
-    ProgDBM     <= '0' when (to_integer(unsigned(ProgStore)) <= 95) else '1';   -- determines whether registers (0) or memory (1)
+    -- determines whether registers (0) or memory (1)
+    ProgDBM     <= '0' when (to_integer(unsigned(ProgStore)) <= 95) else '1';
+    -- output address based on instruction
+    RegAddr     <= ProgStore(6 downto 0) when (std_match(IR, OpLDS) or std_match(IR, OpSTS)) else MemAStore(6 downto 0);
+    -- output address based on instruction
+    MemAddr     <= ProgStore when (std_match(IR, OpLDS) or std_match(IR, OpSTS)) else MemAStore;
     
-    RegAddr     <= ProgStore(6 downto 0) when (std_match(IR, OpLDS) or std_match(IR, OpSTS)) else MemAStore(6 downto 0); -- output address based on instruction
-    MemAddr     <= ProgStore when (std_match(IR, OpLDS) or std_match(IR, OpSTS)) else MemAStore; -- output address based on instruction
+    -- latches number of words of next instruction
+    oneWordNext <= '0' when (std_match(ProgDB, OpLDS) or std_match(ProgDB, OpSTS) or
+                             std_match(ProgDB, OpJMP) or std_match(ProgDB, OpCALL)) and (CycleCount = "00") else
+                   '1' when CycleCount = "00" else
+                   oneWordNext;
 
     -- Decode new instructions on clock edge
     DecodeInstruction: process (IR, CycleCount, MemRegAddr, ProgDB, MemRegAddrM)
     begin
-        ALUOp2Sel <= RegOp2;            -- default second operand is from register
-        EnableIn <= '1';                -- enable write to register by default
+        ALUOp2Sel <= RegOp2;                    -- default second operand is from register
+        EnableIn  <= '1';                       -- enable write to register by default
         SelA  <= "00" & IR(8 downto 4);         -- bits specifying first register
         SelB  <= "00" & IR(9) & IR(3 downto 0); -- bits specifying second register
         SelIn <= "00" & IR(8 downto 4);         -- normally write to first register
-        SpecWr <= '0';                  -- default don't write to the special registers
-        RegDataInSel <= "00";           -- default input from ALUResult
-        DataIOSel <= '0';               -- default input mode for data (leave DB high-Z)
-        AddrOffset <= std_logic_vector(to_unsigned(0,16));-- default address offset is 0
-        ImmediateOut <= IR(11 downto 8) & IR(3 downto 0); -- normal immediate value
+        SpecWr       <= '0';                    -- default don't write to the special registers
+        RegDataInSel <= "00";                   -- default input from ALUResult
         
-        OutRd  <= '1';                  -- default off (active low)
-        OutWr  <= '1';                  -- default off (active low)
+        DataIOSel    <= '0';                    -- default input mode for data (leave DB high-Z)
+        DataOutSel   <= '0';                    -- default data out from registers
+        AddrOffset   <= std_logic_vector(to_unsigned(0,16));    -- default address offset is 0
+        ImmediateOut <= IR(11 downto 8) & IR(3 downto 0);       -- normal immediate value
+        CtrlDataOut  <= CallRetStore(7 downto 0)-- default low byte of call/ret address
+        
+        OutRd        <= '1';                    -- default off (active low)
+        OutWr        <= '1';                    -- default off (active low)
+        
+        NewPC        <= CallRetStore;           -- default PC is set to the return value
+        PCOffset     <= "000000000001";         -- default to normal PC increment
+        PCUpdateSel  <= "00";                   -- default to update PC by adding offset
 
-        ALUBitClrSet <= StatusBitClear; -- arbitrary value (changed in cases where needed)
-        ALUStatusBitChangeEn <= '0';    -- by default, do not change status bits
-        ALUBitTOp <= '0';               -- by default, do not change flag T
+        ALUBitClrSet <= StatusBitClear;         -- arbitrary value (changed in cases where needed)
+        ALUStatusBitChangeEn <= '0';            -- by default, do not change status bits
+        ALUBitTOp <= '0';                       -- by default, do not change flag T
 
         if std_match(IR, OpADC   ) then -- add with carry
             ALUStatusMask <= flag_mask_ZCNVSH; -- specify which bits may be changed
@@ -661,23 +678,131 @@ begin
     begin
         -- only update on rising clock
         if rising_edge(clock) then
-            CycleCount <= "00"; -- default to 0 (not two-clock instruction)
-            if CycleCount = "00" and ( std_match(IR, OpMUL)  or std_match(IR, OpADIW) or std_match(IR, OpSBIW) or
-                                       std_match(IR, OpLDX)  or std_match(IR, OpLDXI) or std_match(IR, OpLDXD) or
-                                       std_match(IR, OpLDYI) or std_match(IR, OpLDYD) or std_match(IR, OpLDDY) or
-                                       std_match(IR, OpLDZI) or std_match(IR, OpLDZD) or std_match(IR, OpLDDZ) or
-                                       std_match(IR, OpSTX)  or std_match(IR, OpSTXI) or std_match(IR, OpSTXD) or
-                                       std_match(IR, OpSTYI) or std_match(IR, OpSTYD) or std_match(IR, OpSTDY) or
-                                       std_match(IR, OpSTZI) or std_match(IR, OpSTZD) or std_match(IR, OpSTDZ) or
-                                       std_match(IR, OpPOP)  or std_match(IR, OpPUSH) or
-                                       std_match(IR, OpLDS)  or std_match(IR, OpSTS) ) then
-                -- update if in first clock of two clock instruction
-                CycleCount <= "01";
+            -- defaults for 1-cycle instructions
+            CycleCount <= "00";
+            newIns     <= '1';
+            
+            -- 2-cycle instructions
+            if (std_match(IR, OpMUL)  or std_match(IR, OpADIW) or std_match(IR, OpSBIW) or
+                std_match(IR, OpLDX)  or std_match(IR, OpLDXI) or std_match(IR, OpLDXD) or
+                std_match(IR, OpLDYI) or std_match(IR, OpLDYD) or std_match(IR, OpLDDY) or
+                std_match(IR, OpLDZI) or std_match(IR, OpLDZD) or std_match(IR, OpLDDZ) or
+                std_match(IR, OpSTX)  or std_match(IR, OpSTXI) or std_match(IR, OpSTXD) or
+                std_match(IR, OpSTYI) or std_match(IR, OpSTYD) or std_match(IR, OpSTDY) or
+                std_match(IR, OpSTZI) or std_match(IR, OpSTZD) or std_match(IR, OpSTDZ) or
+                std_match(IR, OpPOP)  or std_match(IR, OpPUSH) or
+                std_match(IR, OpRJMP) or std_match(IR, OpIJMP)) then
+                
+                newIns <= '0';  -- multi-clock instructions default to not having new instruction next clock
+                if CycleCount = "00" then
+                    CycleCount <= "01";
+                end if;
+                if CycleCount = "01" then
+                    newIns <= '1';
+                end if;
             end if;
-            if CycleCount = "01" and ( std_match(IR, OpLDS) or std_match(IR, OpSTS) ) then
-                -- update if in second clock of three clock instruction
-                CycleCount <= "10";
+            
+            -- 3-cycle instructions
+            if (std_match(IR, OpLDS) or std_match(IR, OpSTS) or std_match(IR, OpJMP) or
+                std_match(IR, OpRCALL) or std_match(IR, OpICALL)) then
+                newIns <= '0';  -- multi-clock instructions default to not having new instruction next clock
+                if CycleCount = "00" then
+                    CycleCount <= "01";
+                end if;
+                if CycleCount = "01" then
+                    CycleCount <= "10";
+                end if;
+                if CycleCount = "10" then
+                    newIns <= '1';
+                end if;
             end if;
+            
+            -- 4-cycle instructions
+            if (std_match(IR, OpCALL) or std_match(IR, OpRET) or std_match(IR, OpRETI)) then
+                newIns <= '0';  -- multi-clock instructions default to not having new instruction next clock
+                if CycleCount = "00" then
+                    CycleCount <= "01";
+                end if;
+                if CycleCount = "01" then
+                    CycleCount <= "10";
+                end if;
+                if CycleCount = "10" then
+                    CycleCount <= "11";
+                end if;
+                if CycleCount = "11" then
+                    newIns <= '1';
+                end if;
+            end if;
+            
+            -- conditional branches
+            if (std_match(IR, OpBRBC) or std_match(IR, OpBRBS)) then
+                -- branch condition
+                if (IR(10) xor StatusReg(integer(unsigned(IR(2 downto 0))))) = '1' then
+                    newIns <= '0';
+                    if CycleCount = "00" then
+                        CycleCount <= "01";
+                    end if;
+                    if CycleCount = "01" then
+                        newIns <= '1';
+                    end if;
+                end if;
+            end if;
+            
+            -- CPSE instruction
+            if (std_match(IR, OpCPSE)) then
+                -- branching condition
+                if UnofficialZeroFlag = '1' then -- 2 or 3 cycle instruction
+                    newIns <= '0';
+                    
+                    if (oneWordNext = '1') then -- 1-word instruction next
+                        if CycleCount = "00" then
+                            CycleCount <= "01";
+                        end if;
+                        if CycleCount = "01" then
+                            newIns <= '1';
+                        end if;
+                    else -- 2-word instruction next
+                        if CycleCount = "00" then
+                            CycleCount <= "01";
+                        end if;
+                        if CycleCount = "01" then
+                            CycleCount <= "10";
+                        end if;
+                        if CycleCount = "10" then
+                            newIns <= '1';
+                        end if;
+                    end if;
+                end if;
+                -- else, normal 1-cycle instruction
+            end if;
+            
+            -- other skip instructions
+            if (std_match(IR, OpSBRC) or std_match(IR, OpSBRS)) then
+                -- branching condition
+                if (IR(9) xor RegAIn(integer(to_unsigned(IR(2 downto 0))))) = '0' then -- 2 or 3 cycle instruction
+                    newIns <= '0';
+                    
+                    if (oneWordNext = '1') then -- 1-word instruction next
+                        if CycleCount = "00" then
+                            CycleCount <= "01";
+                        end if;
+                        if CycleCount = "01" then
+                            newIns <= '1';
+                        end if;
+                    else -- 2-word instruction next
+                        if CycleCount = "00" then
+                            CycleCount <= "01";
+                        end if;
+                        if CycleCount = "01" then
+                            CycleCount <= "10";
+                        end if;
+                        if CycleCount = "10" then
+                            newIns <= '1';
+                        end if;
+                    end if;
+                end if;
+            end if;
+            
         end if;
     end process UpdateCycleCount;
 end DataFlow;
