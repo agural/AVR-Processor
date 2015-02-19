@@ -59,8 +59,11 @@ begin
     end process UpdateIR;
     
     -- Latches the next program counter value
-    UpdatePC: process(clock)
+    UpdatePC: process(clock, reset)
     begin
+        if (reset = '0') then
+            PC <= ResetAddr;
+        end if;
         if rising_edge(clock) then
             PC <= PCOffsetResult when PCUUpdateSel = "00",
                   ProgDB         when PCUUpdateSel = "01",

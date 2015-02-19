@@ -63,7 +63,21 @@ entity AVRControl is
         OutRd                   : out std_logic;                    -- whether to read from memory
         OutWr                   : out std_logic;                    -- whether to write to memory
         RegDataInSel            : out std_logic_vector(1 downto 0); -- selects which input goes to register in
-        MemAddr                 : out std_logic_vector(15 downto 0) -- memory address (16 bits)
+        MemAddr                 : out std_logic_vector(15 downto 0);-- memory address (16 bits)
+        
+        DataOutSel              : out std_logic;                    -- selects whether to output to DataDB from the registers or control
+        CtrlDataOut             : out std_logic_vector(7 downto 0); -- control data to output to DataDB
+        CtrlDataIn              : in  std_logic_vector(7 downto 0); -- control data input from DataDB
+        SpecRegIn               : in  std_logic_vector(15 downto 0);-- input from the special registers
+        
+        StatusReg               : in  std_logic_vector(7 downto 0); -- status flags; used for conditional branching
+        UnofficialZeroFlag      : in  std_logic;                    -- zero status flag (before being masked)
+        
+        NextPC                  : in  std_logic_vector(15 downto 0);-- value of the next PC (after adding the offset)
+        NewPC                   : out std_logic_vector(15 downto 0);-- control register-set PC value
+        PCOffset                : in  std_logic_vector(11 downto 0);-- signed offset to add to PC
+        PCUUpdateSel            : in  std_logic_vector( 1 downto 0);-- selects which input source to use to update PC
+        newIns                  : in  std_logic                     -- signal to latch the instruction register output
     );
 end AVRControl;
 
@@ -75,14 +89,18 @@ architecture DataFlow of AVRControl is
     signal RegAddr     : std_logic_vector(6 downto 0)  := "0000000";            -- stores the first cycle of memory for registers to use
     signal MemAStore   : std_logic_vector(15 downto 0) := "0000000000000000";   -- stores the first cycle value of MemRegAddr
     signal ProgStore   : std_logic_vector(15 downto 0) := "0000000000000000";   -- stores the second cycle value of ProgDB
+    
+    signal CallRetStore: std_logic_vector(15 downto 0); -- temporary storage for the program counter when CALLing/RETurning
 begin
+    -- latches the memory input
     MemAStore   <= MemRegAddr when (CycleCount = "00") and (clock = '0') else MemAStore;
     MemRegAddrM <= '0' when (CycleCount = "00") and (to_integer(unsigned(MemAStore)) <= 95) else
                    '1' when CycleCount = "00" else
-                   MemRegAddrM;
+                   MemRegAddrM; -- determines whether registers (0) or memory (1)
     
+    -- latches the ProgDB input
     ProgStore   <= ProgDB when (CycleCount = "01") and (std_match(IR, OpLDS) or std_match(IR, OpSTS)) and (clock = '0') else ProgStore;
-    ProgDBM     <= '0' when (to_integer(unsigned(ProgStore)) <= 95) else '1';
+    ProgDBM     <= '0' when (to_integer(unsigned(ProgStore)) <= 95) else '1';   -- determines whether registers (0) or memory (1)
     
     RegAddr     <= ProgStore(6 downto 0) when (std_match(IR, OpLDS) or std_match(IR, OpSTS)) else MemAStore(6 downto 0); -- output address based on instruction
     MemAddr     <= ProgStore when (std_match(IR, OpLDS) or std_match(IR, OpSTS)) else MemAStore; -- output address based on instruction
