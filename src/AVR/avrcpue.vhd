@@ -79,6 +79,7 @@ architecture Structural of AVR_CPU is
     signal ALUBitTOp              : std_logic;
 
     signal RegIn                  : std_logic_vector(7 downto 0);
+    signal StatReg                : std_logic_vector(7 downto 0);
 
     -- Signals between ALU and Registers
     signal RegA         : std_logic_vector(7 downto 0);      -- first operand
@@ -94,7 +95,6 @@ architecture Structural of AVR_CPU is
     
     -- Signals between Control Unit and DMA / Memory
     signal MemRegAddr   : std_logic_vector(15 downto 0);-- register-based indirect memory access
-    signal ImmediateOut : std_logic_vector(7 downto 0); -- value of immediate
 
     signal DataIOSel    : std_logic;                    -- selects whether data is input or output
     signal AddrOffset   : std_logic_vector(15 downto 0);-- offset of address
@@ -115,24 +115,24 @@ begin
     -- status and result)
     ALU : entity work.ALU
     port map (
-        clock => clock,
+        clock                   => clock,
 
-        ALUBlockSel => ALUBlockSel,
-        ALUBlockInstructionSel => ALUBlockInstructionSel,
+        ALUBlockSel             => ALUBlockSel,
+        ALUBlockInstructionSel  => ALUBlockInstructionSel,
 
-        ALUOp2Sel => ALUOp2Sel,
-        ImmediateOut => ImmediateOut,
+        ALUOp2Sel               => ALUOp2Sel,
+        ImmediateOut            => ImmediateOut,
 
-        ALUStatusMask => ALUStatusMask,
-        ALUStatusBitChangeEn => ALUStatusBitChangeEn,
-        ALUBitClrSet => ALUBitClrSet,
-        ALUBitTOp => ALUBitTOp,
+        ALUStatusMask           => ALUStatusMask,
+        ALUStatusBitChangeEn    => ALUStatusBitChangeEn,
+        ALUBitClrSet            => ALUBitClrSet,
+        ALUBitTOp               => ALUBitTOp,
 
-        RegAOut => RegA,
-        RegBOut => RegB,
+        RegAOut                 => RegA,
+        RegBOut                 => RegB,
 
-        RegIn => Result,
-        RegStatus => StatReg
+        RegIn                   => ALUResult,
+        RegStatus               => StatReg
     );
 
     -- Connect the Control Unit to the testing interface (reads instruction
@@ -171,29 +171,29 @@ begin
     
     Registers : entity work.AVRRegisters
     port map (
-        clock    => clock,
-        EnableIn => EnableIn,
-        SelIn    => SelIn,
-        SelA     => SelA,
-        SelB     => SelB,
+        clock           => clock,
+        Reset           => Reset,
+        
+        EnableIn        => EnableIn,
+        SelIn           => SelIn,
+        SelA            => SelA,
+        SelB            => SelB,
 
-        ALUIn        => ALUResult,
-        RegDataImm   => ImmediateOut,
-        RegDataInSel => RegDataInSel,
+        ALUIn           => ALUResult,
+        RegDataImm      => ImmediateOut,
+        RegDataInSel    => RegDataInSel,
 
-        RegAOut  => RegA,
-        RegBOut  => RegB,
+        RegAOut         => RegA,
+        RegBOut         => RegB,
 
-        SpecOut  => open,
-        SpecAddr => SpecAddr,
-        SpecWr   => SpecWr,
+        SpecOut         => open,
+        SpecAddr        => SpecAddr,
+        SpecWr          => SpecWr,
 
-        MemRegData => DataDB,
-        AddrOffset => AddrOffset,
-        MemRegAddr => MemRegAddr,
-        DataIOSel  => DataIOSel,
-
-        Reset      => Reset
+        MemRegData      => DataDB,
+        AddrOffset      => AddrOffset,
+        MemRegAddr      => MemRegAddr,
+        DataIOSel       => DataIOSel
     );
 
     DMA : entity work.DMAUnit
