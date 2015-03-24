@@ -45,7 +45,13 @@ begin
     -- Main testing procedure
     process
     begin
-        report "Hi!";
+        report "Starting processor";
+        
+        Reset <= '0';
+        wait for 10 ns;
+        Reset <= '1';
+        
+        wait for 100 us;
 
         wait until (clock = '1');
         wait until (clock = '1');
