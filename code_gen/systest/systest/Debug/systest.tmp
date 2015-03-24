@@ -1,0 +1,42 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.1.57</VERSION>
+ <DEVICE>"ATmega16"</DEVICE>
+ <WORKING_DIR>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>D:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.1175\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>D:\Program Files (x86)\Atmel\Atmel Toolchain\AVR Assembler\Native\2.1.1175\avrassembler\Include\m16def.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\Debug/systest.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>systest.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>systest.map</FILE>
+  <FILE>systest.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <Start><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>22</LINE></Start>
+  <TestJumps><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>339</LINE></TestJumps>
+  <JumpTest><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>346</LINE></JumpTest>
+  <BackRJump><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>342</LINE></BackRJump>
+  <ForwardRJump><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>349</LINE></ForwardRJump>
+  <IndirJump><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>355</LINE></IndirJump>
+  <TestCalls><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>358</LINE></TestCalls>
+  <Subr1><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>437</LINE></Subr1>
+  <TestBranches><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>366</LINE></TestBranches>
+  <Branch1><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>370</LINE></Branch1>
+  <Branch2><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>375</LINE></Branch2>
+  <Branch3><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>382</LINE></Branch3>
+  <Branch4><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>387</LINE></Branch4>
+  <Branch5><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>393</LINE></Branch5>
+  <SubrI><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>444</LINE></SubrI>
+  <Branch6><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>409</LINE></Branch6>
+  <TestSkips><FILE>C:\Users\Albert\Documents\GitHub\AVR-Processor\code_gen\systest\systest\systest.asm</FILE><LINE>416</LINE></TestSkips>
+ </LABELS>
+</ASSEMBLER_INFO>

@@ -163,6 +163,7 @@
     <transform xil_pn:end_ts="1423540923" xil_pn:in_ck="6017717149626901124" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="7756975690952225818" xil_pn:start_ts="1423540862">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
       <outfile xil_pn:name="REG_TEST_TB_beh.prj"/>
       <outfile xil_pn:name="REG_TEST_TB_isim_beh.exe"/>
       <outfile xil_pn:name="fuse.log"/>
@@ -172,8 +173,11 @@
     <transform xil_pn:end_ts="1423540924" xil_pn:in_ck="2374181055579393121" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="6942639812640200647" xil_pn:start_ts="1423540923">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <outfile xil_pn:name="REG_TEST_TB_isim_beh.wdb"/>
-      <outfile xil_pn:name="isim.cmd"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputRemoved"/>
+      <status xil_pn:value="OutputRemoved"/>
     </transform>
     <transform xil_pn:end_ts="1423227485" xil_pn:name="TRAN_copyInitialToXSTAbstractSynthesis" xil_pn:start_ts="1423227485">
       <status xil_pn:value="SuccessfullyRun"/>
