@@ -137,52 +137,6 @@ begin
         report "DONE WITH NEG";
         
 
-        -- Test Mul
-        --    "100111rdddddrrrr";
-        wait until (clock = '1');
-        IR <= "100111XXXXXXXXXX";
-        for i in 0 to max_value loop
-            for j in 0 to max_value loop
-                OperandA <= std_logic_vector(to_unsigned(i, 8));
-                OperandB <= std_logic_vector(to_unsigned(j, 8));
-                answer15 := std_logic_vector(to_unsigned(i * j, 16));
-
-                wait until (clock = '1');
-
-                -- verify that result matches
-                assert (std_match(Result, answer15(7 downto 0)))
-                    report "Wrong answer for MUL(" &
-                        integer'image(to_integer(unsigned(OperandA))) & ", " &
-                        integer'image(to_integer(unsigned(OperandB))) & ") = " &
-                        integer'image(to_integer(unsigned(answer15))) &
-                        " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
-                severity ERROR;
-
-                wait until (clock = '1');
-
-                -- verify that result matches
-                assert (std_match(Result, answer15(15 downto 8)))
-                    report "Wrong answer for MUL(" &
-                        integer'image(to_integer(unsigned(OperandA))) & ", " &
-                        integer'image(to_integer(unsigned(OperandB))) & ") = " &
-                        integer'image(to_integer(unsigned(answer15))) &
-                        " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
-                severity ERROR;
-
-                ---- verify that result matches
-                --assert (std_match(StatReg, status))
-                --    report "Wrong status for MUL(" &
-                --        integer'image(to_integer(unsigned(OperandA))) & ", " &
-                --        integer'image(to_integer(unsigned(temp))) & ") = " &
-                --        integer'image(to_integer(unsigned(answer))) & " (Got " &
-                --        integer'image(to_integer(unsigned(StatReg))) & " instead of " &
-                --        integer'image(to_integer(unsigned(status))) & ")"
-                --severity ERROR;
-            end loop;
-        end loop;
-
-        report "DONE WITH MUL";
-
         -- Test SBCI
         for i in 0 to max_value loop
             for j in 0 to max_value loop
@@ -191,7 +145,6 @@ begin
                 temp := std_logic_vector(to_unsigned(j, 8));
                 IR(11 downto 8) <= temp(7 downto 4);
                 IR(3 downto 0) <= temp(3 downto 0);
-                wait until (clock = '1');
                 OperandA <= std_logic_vector(to_unsigned(i, 8));
                 wait until (clock = '1');
                 answer := std_logic_vector(unsigned(OperandA) - unsigned(temp) - ("0000000" & status(flag_C)));
@@ -664,14 +617,6 @@ begin
             status(i) := '1';
 
             -- verify that result matches
-            assert (std_match(Result, answer))
-                report "Wrong answer for BSET(" &
-                    integer'image(i) & ") = " &
-                    integer'image(to_integer(unsigned(answer))) &
-                    " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
-            severity ERROR;
-
-            -- verify that result matches
             assert (std_match(StatReg, status))
                 report "Wrong status for BSET(" &
                     integer'image(i) & ") = " &
@@ -695,14 +640,6 @@ begin
             wait until (clock = '1');
             answer := (0 => status(i), others => '0');
             status(i) := '0';
-
-            -- verify that result matches
-            assert (std_match(Result, answer))
-                report "Wrong answer for BCLR(" &
-                    integer'image(i) & ") = " &
-                    integer'image(to_integer(unsigned(answer))) &
-                    " (Got " & integer'image(to_integer(unsigned(Result))) & ")"
-            severity ERROR;
 
             -- verify that result matches
             assert (std_match(StatReg, status))
@@ -968,6 +905,7 @@ begin
         report "DONE WITH ORI";
 
         -- Test Or
+        OperandB <= "00000000"; -- prevent warnings from X...X from ORI test
         for i in 0 to max_value loop
             for j in 0 to max_value loop
                 --    "001010rdddddrrrr";
