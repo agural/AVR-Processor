@@ -63,7 +63,13 @@ entity AVRControl is
         OutRd                   : out std_logic;                    -- whether to read from memory
         OutWr                   : out std_logic;                    -- whether to write to memory
         RegDataInSel            : out std_logic_vector(1 downto 0); -- selects which input goes to register in
-        MemAddr                 : out std_logic_vector(15 downto 0) -- memory address (16 bits)
+        MemAddr                 : out std_logic_vector(15 downto 0);-- memory address (16 bits)
+        
+        PCUpdateSel             : out std_logic_vector(1 downto 0);  -- source of next program counter
+        NextPC                  : in  std_logic_vector(15 downto 0); -- next program counter
+        PCOffset                : out std_logic_vector(11 downto 0); -- increment for program counter
+        NewIns                  : out std_logic                      -- indicates new instruction should be loaded
+
     );
 end AVRControl;
 

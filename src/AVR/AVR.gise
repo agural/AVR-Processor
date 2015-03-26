@@ -23,6 +23,9 @@
 
   <files xmlns="http://www.xilinx.com/XMLSchema">
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_LSO" xil_pn:name=".lso"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALUStatus.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="ALUStatus.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="ALUStatus.xst"/>
     <file xil_pn:fileType="FILE_CMD_LOG" xil_pn:name="ALU_TEST.cmd_log"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_LSO" xil_pn:name="ALU_TEST.lso"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALU_TEST.prj"/>
@@ -31,6 +34,15 @@
     <file xil_pn:fileType="FILE_HTML" xil_pn:name="ALU_TEST_summary.html"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ALU_TEST_vhdl.prj"/>
     <file xil_pn:fileType="FILE_XRPT" xil_pn:name="ALU_TEST_xst.xrpt"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AVRControl.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="AVRControl.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="AVRControl.xst"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AVR_CPU.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="AVR_CPU.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="AVR_CPU.xst"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AVR_CPU_TEST.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="AVR_CPU_TEST.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="AVR_CPU_TEST.xst"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AVR_CPU_TEST_TB.prj"/>
     <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="AVR_CPU_TEST_TB.stx"/>
     <file xil_pn:fileType="FILE_XST" xil_pn:name="AVR_CPU_TEST_TB.xst"/>
@@ -38,6 +50,9 @@
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="AVR_CPU_TEST_TB_isim_beh.exe"/>
     <file xil_pn:fileType="FILE_ISIM_MISC" xil_pn:name="AVR_CPU_TEST_TB_isim_beh.wdb"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AVR_CPU_TEST_TB_stx_beh.prj"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="MEM_TEST.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="MEM_TEST.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="MEM_TEST.xst"/>
     <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/xst.xmsgs"/>
     <file xil_pn:fileType="FILE_LOG" xil_pn:name="fuse.log"/>
     <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="isim"/>
@@ -53,13 +68,9 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1427239554" xil_pn:in_ck="3439745171620949165" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1427239554">
+    <transform xil_pn:end_ts="1427347082" xil_pn:in_ck="1882815935420500539" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1427347082">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="OutOfDateForOutputs"/>
-      <status xil_pn:value="InputChanged"/>
-      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="ALU.vhd"/>
       <outfile xil_pn:name="ALUAddBlock.vhd"/>
       <outfile xil_pn:name="ALUCommands.vhd"/>
@@ -75,6 +86,7 @@
       <outfile xil_pn:name="AVR_CPU_TEST_TB.vhd"/>
       <outfile xil_pn:name="DMAUnit.vhd"/>
       <outfile xil_pn:name="MEM_TEST_TB.vhd"/>
+      <outfile xil_pn:name="PMAUnit.vhd"/>
       <outfile xil_pn:name="REG_TEST_TB.vhd"/>
       <outfile xil_pn:name="RegTest.vhd"/>
       <outfile xil_pn:name="avrcpue.vhd"/>
@@ -95,14 +107,9 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1427239565" xil_pn:in_ck="3439745171620949165" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1427239565">
+    <transform xil_pn:end_ts="1427347082" xil_pn:in_ck="1882815935420500539" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1427347082">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
-      <status xil_pn:value="OutOfDateForOutputs"/>
-      <status xil_pn:value="InputChanged"/>
-      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="ALU.vhd"/>
       <outfile xil_pn:name="ALUAddBlock.vhd"/>
       <outfile xil_pn:name="ALUCommands.vhd"/>
@@ -118,6 +125,7 @@
       <outfile xil_pn:name="AVR_CPU_TEST_TB.vhd"/>
       <outfile xil_pn:name="DMAUnit.vhd"/>
       <outfile xil_pn:name="MEM_TEST_TB.vhd"/>
+      <outfile xil_pn:name="PMAUnit.vhd"/>
       <outfile xil_pn:name="REG_TEST_TB.vhd"/>
       <outfile xil_pn:name="RegTest.vhd"/>
       <outfile xil_pn:name="avrcpue.vhd"/>
@@ -126,30 +134,24 @@
       <outfile xil_pn:name="opcodes.vhd"/>
       <outfile xil_pn:name="progmem.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1427239569" xil_pn:in_ck="3439745171620949165" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="4652906877918418942" xil_pn:start_ts="1427239565">
+    <transform xil_pn:end_ts="1427347085" xil_pn:in_ck="1882815935420500539" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="4652906877918418942" xil_pn:start_ts="1427347082">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="OutOfDateForProperties"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
-      <status xil_pn:value="InputChanged"/>
       <status xil_pn:value="OutputChanged"/>
-      <status xil_pn:value="OutputRemoved"/>
+      <outfile xil_pn:name="AVR_CPU_TEST_TB_beh.prj"/>
+      <outfile xil_pn:name="AVR_CPU_TEST_TB_isim_beh.exe"/>
       <outfile xil_pn:name="fuse.log"/>
       <outfile xil_pn:name="isim"/>
       <outfile xil_pn:name="isim.log"/>
       <outfile xil_pn:name="xilinxsim.ini"/>
     </transform>
-    <transform xil_pn:end_ts="1427239570" xil_pn:in_ck="-583773089871998541" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="61747371094060011" xil_pn:start_ts="1427239569">
+    <transform xil_pn:end_ts="1427347085" xil_pn:in_ck="-583773089871998541" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="61747371094060011" xil_pn:start_ts="1427347085">
       <status xil_pn:value="SuccessfullyRun"/>
-      <status xil_pn:value="NotReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="OutOfDateForProperties"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
-      <status xil_pn:value="OutOfDateForOutputs"/>
-      <status xil_pn:value="InputRemoved"/>
-      <status xil_pn:value="OutputRemoved"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <outfile xil_pn:name="AVR_CPU_TEST_TB_isim_beh.wdb"/>
+      <outfile xil_pn:name="isim.cmd"/>
+      <outfile xil_pn:name="isim.log"/>
     </transform>
     <transform xil_pn:end_ts="1427239022" xil_pn:name="TRAN_copyInitialToXSTAbstractSynthesis" xil_pn:start_ts="1427239022">
       <status xil_pn:value="SuccessfullyRun"/>

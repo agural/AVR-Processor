@@ -109,7 +109,12 @@ architecture Structural of AVR_CPU is
     
     -- Signals between Control Unit and PMA Unit
     signal IR           : opcode_word;  -- Instruction Register
+    signal PCUpdateSel  : std_logic_vector(1 downto 0);  -- source of next program counter
+    signal NextPC       : std_logic_vector(15 downto 0); -- next program counter
+    signal PCOffset     : std_logic_vector(11 downto 0); -- increment for program counter
+    signal NewIns       : std_logic;                     -- indicates new instruction should be loaded
 
+    signal NewPC        : std_logic_vector(15 downto 0); -- TODO
 begin
     -- Connect the ALU to the testing interface (reads input values and gives
     -- status and result)
@@ -166,7 +171,12 @@ begin
         OutRd                  => DMARead,
         OutWr                  => DMAWrite,
         RegDataInSel           => RegDataInSel,
-        MemAddr                => MemAddr
+        MemAddr                => MemAddr,
+        
+        PCUpdateSel            => PCUpdateSel,
+        NextPC                 => NextPC,
+        PCOffset               => PCOffset,
+        NewIns                 => NewIns
     );
     
     Registers : entity work.AVRRegisters
@@ -205,6 +215,19 @@ begin
         InWr    => DMAWrite,
         OutRd   => DataRd,
         OutWr   => DataWr
+    );
+    
+    PMA : entity work.PMAUnit
+    port map (
+        ProgAB      => ProgAB,
+        ProgDB      => ProgDB,
+        PCUpdateSel => PCUpdateSel,
+        NextPC      => NextPC,
+        PCOffset    => PCOffset,
+        NewIns      => NewIns,
+        IR          => IR,
+        NewPC       => NewPC,
+        Clk         => Clock
     );
 
 end Structural;
