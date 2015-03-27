@@ -1762,7 +1762,8 @@ ForwardRJump:
         LDI     R16, $A7                ; should skip these instructions
         JMP		Bad
 IndirJump:
-		JMP		TestBranches
+		CALL	TestCalls				; seems like you need to initialize SP
+										; with one more push than pop
 
 TestCalls:                              ; test subroutine calls
         CALL    Subr1                   ; direct subroutine call
@@ -1799,11 +1800,11 @@ TestCalls:                              ; test subroutine calls
 
 		BCLR	7
         CALL    SubrI                   ; direct subroutine call
-		CPI		R24, $27				; with interrupt return (RETI)
+		CPI		R25, $FF				; with interrupt return (RETI)
 		BRNE	CALLBad
-		CPI		R25, $18
+		CPI		R26, $7F
 		BRNE	CALLBad
-		CPI		R26, $28
+		CPI		R30, $66
 		BRNE	CALLBad
 		BRBC	7, CALLBad				; interrupt flag should be set
 		
@@ -1857,15 +1858,15 @@ Branch5:
         BRGE    Bad			            ; so should not take the branch
         CLI                             ; clear interrupt flag
         BRIE    Bad			            ; so should not take the branch
-;        CALL    SubrI                   ; call subroutine that ends with RETI
-;        BRID    Bad			            ; RETI set I flag, don't branch
+        CALL    SubrI                   ; call subroutine that ends with RETI
+        BRID    Bad			            ; RETI set I flag, don't branch
         BST     R30, 1                  ; set the T flag
         BRTC    Bad			            ; so should not branch
         BST     R30, 3                  ; now clear the T flag
         BRTS    Bad			            ; and still should not branch
         ADD     R30, R30                ; R30 is now $CC (no carry)
-;        BRSH    Branch6                 ; so should take the branch
-;        JMP     Bad
+        BRSH    Branch6                 ; so should take the branch
+        JMP     Bad
 Branch6:
 		LDI		R16, $B6
         ADD     R30, R30                ; should set the carry and half carry
