@@ -1,5 +1,5 @@
 # AVR-Processor
-VHDL implementation of an 8-bit AVR processor supporting all AVR RISC instructions.
+VHDL implementation of an 8-bit AVR processor supporting most AVR RISC instructions.
 
 ## Project Information
 Caltech EE 119B
@@ -30,6 +30,7 @@ The test entity is `AVR_CPU_TEST` in the Xilinx ISE project. Simulation can be r
 
 ## Modifying the AVR CPU test
 The supplied tests validate basic operation of the CPU. It isn't too thorough since previous tests of the ALU, Registers, and Memory are already very thorough. However, if there's a specific test you'd like to run, you can modify the tests by following these steps.
+
 1. Open the AVR project located in `./code-gen/systest`.
 1. Modify the `systest.asm` file with updated tests. If the tests fail, you should put an error code (number between 1 and 255) on register `R16`, then jump to the label `Bad`. If the tests pass, just proceed with the rest of the tests normally.
 1. Compile and run the AVR debugger to ensure the modifications pass all tests.
