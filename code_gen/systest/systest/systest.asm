@@ -1740,106 +1740,166 @@ TestJumps:                              ; test unconditional jumping
 
         JMP     JumpTest                ; just test jumping
 		LDI		R16, $A4
-		JMP		Bad
+		JMP		Bad						; yeah, uh... this definitely makes sense...
+
 BackRJump:
         LDI     R22, $5A
         LDI     R23, $5A
         RJMP    ForwardRJump            ; test a forward RJMP
+		LDI		R16, $A6
+		JMP		Bad
+
 JumpTest:
         LDI     R24, $A5
         RJMP    BackRJump               ; test a backward RJMP
+		LDI		R16, $A5
+		JMP		Bad
+
 ForwardRJump:
         LDI     R30, LOW(IndirJump)     ; finally test an indirect jump
         LDI     R31, HIGH(IndirJump)
         IJMP
-        LDI     R27, 0                  ; should skip these instructions
-        LDI     R28, 0
+        LDI     R16, $A7                ; should skip these instructions
+        JMP		Bad
 IndirJump:
-
+		JMP		TestBranches
 
 TestCalls:                              ; test subroutine calls
         CALL    Subr1                   ; direct subroutine call
+		CPI		R27, $31
+		BRNE	CALLBad
+		CPI		R28, $41
+		BRNE	CALLBad
+		CPI		R29, $59
+		BRNE	CALLBad
+		LDI		R27, $00				; reset everything
+		LDI		R28, $00
+		LDI		R29, $00
+
         RCALL   Subr1                   ; relative direct subroutine call
+		CPI		R27, $31
+		BRNE	CALLBad
+		CPI		R28, $41
+		BRNE	CALLBad
+		CPI		R29, $59
+		BRNE	CALLBad
+		LDI		R27, $00				; reset everything
+		LDI		R28, $00
+		LDI		R29, $00
+
         LDI     R30, LOW(Subr1)
         LDI     R31, HIGH(Subr1)
         ICALL                           ; indirect subroutine call
+		CPI		R27, $31
+		BRNE	CALLBad
+		CPI		R28, $41
+		BRNE	CALLBad
+		CPI		R29, $59
+		BRNE	CALLBad
+
+		BCLR	7
+        CALL    SubrI                   ; direct subroutine call
+		CPI		R24, $27				; with interrupt return (RETI)
+		BRNE	CALLBad
+		CPI		R25, $18
+		BRNE	CALLBad
+		CPI		R26, $28
+		BRNE	CALLBad
+		BRBC	7, CALLBad				; interrupt flag should be set
+		
+		JMP		CALLGood
+CALLBad:
+		LDI		R16, $A8
+		JMP		Bad
+CALLGood:
 
 
 TestBranches:                           ; test some conditional branches
+		LDI		R28, $7F
+		LDI		R27, $FF
         CP      R28, R27
         BRLO    Branch1                 ; should branch: $7F U< $FF
-        JMP     TestBranches
+		LDI		R16, $B0
+        JMP     Bad
 Branch1:
-        BRLT    TestBranches            ; should not branch: $7F S> $FF
-        BREQ    TestBranches            ; should not branch: $7F != $FF
+		LDI		R16, $B1
+        BRLT    BrBad		            ; should not branch: $7F S> $FF
+        BREQ    BrBad		            ; should not branch: $7F != $FF
         BRNE    Branch2                 ; should branch: $7F != $FF
-        JMP     TestBranches
+		JMP		Bad
 Branch2:
+		LDI		R16, $B2
         LDI     R21, $69
         ADD     R21, R21
-        BRHC    TestBranches            ; should not branch (HC is set)
+        BRHC    BrBad		            ; should not branch (HC is set)
         OR      R27, R27                ; this is a negative number
         BRMI    Branch3                 ; should take the branch
-        JMP     TestBranches
+        JMP     Bad
 Branch3:
+		LDI		R16, $B3
         OR      R28, R28                ; this is a positive number
-        BRMI    TestBranches            ; should not take the branch
+        BRMI    BrBad		            ; should not take the branch
         BRPL    Branch4                 ; now should take it
-        JMP     TestBranches
+BrBad:
+		JMP		Bad
 Branch4:
+		LDI		R16, $B4
         OR      R27, R27                ; this is a negative number
-        BRPL    TestBranches            ; should not take the branch
+        BRPL    Bad			            ; should not take the branch
         SUB     R28, R27                ; this generates an overflow
         BRVS    Branch5                 ; so should take the branch
-        JMP     TestBranches
+        JMP     Bad
 Branch5:
+		LDI		R16, $B5
         DEC     R28                     ; 80 - 1 -> 7F => overflow
-        BRVC    TestBranches            ; should not take the branch
+        BRVC    Bad			            ; should not take the branch
         CPI     R27, 1                  ; -1 < 1
-        BRGE    TestBranches            ; so should not take the branch
+        BRGE    Bad			            ; so should not take the branch
         CLI                             ; clear interrupt flag
-        BRIE    TestBranches            ; so should not take the branch
-        CALL    SubrI                   ; call subroutine that ends with RETI
-        BRID    TestBranches            ; RETI set I flag, don't branch
+        BRIE    Bad			            ; so should not take the branch
+;        CALL    SubrI                   ; call subroutine that ends with RETI
+;        BRID    Bad			            ; RETI set I flag, don't branch
         BST     R30, 1                  ; set the T flag
-        BRTC    TestBranches            ; so should not branch
+        BRTC    Bad			            ; so should not branch
         BST     R30, 3                  ; now clear the T flag
-        BRTS    TestBranches            ; and still should not branch
+        BRTS    Bad			            ; and still should not branch
         ADD     R30, R30                ; R30 is now $CC (no carry)
-        BRSH    Branch6                 ; so should take the branch
-        JMP     TestBranches
+;        BRSH    Branch6                 ; so should take the branch
+;        JMP     Bad
 Branch6:
+		LDI		R16, $B6
         ADD     R30, R30                ; should set the carry and half carry
-        BRSH    TestBranches            ; should not take branch
+        BRSH    Bad			            ; should not take branch
         BRHS    TestSkips               ; but should take this one
-        JMP     TestBranches
+        JMP     Bad
 
 
 TestSkips:                              ; test skip instructions
+		LDI		R16, $B7
         CPSE    R22, R23                ; skip a 1 byte instruction
-        RJMP    TestSkips
+        RJMP    Bad
         CPSE    R22, R23                ; skip a 2 byte instruction
-        JMP     TestSkips
+        JMP     Bad
         CPSE    R22, R24                ; don't skip
         LDI     R22, $80
         SBRC    R22, 6                  ; should skip a 1 byte instruction
         LDI     R22, $FF
         SBRC    R22, 3                  ; should skip a 2 byte instruction
-        JMP     TestSkips
+        JMP     Bad
         SBRC    R22, 7                  ; don't skip
         LDI     R22, $A5
         SBRS    R22, 0                  ; should skip a 1 byte instruction
         LDI     R22, 0
         SBRS    R22, 5                  ; should skip a 2 byte instruction
-        JMP     TestSkips
+        JMP     Bad
         SBRS    R22, 1                  ; don't skip
         JMP     Good                    ; all tests passed!
 
 
 Subr1:                                  ; the subroutine
-        LDI     R27, $FF
-        LDI     R28, $7F
-        LDI     R29, 0
+        LDI     R27, $31
+        LDI     R28, $41
+        LDI     R29, $59
         RET
 
 
