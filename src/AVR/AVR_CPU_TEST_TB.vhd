@@ -32,6 +32,9 @@ architecture TB_ARCHITECTURE of AVR_CPU_TEST_TB is
     signal INT0    :  std_logic;                        -- interrupt 0
     signal INT1    :  std_logic;                        -- interrupt 1
     
+    signal Addr    :  std_logic_vector(15 downto 0);    -- program counter address
+    signal Debug   :  std_logic_vector(7 downto 0);     -- debug output
+    
     signal end_sim :  boolean := false;                 -- end simulation flag
 begin
     UUT : entity work.AVR_CPU_TEST
@@ -39,7 +42,9 @@ begin
             Clock   => Clock,
             Reset   => Reset,
             INT0    => INT0,
-            INT1    => INT1
+            INT1    => INT1,
+            Addr    => Addr,
+            Debug   => Debug
         );
     
     -- Main testing procedure
@@ -51,7 +56,11 @@ begin
         wait for 10 ns;
         Reset <= '1';
         
+        -- 20ns clock * 2500 clock cycles = 50us. 100us to be safe.
         wait for 100 us;
+        
+        -- Check debug register (contains error code, or 0 if no error).
+        assert(std_match(Debug, std_logic_vector(to_unsigned(0, 8))));
 
         wait until (clock = '1');
         wait until (clock = '1');

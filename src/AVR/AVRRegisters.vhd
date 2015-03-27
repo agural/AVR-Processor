@@ -55,6 +55,10 @@ entity AVRRegisters is
         DataIOSel  : in     std_logic;                     -- specifies input/output
                                                            -- 0 - input from DB
                                                            -- 1 - output from DB
+        
+        DebugReg   : out std_logic_vector(7 downto 0);  -- Register R16 contains debug output
+                                                        -- from test program run.
+        
         Reset      : in std_logic -- reset signal for SP
     );
 end AVRRegisters;
@@ -76,6 +80,8 @@ begin
     -- report value of second register
     RegBOut      <= Registers(conv_integer(SelB)) when (conv_integer(SelB) < NUM_REGS) else
                     (others => 'X');
+ 
+    DebugReg <= Registers(16);
  
     SpecOut <= Registers(27) & Registers(26) when (SpecAddr = "00") else
                Registers(29) & Registers(28) when (SpecAddr = "01") else

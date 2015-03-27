@@ -42,7 +42,9 @@ entity AVR_CPU_TEST is
         Clock       : in  std_logic;  -- system clock
         Reset       : in  std_logic;  -- global reset
         INT0        : in  std_logic;  -- interrupt 0
-        INT1        : in  std_logic   -- interrupt 1
+        INT1        : in  std_logic;  -- interrupt 1
+        Addr        : out std_logic_vector(15 downto 0);-- program counter address
+        Debug       : out std_logic_vector(7 downto 0)  -- debug output
     );
 end AVR_CPU_TEST;
 
@@ -56,6 +58,8 @@ architecture Structural of AVR_CPU_TEST is
     signal DataRd   : std_logic;
     signal DataWr   : std_logic;
 begin
+    Addr <= ProgAB;
+
     AVRCPU : entity work.AVR_CPU
     port map (
         clock   => clock,
@@ -69,7 +73,9 @@ begin
         DataWr  => DataWr,
         DataRd  => DataRd,
         DataAB  => DataAB,
-        DataDB  => DataDB
+        DataDB  => DataDB,
+        
+        Debug   => Debug
     );
     
     DataMemory : entity work.DataMemory

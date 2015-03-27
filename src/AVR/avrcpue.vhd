@@ -32,6 +32,7 @@
 --    DataAB - data memory address bus (16 bits)
 --    DataWr - data write signal
 --    DataRd - data read signal
+--    Debug  - debug return value (0 for no error)
 --
 --  Inputs/Outputs:
 --    DataDB - data memory data bus (8 bits)
@@ -60,7 +61,9 @@ entity AVR_CPU is
         DataWr  :  out    std_logic;                       -- data memory write enable (active low)
         DataRd  :  out    std_logic;                       -- data memory read enable (active low)
         DataAB  :  out    std_logic_vector(15 downto 0);   -- data memory address bus
-        DataDB  :  inout  std_logic_vector(7 downto 0)     -- data memory data bus
+        DataDB  :  inout  std_logic_vector(7 downto 0);    -- data memory data bus
+        
+        Debug   :  out    std_logic_vector(7 downto 0)     -- R16 debug output
     );
 end AVR_CPU;
 
@@ -203,7 +206,9 @@ begin
         MemRegData      => DataDB,
         AddrOffset      => AddrOffset,
         MemRegAddr      => MemRegAddr,
-        DataIOSel       => DataIOSel
+        DataIOSel       => DataIOSel,
+        
+        DebugReg        => Debug
     );
 
     DMA : entity work.DMAUnit

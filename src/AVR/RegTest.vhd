@@ -103,6 +103,8 @@ begin
         AddrOffset => AddrOffset,
         MemRegAddr => MemRegAddr,
         DataIOSel  => DataIOSel,
+        
+        DebugReg   => open,
 
         Reset      => '1' -- no reset
     );
