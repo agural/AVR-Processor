@@ -1511,9 +1511,26 @@ SWAPGood:
         PUSH    R29                     ; write AA @ FFFC
         PUSH    R30                     ; write E0 @ FFFB
         PUSH    R31                     ; write D1 @ FFFA
-                                        ; pop back into a couple other regs
-        POP     R0                      ; read D1 @ FFFA
-        POP     R1                      ; read E0 @ FFFB
+                                        ; pop back into the same regs
+        POP		R26                     ; read D1 @ FFFA
+        POP		R27                     ; read E0 @ FFFB
+        POP		R28                     ; read AA @ FFFC
+        POP		R29                     ; read 55 @ FFFD
+        POP		R30                     ; read 00 @ FFFE
+        POP		R31                     ; read 00 @ FFFF
+		
+		CPI		R26, $D1
+		BRNE	PPBad
+		CPI		R27, $E0
+		BRNE	PPBad
+		CPI		R28, $AA
+		BRNE	PPBad
+		CPI		R29, $55
+		BRNE	PPBad
+		CPI		R30, $00
+		BRNE	PPBad
+		CPI		R31, $00
+		BRNE	PPBad
 
 		JMP		PPGood
 PPBad:
@@ -1521,8 +1538,6 @@ PPBad:
 		JMP		Bad
 PPGood:
 
-
-		;>>> Check LDI
                                         ; setup addresses for writing
         LDI     R27, $FF                ; X = FFFF
         LDI     R26, $FF
@@ -1531,16 +1546,34 @@ PPGood:
         LDI     R31, $00                ; Z = 0080
         LDI     R30, $80
 
-		JMP		LDIGood
-LDIBad:
-		LDI		R16, $9F
-		JMP		Bad
-LDIGood:
 
-
-		;>>> Check STS
-        STS      $5555, R0              ; write D1 @ 5555
-        STS      $AAAA, R1              ; write E0 @ AAAA
+		;>>> Check STS / LDS
+		LDI		R16, $55
+        STS		$5555, R16				; write 55 @ 5555
+		LDI		R16, $AA
+        STS		$AAAA, R16				; write AA @ AAAA
+		LDI		R16, $00
+        STS		$1234, R16				; write 00 @ 1234
+		LDI		R16, $FF
+        STS		$4321, R16				; write FF @ 4321
+		LDI		R16, $6E
+        STS		$6E6E, R16				; write 6E @ 6E6E
+		
+        LDS     R16, $5555              ; read 55 @ 5555
+		CPI		R16, $55
+		BRNE	STSBad
+        LDS     R16, $AAAA              ; read AA @ AAAA
+		CPI		R16, $AA
+		BRNE	STSBad
+        LDS     R16, $1234              ; read 00 @ 1234
+		CPI		R16, $00
+		BRNE	STSBad
+        LDS     R16, $4321              ; read FF @ 4321
+		CPI		R16, $FF
+		BRNE	STSBad
+        LDS     R16, $6E6E              ; read 6E @ 6E6E
+		CPI		R16, $6E
+		BRNE	STSBad
 
 		JMP		STSGood
 STSBad:
@@ -1549,84 +1582,165 @@ STSBad:
 STSGood:
 
 
-		;>>> Check ST/STD
-        ST       X, R2                  ; write 02 @ FFFF
-        ST      -X, R3                  ; write 40 @ FFFE
-        ST      X+, R4                  ; write 01 @ FFFE
-        ST      X+, R5                  ; write 20 @ FFFF
-        ST       X, R6                  ; write 10 @ 0000
+		;>>> Check ST/LD (X)
+		LDI		R18, $01
+		LDI		R19, $02
+		LDI		R20, $04
+		LDI		R21, $10
+		LDI		R22, $20
+		LDI		R23, $40
 
-        ST      Y+, R7                  ; write 04 @ FFC0
-        ST       Y, R8                  ; write EF @ FFC1
-        ST      -Y, R9                  ; write 04 @ FFC0
-        ST       Y, R10                 ; write E7 @ FFC0
-        STD     Y + 60, R11             ; write 01 @ FFFC
-        STD     Y + 2, R12              ; write FD @ FFC2
-        STD     Y + 22, R13             ; write 00 @ FFD6
-        STD     Y + 1, R14              ; write F7 @ FFC1
+        ST       X, R19                 ; write 02 @ FFFF
+		LD		R16, X
+		CPI		R16, $02
+		BRNE	STXBad
 
-        ST      Z+, R15                 ; write 10 @ 0080
-        ST       Z, R16                 ; write 02 @ 0081
-        ST      -Z, R17                 ; write FF @ 0080
-        ST       Z, R18                 ; write FF @ 0080
-        STD     Z + 30, R19             ; write B8 @ 009E
-        STD     Z + 1, R20              ; write 81 @ 0081
-        STD     Z + 63, R21             ; write 28 @ 00BF
-        STD     Z + 32, R22             ; write AA @ 00A0
+        ST      -X, R23                 ; write 40 @ FFFE
+		LD		R16, X
+		CPI		R16, $40
+		BRNE	STXBad
 
-		JMP		STGood
-STBad:
+        ST      X+, R18                 ; write 01 @ FFFE
+		LD		R16, -X
+		CPI		R16, $01
+		BRNE	STXBad
+		LD		R16, X+					; (just to re-increment X)
+
+        ST      X+, R22                 ; write 20 @ FFFF
+		LD		R16, -X
+		CPI		R16, $20
+		BRNE	STXBad
+		LD		R16, X+
+		CPI		R16, $20
+		BRNE	STXBad
+
+        ST       X, R21                 ; write 10 @ 0000
+		LD		R16, X
+		CPI		R16, $10
+		BRNE	STXBad
+		LD		R16, -X
+		CPI		R16, $20
+		BRNE	STXBad
+		LD		R16, -X
+		CPI		R16, $01
+		BRNE	STXBad
+		LD		R16, X+
+		CPI		R16, $01
+		BRNE	STXBad
+		LD		R16, X+
+		CPI		R16, $20
+		BRNE	STXBad
+
+		JMP		STXGood
+STXBad:
 		LDI		R16, $A1
 		JMP		Bad
-STGood:
+STXGood:
 
 
-		;>>> Check LD/LDD
-                                        ; setup another address for writing
-        LDI     R29, $FF                ; Y = FFE0
-        LDI     R28, $E0
+		;>>> Check ST/LD (Quick verification with Y and Z)
+        ST      Y+, R18                 ; write 01 @ FFC0
+        ST      Y+, R19                 ; write 02 @ FFC1
+        ST       Y, R20                 ; write 04 @ FFC2
+        ST      -Y, R21                 ; write 10 @ FFC1
+		
+        ST      Z+, R22                 ; write 20 @ 0080
+        ST      Z+, R23                 ; write 40 @ 0081
+        ST       Z, R18                 ; write 01 @ 0082
+        ST      -Z, R19                 ; write 02 @ 0081
+		
+		LD		R16, -Y					; read 01 @ FFC0
+		CPI		R16, $01
+		BRNE	STYZBad
+		LD		R16, Y+					; read 01 @ FFC0
+		CPI		R16, $01
+		BRNE	STYZBad
+		LD		R16, Y+					; read 10 @ FFC1
+		CPI		R16, $10
+		BRNE	STYZBad
+		LD		R16, Y					; read 04 @ FFC2
+		CPI		R16, $04
+		BRNE	STYZBad
+		
+		LD		R16, -Z					; read 20 @ 0080
+		CPI		R16, $20
+		BRNE	STYZBad
+		LD		R16, Z+					; read 20 @ 0080
+		CPI		R16, $20
+		BRNE	STYZBad
+		LD		R16, Z+					; read 02 @ 0081
+		CPI		R16, $02
+		BRNE	STYZBad
+		LD		R16, Z					; read 01 @ 0082
+		CPI		R16, $01
+		BRNE	STYZBad
 
-        ST      -Y, R23                 ; write 00 @ FFDF
-        ST      Y+, R24                 ; write FD @ FFDF
-        STD     Y + 63, R25             ; write FF @ 001F
+		JMP		STYZGood
+STYZBad:
+		LDI		R16, $A2
+		JMP		Bad
+STYZGood:
 
+		;>>> Check STD/LDD
+		LDI		R29, $FF				; restore Y = FFC0
+		LDI		R28, $C0				;
+		LDI		R31, $00				; restore Z = 0080
+		LDI		R30, $80				;
+
+        STD     Y + 60, R18             ; write 01 @ FFFC
+        STD     Y + 2 , R19             ; write 02 @ FFC2
+        STD     Y + 22, R20             ; write 04 @ FFD6
+        STD     Y + 1 , R21             ; write 10 @ FFC1
+
+        STD     Z + 30, R19             ; write 02 @ 009E
+        STD     Z + 1 , R20             ; write 04 @ 0081
+        STD     Z + 63, R22             ; write 20 @ 00BF
+        STD     Z + 32, R23             ; write 40 @ 00A0
 
                                         ;setup new addresses for reading
-        LDI     R27, 0                  ; X = 0
-        LDI     R26, 0
-        LDI     R29, $FF                ; Y = FFFF
-        LDI     R28, $FF
+        LDI     R29, $00                ; Y = 0081
+        LDI     R28, $81
         LDI     R31, $FF                ; Z = FFC0
         LDI     R30, $C0
 
-        LDS     R0, $AAAA               ; read E0 @ AAAA
-        LDS     R1, $5555               ; read D1 @ 5555
+		LDD		R16, Z + 60				; read 01 @ FFFC
+		CPI		R16, $01
+		BRNE	STDBad
+		LDD		R16, Z + 2				; read 02 @ FFC2
+		CPI		R16, $02
+		BRNE	STDBad
+		LDD		R16, Z + 22				; read 04 @ FFD6
+		CPI		R16, $04
+		BRNE	STDBad
+		LDD		R16, Z + 1				; read 10 @ FFC1
+		CPI		R16, $10
+		BRNE	STDBad
 
-        LD      R7, X                   ; read 10 @ 0000
-        LD      R9, -X                  ; read 20 @ FFFF
-        LD      R20, X+                 ; read 20 @ FFFF
-        LD      R21, X                  ; read 10 @ 0000
+        LDD     R16, Y + 29             ; read 02 @ 009E
+		CPI		R16, $02
+		BRNE	STDBad
+        LDD     R16, Y + 0              ; read 04 @ 0081
+		CPI		R16, $04
+		BRNE	STDBad
+        LDD     R16, Y + 62             ; read 20 @ 00BF
+		CPI		R16, $20
+		BRNE	STDBad
+        LDD     R16, Y + 31             ; read 40 @ 00A0
+		CPI		R16, $40
+		BRNE	STDBad
 
-        LD      R6, Y+                  ; read 20 @ FFFF
-        LD      R23, Y                  ; read 10 @ 0000
-        LD      R22, -Y                 ; read 20 @ FFFF
-        LDD     R15, Y + 32             ; read FF @ 001F
-
-        LD      R4, Z+                  ; read 04 @ FFC0
-        LD      R13, Z                  ; read EF @ FFC1
-        LD      R2, -Z                  ; read 04 @ FFC0
-        LDD     R17, Z + 60             ; read 01 @ FFFC
-
-		JMP		LDGood
-LDBad:
-		LDI		R16, $A2
+		JMP		STDGood
+STDBad:
+		LDI		R16, $A3
 		JMP		Bad
-LDGood:
+STDGood:
 
 
 TestJumps:                              ; test unconditional jumping
 
         JMP     JumpTest                ; just test jumping
+		LDI		R16, $A4
+		JMP		Bad
 BackRJump:
         LDI     R22, $5A
         LDI     R23, $5A
