@@ -41,31 +41,33 @@ entity AVRControl is
         ProgDB                  : in  std_logic_vector(15 downto 0);-- immediate memory address
         MemRegAddr              : in  std_logic_vector(15 downto 0);-- register-based indirect memory access
 
-        ALUStatusMask           : out std_logic_vector(7 downto 0); -- status bits that can be changed
+        ALUStatusMask           : out std_logic_vector( 7 downto 0);-- status bits that can be changed
         ALUStatusBitChangeEn    : out std_logic;                    -- instruction to change status
         ALUBitClrSet            : out std_logic;                    -- set the selected bit
         ALUBitTOp               : out std_logic;                    -- instruction to change flag T
         ALUOp2Sel               : out std_logic;                    -- second argument is register/immediate
-        ImmediateOut            : out std_logic_vector(7 downto 0); -- value of immediate
-        ALUBlockSel             : out std_logic_vector(1 downto 0); -- which ALU block is used
-        ALUBlockInstructionSel  : out std_logic_vector(3 downto 0); -- which instruction for ALU block
+        ImmediateOut            : out std_logic_vector( 7 downto 0);-- value of immediate
+        ALUBlockSel             : out std_logic_vector( 1 downto 0);-- which ALU block is used
+        ALUBlockInstructionSel  : out std_logic_vector( 3 downto 0);-- which instruction for ALU block
         
         EnableIn                : out std_logic;                    -- whether or not to write to register
-        SelIn                   : out std_logic_vector(6 downto 0); -- register to write to
-        SelA                    : out std_logic_vector(6 downto 0); -- first register to read
-        SelB                    : out std_logic_vector(6 downto 0); -- second register to read
+        SelIn                   : out std_logic_vector( 6 downto 0);-- register to write to
+        SelA                    : out std_logic_vector( 6 downto 0);-- first register to read
+        SelB                    : out std_logic_vector( 6 downto 0);-- second register to read
         
         DataIOSel               : out std_logic;                    -- selects whether data is input or output
         AddrOffset              : out std_logic_vector(15 downto 0);-- offset of address
-        SpecAddr                : out std_logic_vector(1 downto 0); -- selects X, Y, Z, or SP
+        SpecAddr                : out std_logic_vector( 1 downto 0);-- selects X, Y, Z, or SP
         SpecWr                  : out std_logic;                    -- whether to write to the special addresses
                                                                     -- (this is independent of the normal write to registers)
+        RetAddrSel              : out std_logic_vector( 1 downto 0);-- controls buffering stack entry (SP) to return addr buffer in registers
+        
         OutRd                   : out std_logic;                    -- whether to read from memory
         OutWr                   : out std_logic;                    -- whether to write to memory
-        RegDataInSel            : out std_logic_vector(1 downto 0); -- selects which input goes to register in
+        RegDataInSel            : out std_logic_vector( 1 downto 0);-- selects which input goes to register in
         MemAddr                 : out std_logic_vector(15 downto 0);-- memory address (16 bits)
         
-        PCUpdateSel             : out std_logic_vector(1 downto 0);  -- source of next program counter
+        PCUpdateSel             : out std_logic_vector( 1 downto 0); -- source of next program counter
         NextPC                  : in  std_logic_vector(15 downto 0); -- next program counter
         PCOffset                : out std_logic_vector(11 downto 0); -- increment for program counter
         NewIns                  : out std_logic                      -- indicates new instruction should be loaded
@@ -112,7 +114,13 @@ begin
 
         ALUBitClrSet <= StatusBitClear; -- arbitrary value (changed in cases where needed)
         ALUStatusBitChangeEn <= '0';    -- by default, do not change status bits
-        ALUBitTOp <= '0';               -- by default, do not change flag T
+        ALUBitTOp   <= '0';             -- by default, do not change flag T
+        
+        RetAddrSel  <= "00";            -- default don't change the return address buffer
+        PCUpdateSel <= "00";            -- default update PC using incrementor
+        PCOffset    <= std_logic_vector(to_signed(1, 12));  -- default step PC by +1
+        newIns      <= '1';             -- default get new instruction
+        
 
         if std_match(IR, OpADC   ) then -- add with carry
             ALUStatusMask <= flag_mask_ZCNVSH; -- specify which bits may be changed

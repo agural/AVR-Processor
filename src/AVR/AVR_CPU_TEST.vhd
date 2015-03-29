@@ -44,6 +44,7 @@ entity AVR_CPU_TEST is
         INT0        : in  std_logic;  -- interrupt 0
         INT1        : in  std_logic;  -- interrupt 1
         Addr        : out std_logic_vector(15 downto 0);-- program counter address
+        IRDebug     : out std_logic_vector(15 downto 0);-- current instruction
         Debug       : out std_logic_vector(7 downto 0)  -- debug output
     );
 end AVR_CPU_TEST;
@@ -75,6 +76,7 @@ begin
         DataAB  => DataAB,
         DataDB  => DataDB,
         
+        IRDebug => IRDebug,
         Debug   => Debug
     );
     

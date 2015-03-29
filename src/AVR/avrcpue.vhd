@@ -61,9 +61,10 @@ entity AVR_CPU is
         DataWr  :  out    std_logic;                       -- data memory write enable (active low)
         DataRd  :  out    std_logic;                       -- data memory read enable (active low)
         DataAB  :  out    std_logic_vector(15 downto 0);   -- data memory address bus
-        DataDB  :  inout  std_logic_vector(7 downto 0);    -- data memory data bus
+        DataDB  :  inout  std_logic_vector( 7 downto 0);   -- data memory data bus
         
-        Debug   :  out    std_logic_vector(7 downto 0)     -- R16 debug output
+        IRDebug :  out    std_logic_vector(15 downto 0);   -- current instruction
+        Debug   :  out    std_logic_vector( 7 downto 0)    -- R16 debug output
     );
 end AVR_CPU;
 
@@ -85,28 +86,28 @@ architecture Structural of AVR_CPU is
     signal StatReg                : std_logic_vector(7 downto 0);
 
     -- Signals between ALU and Registers
-    signal RegA         : std_logic_vector(7 downto 0);      -- first operand
-    signal RegB         : std_logic_vector(7 downto 0);      -- second operand
-    signal ALUResult    : std_logic_vector(7 downto 0);      -- ALU result
-    signal ALUStatReg   : std_logic_vector(7 downto 0);      -- status register
+    signal RegA         : std_logic_vector(7 downto 0);     -- first operand
+    signal RegB         : std_logic_vector(7 downto 0);     -- second operand
+    signal ALUResult    : std_logic_vector(7 downto 0);     -- ALU result
+    signal ALUStatReg   : std_logic_vector(7 downto 0);     -- status register
         
     -- Signals between Control Unit and Registers
-    signal EnableIn     : std_logic;
-    signal SelIn        : std_logic_vector(6 downto 0);
-    signal SelA         : std_logic_vector(6 downto 0);
-    signal SelB         : std_logic_vector(6 downto 0);
-    
+    signal EnableIn     : std_logic;                        -- enable writing to register
+    signal SelIn        : std_logic_vector(6 downto 0);     -- select input register for writing
+    signal SelA         : std_logic_vector(6 downto 0);     -- register to output at regA
+    signal SelB         : std_logic_vector(6 downto 0);     -- register to output at regB
+    signal MemRegAddr   : std_logic_vector(15 downto 0);    -- register-based indirect memory access
+
+    signal DataIOSel    : std_logic;                        -- selects whether data is input or output
+    signal AddrOffset   : std_logic_vector(15 downto 0);    -- offset of address
+    signal SpecAddr     : std_logic_vector(1 downto 0);     -- selects X, Y, Z, or SP
+    signal SpecWr       : std_logic;                        -- whether to write to the special addresses
+    signal RetAddrSel   : std_logic_vector(1 downto 0);     -- writes stack (SP) entry to return addr buffer
+
+    signal RegDataInSel : std_logic_vector(1 downto 0);     -- selects which input goes to register in
+    signal MemAddr      : std_logic_vector(15 downto 0);    -- memory address (16 bits)
+
     -- Signals between Control Unit and DMA / Memory
-    signal MemRegAddr   : std_logic_vector(15 downto 0);-- register-based indirect memory access
-
-    signal DataIOSel    : std_logic;                    -- selects whether data is input or output
-    signal AddrOffset   : std_logic_vector(15 downto 0);-- offset of address
-    signal SpecAddr     : std_logic_vector(1 downto 0); -- selects X, Y, Z, or SP
-    signal SpecWr       : std_logic;                    -- whether to write to the special addresses
-
-    signal RegDataInSel : std_logic_vector(1 downto 0); -- selects which input goes to register in
-    signal MemAddr      : std_logic_vector(15 downto 0);-- memory address (16 bits)
-
     signal DMARead      : std_logic;
     signal DMAWrite     : std_logic;
     
@@ -117,8 +118,12 @@ architecture Structural of AVR_CPU is
     signal PCOffset     : std_logic_vector(11 downto 0); -- increment for program counter
     signal NewIns       : std_logic;                     -- indicates new instruction should be loaded
 
-    signal NewPC        : std_logic_vector(15 downto 0); -- TODO
+    -- Signals between Registers and PMA Unit
+    signal NewPCZ       : std_logic_vector(15 downto 0); -- jump to address stored in Z register
+    signal RetAddrRd    : std_logic_vector(15 downto 0); -- jump to address stored in latest stack entry
 begin
+    IRDebug <= IR;  -- route IR to the debug output
+    
     -- Connect the ALU to the testing interface (reads input values and gives
     -- status and result)
     ALU : entity work.ALU
@@ -147,39 +152,40 @@ begin
     -- and tells ALU what to do)
     ControlUnit : entity work.AVRControl
     port map (
-        clock                  => clock,
-        IR                     => IR,
-        ProgDB                 => ProgDB,
-        MemRegAddr             => MemRegAddr,
+        clock                   => clock,
+        IR                      => IR,
+        ProgDB                  => ProgDB,
+        MemRegAddr              => MemRegAddr,
 
-        ALUStatusMask          => ALUStatusMask,
-        ALUStatusBitChangeEn   => ALUStatusBitChangeEn,
-        ALUBitClrSet           => ALUBitClrSet,
-        ALUBitTOp              => ALUBitTOp,
-        ALUOp2Sel              => ALUOp2Sel,
-        ImmediateOut           => ImmediateOut,
-        ALUBlockSel            => ALUBlockSel,
-        ALUBlockInstructionSel => ALUBlockInstructionSel,
+        ALUStatusMask           => ALUStatusMask,
+        ALUStatusBitChangeEn    => ALUStatusBitChangeEn,
+        ALUBitClrSet            => ALUBitClrSet,
+        ALUBitTOp               => ALUBitTOp,
+        ALUOp2Sel               => ALUOp2Sel,
+        ImmediateOut            => ImmediateOut,
+        ALUBlockSel             => ALUBlockSel,
+        ALUBlockInstructionSel  => ALUBlockInstructionSel,
         
-        EnableIn               => EnableIn,
-        SelIn                  => SelIn,
-        SelA                   => SelA,
-        SelB                   => SelB,
+        EnableIn                => EnableIn,
+        SelIn                   => SelIn,
+        SelA                    => SelA,
+        SelB                    => SelB,
         
-        DataIOSel              => DataIOSel,
-        AddrOffset             => AddrOffset,
-        SpecAddr               => SpecAddr,
-        SpecWr                 => SpecWr,
+        DataIOSel               => DataIOSel,
+        AddrOffset              => AddrOffset,
+        SpecAddr                => SpecAddr,
+        SpecWr                  => SpecWr,
+        RetAddrSel              => RetAddrSel,
 
-        OutRd                  => DMARead,
-        OutWr                  => DMAWrite,
-        RegDataInSel           => RegDataInSel,
-        MemAddr                => MemAddr,
+        OutRd                   => DMARead,
+        OutWr                   => DMAWrite,
+        RegDataInSel            => RegDataInSel,
+        MemAddr                 => MemAddr,
         
-        PCUpdateSel            => PCUpdateSel,
-        NextPC                 => NextPC,
-        PCOffset               => PCOffset,
-        NewIns                 => NewIns
+        PCUpdateSel             => PCUpdateSel,
+        NextPC                  => NextPC,
+        PCOffset                => PCOffset,
+        NewIns                  => NewIns
     );
     
     Registers : entity work.AVRRegisters
@@ -199,7 +205,7 @@ begin
         RegAOut         => RegA,
         RegBOut         => RegB,
 
-        SpecOut         => open,
+        SpecOut         => NewPCZ,
         SpecAddr        => SpecAddr,
         SpecWr          => SpecWr,
 
@@ -207,6 +213,10 @@ begin
         AddrOffset      => AddrOffset,
         MemRegAddr      => MemRegAddr,
         DataIOSel       => DataIOSel,
+        
+        RetAddrSel      => RetAddrSel,
+        RetAddrRd       => RetAddrRd,
+        RetAddrWr       => NextPC,
         
         DebugReg        => Debug
     );
@@ -231,7 +241,10 @@ begin
         PCOffset    => PCOffset,
         NewIns      => NewIns,
         IR          => IR,
-        NewPC       => NewPC,
+        NewPCZ      => NewPCZ,
+        NewPCS      => RetAddrRd,
+        
+        Reset       => Reset,
         Clk         => Clock
     );
 

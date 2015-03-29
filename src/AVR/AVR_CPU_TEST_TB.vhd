@@ -33,6 +33,7 @@ architecture TB_ARCHITECTURE of AVR_CPU_TEST_TB is
     signal INT1    :  std_logic;                        -- interrupt 1
     
     signal Addr    :  std_logic_vector(15 downto 0);    -- program counter address
+    signal IRDebug :  std_logic_vector(15 downto 0);    -- current instruction
     signal Debug   :  std_logic_vector(7 downto 0);     -- debug output
     
     signal end_sim :  boolean := false;                 -- end simulation flag
@@ -44,6 +45,7 @@ begin
             INT0    => INT0,
             INT1    => INT1,
             Addr    => Addr,
+            IRDebug => IRDebug,
             Debug   => Debug
         );
     
@@ -52,8 +54,13 @@ begin
     begin
         report "Starting processor";
         
+        -- We don't do anything with interrupts
+        INT0  <= '0';
+        INT1  <= '0';
+        
+        -- Send the reset signal
         Reset <= '0';
-        wait for 10 ns;
+        wait for 20 ns;
         Reset <= '1';
         
         -- 20ns clock * 2500 clock cycles = 50us. 100us to be safe.

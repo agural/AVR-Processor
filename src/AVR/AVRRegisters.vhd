@@ -32,34 +32,38 @@ use ALUCommands.ALUCommands.all;
 -- one of the registers
 entity AVRRegisters is
     port (
-        clock    : in  std_logic;                    -- system clock
-        EnableIn : in  std_logic;                    -- specifies write
-        SelIn    : in  std_logic_vector(6 downto 0); -- register to write to
-        SelA     : in  std_logic_vector(6 downto 0); -- register to read from
-        SelB     : in  std_logic_vector(6 downto 0); -- register to read from
+        clock       : in  std_logic;                        -- system clock
+        EnableIn    : in  std_logic;                        -- specifies write
+        SelIn       : in  std_logic_vector(6 downto 0);     -- register to write to
+        SelA        : in  std_logic_vector(6 downto 0);     -- register to read from
+        SelB        : in  std_logic_vector(6 downto 0);     -- register to read from
 
-        ALUIn        : in std_logic_vector(7 downto 0); -- ALU output
-        RegDataImm   : in std_logic_vector(7 downto 0); -- Control logic output
-        RegDataInSel : in std_logic_vector(1 downto 0); -- select value to update registers
+        ALUIn       : in std_logic_vector(7 downto 0);      -- ALU output
+        RegDataImm  : in std_logic_vector(7 downto 0);      -- Control logic output
+        RegDataInSel: in std_logic_vector(1 downto 0);      -- select value to update registers
 
-        RegAOut  : out    std_logic_vector(7 downto 0); -- first output
-        RegBOut  : out    std_logic_vector(7 downto 0); -- second output
+        RegAOut     : out std_logic_vector(7 downto 0);     -- first output
+        RegBOut     : out std_logic_vector(7 downto 0);     -- second output
 
-        SpecOut  : buffer std_logic_vector(15 downto 0); -- Address Output (no offset)
-        SpecAddr : in  std_logic_vector(1 downto 0);  -- Select X, Y, Z, SP
-        SpecWr   : in  std_logic;                     -- Write to X, Y, Z, SP
+        SpecOut     : buffer std_logic_vector(15 downto 0); -- Address Output [X,Y,Z,SP] (no offset)
+        SpecAddr    : in  std_logic_vector(1 downto 0);     -- Select X, Y, Z, SP
+        SpecWr      : in  std_logic;                        -- Write to X, Y, Z, SP
 
-        MemRegData : inout  std_logic_vector(7 downto 0);  -- data bus
-        AddrOffset : in     std_logic_vector(15 downto 0); -- offset for address
-        MemRegAddr : buffer std_logic_vector(15 downto 0); -- updated value for Control
-        DataIOSel  : in     std_logic;                     -- specifies input/output
-                                                           -- 0 - input from DB
-                                                           -- 1 - output from DB
+        MemRegData  : inout  std_logic_vector(7 downto 0);  -- data bus
+        AddrOffset  : in  std_logic_vector(15 downto 0);    -- offset for address
+        MemRegAddr  : buffer std_logic_vector(15 downto 0); -- updated value for Control
+        DataIOSel   : in  std_logic;                        -- specifies input/output
+                                                            -- 0 - input from DataDB
+                                                            -- 1 - output from DataDB
+                                                            
+        RetAddrSel  : in  std_logic_vector( 1 downto 0);    -- when non-zero, updates stackbuffer
+        RetAddrWr   : in  std_logic_vector(15 downto 0);    -- write to buffer for most recent CALL
+        RetAddrRd   : out std_logic_vector(15 downto 0);    -- read from buffer for most recent RET
         
-        DebugReg   : out std_logic_vector(7 downto 0);  -- Register R16 contains debug output
-                                                        -- from test program run.
+        DebugReg    : out std_logic_vector(7 downto 0);     -- Register R16 contains debug output
+                                                            -- from test program run.
         
-        Reset      : in std_logic -- reset signal for SP
+        Reset       : in std_logic                          -- reset signal for SP
     );
 end AVRRegisters;
 
@@ -69,9 +73,10 @@ architecture DataFlow of AVRRegisters is
     -- define the registers
     type REG_ARRAY is array (0 to NUM_REGS-1) of std_logic_vector(7 downto 0);
     signal Registers : REG_ARRAY;
-    signal SP : std_logic_vector(15 downto 0);
-    signal RegIn : std_logic_vector(7 downto 0); -- mux ALU, data, and regdata
-    signal RegAInternal : std_logic_vector(7 downto 0);
+    signal SP           : std_logic_vector(15 downto 0);    -- stack pointer (separate from registers)
+    signal RetAddrBuffer: std_logic_vector(15 downto 0);    -- buffer for value to read/write to stack
+    signal RegIn        : std_logic_vector( 7 downto 0);    -- mux ALU, data, and regdata
+    signal RegAInternal : std_logic_vector( 7 downto 0);    -- value of register A
 begin
     -- report value of first register
     RegAInternal <= Registers(conv_integer(SelA)) when (conv_integer(SelA) < NUM_REGS) else
@@ -80,6 +85,8 @@ begin
     -- report value of second register
     RegBOut      <= Registers(conv_integer(SelB)) when (conv_integer(SelB) < NUM_REGS) else
                     (others => 'X');
+    -- output current stack buffer
+    RetAddrRd    <= RetAddrBuffer;
  
     DebugReg <= Registers(16);
  
@@ -122,6 +129,17 @@ begin
             if (EnableIn = '1') then
                 -- write value to selected register
                 Registers(to_integer(unsigned(SelIn))) <= RegIn;
+            end if;
+            if    (RetAddrSel = "10") then
+                RetAddrBuffer(15 downto 8) <= RetAddrBuffer(15 downto 8);
+                RetAddrBuffer( 7 downto 0) <= MemRegData;
+            elsif (RetAddrSel = "11") then
+                RetAddrBuffer(15 downto 8) <= MemRegData;
+                RetAddrBuffer( 7 downto 0) <= RetAddrBuffer( 7 downto 0);
+            elsif (RetAddrSel = "01") then
+                RetAddrBuffer <= RetAddrWr;
+            else
+                RetAddrBuffer <= RetAddrBuffer;
             end if;
             if (Reset = '0') then
                 SP <= (others => '1');

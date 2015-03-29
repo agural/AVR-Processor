@@ -1,22 +1,20 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company:         Caltech EE 119B
+-- Engineer:        Albert Gural and Bryan He
 -- 
--- Create Date:    17:19:35 03/25/2015 
--- Design Name: 
--- Module Name:    PMAUnit - DataFlow 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
+-- Design Name:     AVR-Processor
+-- Module Name:     PMAUnit - DataFlow 
+-- Project Name:    AVR-Processor
+-- Target Devices:  Xilinx Spartan III XC3S1200EFGG3204C
+-- Tool versions:   Xilinx ISE 14.7
+-- Description:     Keeps an updated program counter (PC) and is responsible for
+--                  fetching new instructions.
 --
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
+-- Revision: 1.0
+-- For file history, see https://github.com/agural/AVR-Processor 
 --
 ----------------------------------------------------------------------------------
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
@@ -33,24 +31,27 @@ entity PMAUnit is
     port (
         ProgAB      : out std_logic_vector(15 downto 0); -- address for program memory
         ProgDB      : in  std_logic_vector(15 downto 0); -- data from program memory
-        PCUpdateSel : in  std_logic_vector(1 downto 0);  -- source of next program counter
+        PCUpdateSel : in  std_logic_vector( 1 downto 0);  -- source of next program counter
         NextPC      : out std_logic_vector(15 downto 0); -- next program counter
         PCOffset    : in  std_logic_vector(11 downto 0); -- increment for program counter
         NewIns      : in  std_logic;                     -- indicates new instruction should be loaded
         IR          : out std_logic_vector(15 downto 0); -- instruction register
-        NewPC       : in  std_logic_vector(15 downto 0); -- from X, Y, Z register
+        NewPCZ      : in  std_logic_vector(15 downto 0); -- from Z register
+        NewPCS      : in  std_logic_vector(15 downto 0); -- from stack
+        
+        Reset       : in  std_logic;                     -- reset
         Clk         : in  std_logic                      -- system clock
     );
 end PMAUnit;
 
 architecture DataFlow of PMAUnit is
-    signal PC : std_logic_vector(15 downto 0);
-    signal IncrementedPC : std_logic_vector(15 downto 0);
-    constant ResetValue : std_logic_vector(15 downto 0) := (others => '0');
+    signal PC               : std_logic_vector(15 downto 0);
+    signal IncrementedPC    : std_logic_vector(15 downto 0);
+    constant ResetValue     : std_logic_vector(15 downto 0) := (others => '0');
 begin
-    ProgAB <= PC;
-    IncrementedPC <= std_logic_vector(unsigned(PC) + unsigned(PCOffset));
-    NextPC <= IncrementedPC;
+    ProgAB          <= PC;
+    IncrementedPC   <= std_logic_vector(unsigned(PC) + unsigned(PCOffset));
+    NextPC          <= IncrementedPC;
     
     process (Clk)
     begin
@@ -64,11 +65,15 @@ begin
             elsif (PCUpdateSel = "01") then
                 PC <= ProgDB;
             elsif (PCUpdateSel = "10") then
-                PC <= NewPC;
+                PC <= NewPCZ;
             elsif (PCUpdateSel = "11") then
-                PC <= ResetValue;
+                PC <= NewPCS;
             else
                 PC <= (others => 'X');
+            end if;
+            
+            if (Reset = '0') then
+                PC <= ResetValue;
             end if;
         end if;
     end process;
