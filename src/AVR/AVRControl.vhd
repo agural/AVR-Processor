@@ -141,7 +141,8 @@ begin
             ImmediateOut(7 downto 6) <= "00"; -- top 2 immediate bits are forced 0
 
             if (CycleCount(0) = '0') then -- first clock of 2
-                newIns <= '0';
+                newIns   <= '0';
+                PCOffset <= std_logic_vector(to_signed(0, 12));
                 ALUBlockInstructionSel <= AddBlockAdd;
                 -- select the first register of the two
                 if (IR(5 downto 4) = "00") then
@@ -332,7 +333,8 @@ begin
             ALUStatusMask <= flag_mask_ZC; -- specify which bits can be changed
             ALUBlockSel <= ALUMulBlock; -- specify multiply block
             if (CycleCount(0) = '0') then -- first cycle
-                newIns <= '0';
+                newIns   <= '0';
+                PCOffset <= std_logic_vector(to_signed(0, 12));
                 ALUBlockInstructionSel <= MulBlockLowByte;
                 SelIn <= "0000000"; -- write to register 0
             end if;
@@ -391,7 +393,8 @@ begin
             ImmediateOut(7 downto 6) <= "00"; -- top 2 bits in immediate set to 0
 
             if (CycleCount(0) = '0') then -- first cycle
-                newIns <= '0';
+                newIns   <= '0';
+                PCOffset <= std_logic_vector(to_signed(0, 12));
                 ALUBlockInstructionSel <= AddBlockSub;
                 -- select the first register of the two
                 if (IR(5 downto 4) = "00") then
@@ -501,7 +504,8 @@ begin
             
             -- Clock dependent stuff
             if CycleCount(0) = '0' then
-                newIns <= '0';
+                newIns   <= '0';
+                PCOffset <= std_logic_vector(to_signed(0, 12));
                 if IR(1 downto 0) = "00" then   -- no inc/dec
                     -- No action
                 end if;
@@ -587,7 +591,8 @@ begin
             
             -- Clock dependent stuff
             if CycleCount(0) = '0' then
-                newIns <= '0';
+                newIns   <= '0';
+                PCOffset <= std_logic_vector(to_signed(0, 12));
                 -- No action
             end if;
             if CycleCount(0) = '1' then
@@ -626,11 +631,12 @@ begin
             
             -- Clock dependent stuff
             if CycleCount = "00" then
-                newIns <= '0';
+                newIns  <= '0';
+                PCOffset <= std_logic_vector(to_signed(0, 12));
                 -- No action (waiting for m)
             end if;
             if CycleCount = "01" then
-                newIns <= '0';
+                newIns   <= '0';
                 -- No action (m is output automatically, outside this process)
             end if;
             if CycleCount = "10" then
@@ -663,15 +669,25 @@ begin
                 newIns <= '0';
                 PCOffset <= std_logic_vector(to_signed(0, 12));
                 PCUpdateSel <= "01";
-                
-            elsif CycleCount = "01" then
+            end if;
+            if CycleCount = "01" then
                 newIns <= '0';
                 PCOffset <= std_logic_vector(to_signed(0, 12));
-                
-            elsif CycleCount = "10" then
-                -- no action (commense normal operation)
+            end if;
+            if CycleCount = "10" then
+                -- no action (resume normal operation)
             end if;
         end if;
+        
+--        if ( std_match(IR, OpRJMP) ) then
+--            if CycleCount(0) = '0' then
+--                newIns <= '0';
+--                PCOffset <= IR(11 downto 0);
+--            end if;
+--            if CycleCount(0) = '1' then
+--                --PCOffset <= std_logic_vector(to_signed(0, 12));
+--            end if;
+--        end if;
     end process DecodeInstruction;
 
     -- process to keep track of which step in a two-clock instruction is being run
@@ -689,12 +705,12 @@ begin
                                        std_match(IR, OpSTZI) or std_match(IR, OpSTZD) or std_match(IR, OpSTDZ) or
                                        std_match(IR, OpPOP)  or std_match(IR, OpPUSH) or
                                        std_match(IR, OpLDS)  or std_match(IR, OpSTS)  or
-                                       std_match(IR, OpJMP) ) then
+                                       std_match(IR, OpJMP)  or std_match(IR, OpRJMP) ) then
                 -- update if in first clock of two clock instruction
                 CycleCount <= "01";
             end if;
             if CycleCount = "01" and ( std_match(IR, OpLDS) or std_match(IR, OpSTS) or
-                                       std_match(IR, OpJMP) ) then
+                                       std_match(IR, OpJMP) or std_match(IR, OpRJMP) ) then
                 -- update if in second clock of three clock instruction
                 CycleCount <= "10";
             end if;
