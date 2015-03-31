@@ -50,7 +50,7 @@ architecture DataFlow of PMAUnit is
     constant ResetValue     : std_logic_vector(15 downto 0) := (others => '0');
 begin
     ProgAB          <= PC;
-    IncrementedPC   <= std_logic_vector(unsigned(PC) + unsigned(PCOffset));
+    IncrementedPC   <= std_logic_vector(signed(PC) + signed(PCOffset));
     NextPC          <= IncrementedPC;
     
     process (Clk)

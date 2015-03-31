@@ -81,15 +81,13 @@ architecture Structural of AVR_CPU is
     signal ALUStatusBitChangeEn   : std_logic;
     signal ALUBitClrSet           : std_logic;
     signal ALUBitTOp              : std_logic;
-
-    signal RegIn                  : std_logic_vector(7 downto 0);
-    signal StatReg                : std_logic_vector(7 downto 0);
+    
+    signal ALUResult              : std_logic_vector(7 downto 0);
+    signal ALUStatReg             : std_logic_vector(7 downto 0);
 
     -- Signals between ALU and Registers
     signal RegA         : std_logic_vector(7 downto 0);     -- first operand
     signal RegB         : std_logic_vector(7 downto 0);     -- second operand
-    signal ALUResult    : std_logic_vector(7 downto 0);     -- ALU result
-    signal ALUStatReg   : std_logic_vector(7 downto 0);     -- status register
         
     -- Signals between Control Unit and Registers
     signal EnableIn     : std_logic;                        -- enable writing to register
@@ -145,7 +143,7 @@ begin
         RegBOut                 => RegB,
 
         RegIn                   => ALUResult,
-        RegStatus               => StatReg
+        RegStatus               => ALUStatReg
     );
 
     -- Connect the Control Unit to the testing interface (reads instruction
@@ -170,6 +168,9 @@ begin
         SelIn                   => SelIn,
         SelA                    => SelA,
         SelB                    => SelB,
+        
+        ALUResult               => ALUResult,
+        ALUStatReg              => ALUStatReg,
         
         DataIOSel               => DataIOSel,
         AddrOffset              => AddrOffset,

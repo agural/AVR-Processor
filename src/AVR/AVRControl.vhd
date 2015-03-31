@@ -54,6 +54,8 @@ entity AVRControl is
         SelIn                   : out std_logic_vector( 6 downto 0);-- register to write to
         SelA                    : out std_logic_vector( 6 downto 0);-- first register to read
         SelB                    : out std_logic_vector( 6 downto 0);-- second register to read
+        ALUResult               : in  std_logic_vector( 7 downto 0);-- result from ALU
+        ALUStatReg              : in  std_logic_vector( 7 downto 0);-- status from ALU
         
         DataIOSel               : out std_logic;                    -- selects whether data is input or output
         AddrOffset              : out std_logic_vector(15 downto 0);-- offset of address
@@ -688,6 +690,19 @@ begin
 --                --PCOffset <= std_logic_vector(to_signed(0, 12));
 --            end if;
 --        end if;
+        
+--        if ( std_match(IR, OpBRBC) or std_match(IR, OpBRBS) ) then
+--            if CycleCount(0) = '0' then
+--                if (IR(10) = '0' xor ALUStatReg(to_integer(unsigned(IR(2 downto 0)))) = '0') then
+--                    newIns <= '0';
+--                    PCOffset <= std_logic_vector(to_signed(to_integer(signed(IR(9 downto 3))), 12));
+--                end if;
+--            end if;
+--            if CycleCount(0) = '1' then
+--                -- default operation
+--            end if;
+--        end if;
+
     end process DecodeInstruction;
 
     -- process to keep track of which step in a two-clock instruction is being run
@@ -705,7 +720,10 @@ begin
                                        std_match(IR, OpSTZI) or std_match(IR, OpSTZD) or std_match(IR, OpSTDZ) or
                                        std_match(IR, OpPOP)  or std_match(IR, OpPUSH) or
                                        std_match(IR, OpLDS)  or std_match(IR, OpSTS)  or
-                                       std_match(IR, OpJMP)  or std_match(IR, OpRJMP) ) then
+                                       std_match(IR, OpJMP)  or std_match(IR, OpRJMP) or
+                                       ((std_match(IR, OpBRBC) or std_match(IR, OpBRBS)) and
+                                            (IR(10) = '0' xor ALUStatReg(to_integer(unsigned(IR(2 downto 0)))) = '0')) 
+                                     ) then
                 -- update if in first clock of two clock instruction
                 CycleCount <= "01";
             end if;
