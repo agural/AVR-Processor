@@ -117,6 +117,7 @@ begin
         ALUBitClrSet <= StatusBitClear; -- arbitrary value (changed in cases where needed)
         ALUStatusBitChangeEn <= '0';    -- by default, do not change status bits
         ALUBitTOp   <= '0';             -- by default, do not change flag T
+        ALUStatusMask <= "00000000";    -- clear everything except selected bit
         
         RetAddrSel  <= "00";            -- default don't change the return address buffer
         PCUpdateSel <= "00";            -- default update PC using incrementor
