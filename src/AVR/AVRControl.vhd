@@ -670,38 +670,38 @@ begin
             if CycleCount = "00" then
                 newIns <= '0';
                 PCOffset <= std_logic_vector(to_signed(0, 12));
-                PCUpdateSel <= "01";
+                --PCUpdateSel <= "01";
             end if;
             if CycleCount = "01" then
                 newIns <= '0';
                 PCOffset <= std_logic_vector(to_signed(0, 12));
+                PCUpdateSel <= "01";
             end if;
             if CycleCount = "10" then
                 -- no action (resume normal operation)
             end if;
         end if;
         
---        if ( std_match(IR, OpRJMP) ) then
---            if CycleCount(0) = '0' then
---                newIns <= '0';
---                PCOffset <= IR(11 downto 0);
---            end if;
---            if CycleCount(0) = '1' then
---                --PCOffset <= std_logic_vector(to_signed(0, 12));
---            end if;
---        end if;
+        if ( std_match(IR, OpRJMP) ) then
+            if CycleCount(0) = '0' then
+                newIns <= '0';
+                PCOffset <= IR(11 downto 0);
+            end if;
+            if CycleCount(0) = '1' then
+                --PCOffset <= std_logic_vector(to_signed(0, 12));
+            end if;
+        end if;
         
---        if ( std_match(IR, OpBRBC) or std_match(IR, OpBRBS) ) then
---            if CycleCount(0) = '0' then
---                if (IR(10) = '0' xor ALUStatReg(to_integer(unsigned(IR(2 downto 0)))) = '0') then
---                    newIns <= '0';
---                    PCOffset <= std_logic_vector(to_signed(to_integer(signed(IR(9 downto 3))), 12));
---                end if;
---            end if;
---            if CycleCount(0) = '1' then
---                -- default operation
---            end if;
---        end if;
+        if ( std_match(IR, OpBRBC) or std_match(IR, OpBRBS) ) then
+            if CycleCount(0) = '0' then
+                if (IR(10) = '0' xor ALUStatReg(to_integer(unsigned(IR(2 downto 0)))) = '0') then
+                    newIns <= '0';
+                end if;
+            end if;
+            if CycleCount(0) = '1' then
+                PCOffset <= std_logic_vector(to_signed(to_integer(signed(IR(9 downto 3))), 12));
+            end if;
+        end if;
 
     end process DecodeInstruction;
 
