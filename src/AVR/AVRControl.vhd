@@ -117,7 +117,7 @@ begin
         ALUBitClrSet <= StatusBitClear; -- arbitrary value (changed in cases where needed)
         ALUStatusBitChangeEn <= '0';    -- by default, do not change status bits
         ALUBitTOp   <= '0';             -- by default, do not change flag T
-        ALUStatusMask <= "00000000";    -- clear everything except selected bit
+        ALUStatusMask <= "00000000";    -- don't change any status bits
         
         RetAddrSel  <= "00";            -- default don't change the return address buffer
         PCUpdateSel <= "00";            -- default update PC using incrementor
@@ -668,6 +668,7 @@ begin
         end if;
         
         if ( std_match(IR, OpJMP) ) then
+            ALUStatusMask <= "00000000";    -- don't change any status bits
             if CycleCount = "00" then
                 newIns <= '0';
                 PCOffset <= std_logic_vector(to_signed(0, 12));
@@ -684,6 +685,7 @@ begin
         end if;
         
         if ( std_match(IR, OpRJMP) ) then
+            ALUStatusMask <= "00000000";    -- don't change any status bits
             if CycleCount(0) = '0' then
                 newIns <= '0';
                 PCOffset <= IR(11 downto 0);
@@ -694,6 +696,7 @@ begin
         end if;
         
         if ( std_match(IR, OpBRBC) or std_match(IR, OpBRBS) ) then
+--            ALUStatusMask <= "00110111";    -- don't change any status bits
             if CycleCount(0) = '0' then
                 if (IR(10) = '0' xor ALUStatReg(to_integer(unsigned(IR(2 downto 0)))) = '0') then
                     newIns <= '0';
