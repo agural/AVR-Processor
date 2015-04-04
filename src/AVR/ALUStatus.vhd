@@ -56,6 +56,7 @@ begin
     process(ALUResult, statusMask, statusH, statusV, statusN, statusC, bitChangeEn, bitClrSet, bitT)
     begin
         result <= ALUResult;
+        temp_status <= old_status;
         if (bitT = '0' AND bitChangeEn = '0') then  -- "Normal instruction" operation
             -- C-flag
             if (statusMask(flag_C) = '1') then
@@ -110,12 +111,11 @@ begin
                     temp_status(flag_T) <= '1';
                 end if;
             else                                    -- BLD instruction
-                if (statusMask(flag_T) = '1') then
+                if (old_status(flag_T) = '1') then
                     result <= ALUResult OR statusMask;
                 else
                     result <= ALUResult AND (not statusMask);
                 end if;
-                temp_status(flag_T) <= old_status(flag_T);
             end if;
         else                                        -- BCLR or BSET instruction operation
             if (bitClrSet = '1') then               -- BSET instruction

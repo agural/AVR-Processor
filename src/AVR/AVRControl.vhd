@@ -142,6 +142,7 @@ begin
             ALUOp2Sel <= ImmedOp2;            -- specify immediate value used
             ALUBlockSel <= ALUAddBlock;       -- specify add block used
             ImmediateOut(7 downto 6) <= "00"; -- top 2 immediate bits are forced 0
+            ImmediateOut(5 downto 4) <= IR(7 downto 6); -- next 2 immediate bits taken from here
 
             if (CycleCount(0) = '0') then -- first clock of 2
                 newIns   <= '0';
@@ -300,7 +301,6 @@ begin
             ALUBlockSel <= ALUAddBlock; -- specify add block used
             EnableIn <= '0'; -- do not write
             SelA(4)  <= '1'; -- only upper registers can be used
-            SelIn(4) <= '1'; -- only upper registers can be used
             ALUBlockInstructionSel <= AddBlockSub; -- specify subtract instruction
         end if;
 
@@ -394,6 +394,7 @@ begin
             ALUOp2Sel <= ImmedOp2; -- specify immediate value used
             ALUBlockSel <= ALUAddBlock; -- specify add block
             ImmediateOut(7 downto 6) <= "00"; -- top 2 bits in immediate set to 0
+            ImmediateOut(5 downto 4) <= IR(7 downto 6); -- next 2 immediate bits taken from here
 
             if (CycleCount(0) = '0') then -- first cycle
                 newIns   <= '0';
@@ -668,7 +669,7 @@ begin
         end if;
         
         if ( std_match(IR, OpJMP) ) then
-            ALUStatusMask <= "00000000";    -- don't change any status bits
+            EnableIn <= '0'; -- do not write
             if CycleCount = "00" then
                 newIns <= '0';
                 PCOffset <= std_logic_vector(to_signed(0, 12));
@@ -685,25 +686,26 @@ begin
         end if;
         
         if ( std_match(IR, OpRJMP) ) then
-            ALUStatusMask <= "00000000";    -- don't change any status bits
+            EnableIn <= '0'; -- do not write
             if CycleCount(0) = '0' then
                 newIns <= '0';
                 PCOffset <= IR(11 downto 0);
             end if;
             if CycleCount(0) = '1' then
-                --PCOffset <= std_logic_vector(to_signed(0, 12));
+                -- no action (resume normal operation)
             end if;
         end if;
         
         if ( std_match(IR, OpBRBC) or std_match(IR, OpBRBS) ) then
---            ALUStatusMask <= "00110111";    -- don't change any status bits
+            EnableIn <= '0'; -- do not write
             if CycleCount(0) = '0' then
                 if (IR(10) = '0' xor ALUStatReg(to_integer(unsigned(IR(2 downto 0)))) = '0') then
+                    PCOffset <= std_logic_vector(to_signed(to_integer(signed(IR(9 downto 3))), 12));
                     newIns <= '0';
                 end if;
             end if;
             if CycleCount(0) = '1' then
-                PCOffset <= std_logic_vector(to_signed(to_integer(signed(IR(9 downto 3))), 12));
+                -- no action (resume normal operation)
             end if;
         end if;
 
