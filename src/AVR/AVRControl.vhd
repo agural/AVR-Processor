@@ -49,6 +49,7 @@ entity AVRControl is
         ImmediateOut            : out std_logic_vector( 7 downto 0);-- value of immediate
         ALUBlockSel             : out std_logic_vector( 1 downto 0);-- which ALU block is used
         ALUBlockInstructionSel  : out std_logic_vector( 3 downto 0);-- which instruction for ALU block
+        statusZmod              : out std_logic;                    -- normal or modified Z update
         
         EnableIn                : out std_logic;                    -- whether or not to write to register
         SelIn                   : out std_logic_vector( 6 downto 0);-- register to write to
@@ -117,6 +118,7 @@ begin
         ALUBitClrSet <= StatusBitClear; -- arbitrary value (changed in cases where needed)
         ALUStatusBitChangeEn <= '0';    -- by default, do not change status bits
         ALUBitTOp   <= '0';             -- by default, do not change flag T
+        statusZmod  <= '0';             -- by default, normal Z update
         ALUStatusMask <= "00000000";    -- don't change any status bits
         
         RetAddrSel  <= "00";            -- default don't change the return address buffer
@@ -290,6 +292,7 @@ begin
 
         if std_match(IR, OpCPC   ) then -- compare with carry
             ALUStatusMask <= flag_mask_ZCNVSH; -- specify which bits can be changed
+            statusZmod <= '1';
             ALUBlockSel <= ALUAddBlock; -- specify add block used
             EnableIn <= '0'; -- do not write
             ALUBlockInstructionSel <= AddBlockSubCarry; -- specify subtract with carry instruction
@@ -376,6 +379,7 @@ begin
 
         if std_match(IR, OpSBC   ) then -- subtract with carry
             ALUStatusMask <= flag_mask_ZCNVSH; -- specify which bits can be changed
+            statusZmod <= '1';
             ALUBlockSel <= ALUAddBlock; -- specify add block
             ALUBlockInstructionSel <= AddBlockSubCarry; -- specify subtract with carry instruction
         end if;

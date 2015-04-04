@@ -22,6 +22,8 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+library opcodes;
+use opcodes.opcodes.all;
 library ALUCommands;
 use ALUCommands.ALUCommands.all;
 
@@ -35,6 +37,7 @@ entity ALUStatus is
         statusH     : in  std_logic;                    -- Input flags from ALU calculation
         statusV     : in  std_logic;                    -- If a flag isn't here, it can be computed from ALUResult
         statusC     : in  std_logic;
+        statusZmod  : in  std_logic;                    -- Tells whether to use the normal or modified Z update
         
         bitChangeEn : in  std_logic;                    -- Allow change to individual status bits outside normal mode
         bitClrSet   : in  std_logic;                    -- If bitChangeEn, sets or clears bits according to mask
@@ -67,7 +70,7 @@ begin
             
             -- Z-flag
             if (statusMask(flag_Z) = '1') then
-                if (ALUResult = std_logic_vector(to_unsigned(0, ALUResult'length))) then
+                if (((statusZmod = '0') or (old_status(flag_Z) = '1')) and (ALUResult = std_logic_vector(to_unsigned(0, ALUResult'length)))) then
                     temp_status(flag_Z) <= '1';
                 else
                     temp_status(flag_Z) <= '0';

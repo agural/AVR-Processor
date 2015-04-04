@@ -81,6 +81,7 @@ architecture Structural of AVR_CPU is
     signal ALUStatusBitChangeEn   : std_logic;
     signal ALUBitClrSet           : std_logic;
     signal ALUBitTOp              : std_logic;
+    signal statusZmod             : std_logic;
     
     signal ALUResult              : std_logic_vector(7 downto 0);
     signal ALUStatReg             : std_logic_vector(7 downto 0);
@@ -138,6 +139,7 @@ begin
         ALUStatusBitChangeEn    => ALUStatusBitChangeEn,
         ALUBitClrSet            => ALUBitClrSet,
         ALUBitTOp               => ALUBitTOp,
+        statusZmod              => statusZmod,
 
         RegAOut                 => RegA,
         RegBOut                 => RegB,
@@ -163,6 +165,7 @@ begin
         ImmediateOut            => ImmediateOut,
         ALUBlockSel             => ALUBlockSel,
         ALUBlockInstructionSel  => ALUBlockInstructionSel,
+        statusZmod              => statusZmod,
         
         EnableIn                => EnableIn,
         SelIn                   => SelIn,
