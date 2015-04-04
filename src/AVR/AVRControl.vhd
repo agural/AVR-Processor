@@ -677,12 +677,10 @@ begin
             if CycleCount = "00" then
                 newIns <= '0';
                 PCOffset <= std_logic_vector(to_signed(0, 12));
-                --PCUpdateSel <= "01";
             end if;
             if CycleCount = "01" then
                 newIns <= '0';
-                PCOffset <= std_logic_vector(to_signed(0, 12));
-                PCUpdateSel <= "01";
+                PCUpdateSel <= "01";-- update PC from ProgDB
             end if;
             if CycleCount = "10" then
                 -- no action (resume normal operation)
@@ -694,6 +692,19 @@ begin
             if CycleCount(0) = '0' then
                 newIns <= '0';
                 PCOffset <= IR(11 downto 0);
+            end if;
+            if CycleCount(0) = '1' then
+                -- no action (resume normal operation)
+            end if;
+        end if;
+        
+        if ( std_match(IR, OpIJMP) ) then
+            EnableIn <= '0'; -- do not write
+            if CycleCount(0) = '0' then
+                SpecAddr <= "10";   -- output Z from registers
+                
+                newIns <= '0';
+                PCUpdateSel <= "10";-- update PC from Z
             end if;
             if CycleCount(0) = '1' then
                 -- no action (resume normal operation)
@@ -730,7 +741,7 @@ begin
                                        std_match(IR, OpSTZI) or std_match(IR, OpSTZD) or std_match(IR, OpSTDZ) or
                                        std_match(IR, OpPOP)  or std_match(IR, OpPUSH) or
                                        std_match(IR, OpLDS)  or std_match(IR, OpSTS)  or
-                                       std_match(IR, OpJMP)  or std_match(IR, OpRJMP) or
+                                       std_match(IR, OpJMP)  or std_match(IR, OpRJMP) or std_match(IR, OpIJMP) or
                                        ((std_match(IR, OpBRBC) or std_match(IR, OpBRBS)) and
                                             (IR(10) = '0' xor ALUStatReg(to_integer(unsigned(IR(2 downto 0)))) = '0')) 
                                      ) then
