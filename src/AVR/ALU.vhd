@@ -81,7 +81,6 @@ architecture Structural of ALU is
 
     signal ALUResult : std_logic_vector(7 downto 0); -- result from ALU
 
-
 begin
     opA <= regAOut; -- first input is usually first register
     -- choose between second register and immediate for second input
