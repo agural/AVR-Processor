@@ -38,9 +38,9 @@ entity AVRRegisters is
         SelA        : in  std_logic_vector(6 downto 0);     -- register to read from
         SelB        : in  std_logic_vector(6 downto 0);     -- register to read from
 
-        ALUIn       : in std_logic_vector(7 downto 0);      -- ALU output
-        RegDataImm  : in std_logic_vector(7 downto 0);      -- Control logic output
-        RegDataInSel: in std_logic_vector(1 downto 0);      -- select value to update registers
+        ALUIn       : in  std_logic_vector(7 downto 0);     -- ALU output
+        RegDataImm  : in  std_logic_vector(7 downto 0);     -- Control logic output
+        RegDataInSel: in  std_logic_vector(1 downto 0);     -- select value to update registers
 
         RegAOut     : out std_logic_vector(7 downto 0);     -- first output
         RegBOut     : out std_logic_vector(7 downto 0);     -- second output
@@ -52,13 +52,15 @@ entity AVRRegisters is
         MemRegData  : inout  std_logic_vector(7 downto 0);  -- data bus
         AddrOffset  : in  std_logic_vector(15 downto 0);    -- offset for address
         MemRegAddr  : buffer std_logic_vector(15 downto 0); -- updated value for Control
-        DataIOSel   : in  std_logic;                        -- specifies input/output
-                                                            -- 0 - input from DataDB
-                                                            -- 1 - output from DataDB
+        DataIOSel   : in  std_logic_vector(1 downto 0);     -- specifies input/output (and src if output)
+                                                                -- 00 - input from DataDB to regA
+                                                                -- 01 - output to DataDB from regA
+                                                                -- 10, 11 - output to DataDB from retAddr
                                                             
         RetAddrSel  : in  std_logic_vector( 1 downto 0);    -- when non-zero, updates stackbuffer
         RetAddrWr   : in  std_logic_vector(15 downto 0);    -- write to buffer for most recent CALL
         RetAddrRd   : out std_logic_vector(15 downto 0);    -- read from buffer for most recent RET
+        PCZ         : out std_logic_vector(15 downto 0);    -- Z register for PC purposes
         
         DebugReg    : out std_logic_vector(7 downto 0);     -- Register R16 contains debug output
                                                             -- from test program run.
@@ -75,6 +77,7 @@ architecture DataFlow of AVRRegisters is
     signal Registers : REG_ARRAY;
     signal SP           : std_logic_vector(15 downto 0);    -- stack pointer (separate from registers)
     signal RetAddrBuffer: std_logic_vector(15 downto 0);    -- buffer for value to read/write to stack
+    signal RetAddr      : std_logic_vector(15 downto 0);    -- signal for current return address
     signal RegIn        : std_logic_vector( 7 downto 0);    -- mux ALU, data, and regdata
     signal RegAInternal : std_logic_vector( 7 downto 0);    -- value of register A
 begin
@@ -87,9 +90,12 @@ begin
                     (others => 'X');
     -- output current stack buffer
     RetAddrRd    <= RetAddrBuffer;
+    
+    RetAddr      <= std_logic_vector(unsigned(RetAddrWr) + to_unsigned(1,16));
  
     DebugReg <= Registers(16);
  
+    PCZ     <= Registers(31) & Registers(30);
     SpecOut <= Registers(27) & Registers(26) when (SpecAddr = "00") else
                Registers(29) & Registers(28) when (SpecAddr = "01") else
                Registers(31) & Registers(30) when (SpecAddr = "10") else
@@ -103,9 +109,19 @@ begin
              (others => 'X');
     MemRegAddr <= std_logic_vector(signed(SpecOut) + signed(AddrOffset));
 
-    MemRegData <= (others => 'Z') when (DataIOSel = '0') else
-                  RegAInternal    when (DataIOSel = '1') else
+    MemRegData <= (others => 'Z') when (DataIOSel = "00") else
+                  RegAInternal    when (DataIOSel = "01") else
+                  RetAddrBuffer( 7 downto 0) when (DataIOSel = "10") else
+                  RetAddr(15 downto 8) when (DataIOSel = "11") else
                   (others => 'X');
+
+    -- we want to transparently update RetAddrBuffer
+--    UpdateRetAddr: process (RetAddrSel)
+--    begin
+--        if (RetAddrSel = "01") then
+--            RetAddrBuffer <= 
+--        end if;
+--    end process UpdateRetAddr;
 
     -- process to update value in one register if requested
     WriteRegister: process (clock)
@@ -137,7 +153,7 @@ begin
                 RetAddrBuffer(15 downto 8) <= MemRegData;
                 RetAddrBuffer( 7 downto 0) <= RetAddrBuffer( 7 downto 0);
             elsif (RetAddrSel = "01") then
-                RetAddrBuffer <= RetAddrWr;
+                RetAddrBuffer <= RetAddr;
             else
                 RetAddrBuffer <= RetAddrBuffer;
             end if;

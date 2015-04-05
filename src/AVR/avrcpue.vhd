@@ -92,18 +92,18 @@ architecture Structural of AVR_CPU is
         
     -- Signals between Control Unit and Registers
     signal EnableIn     : std_logic;                        -- enable writing to register
-    signal SelIn        : std_logic_vector(6 downto 0);     -- select input register for writing
-    signal SelA         : std_logic_vector(6 downto 0);     -- register to output at regA
-    signal SelB         : std_logic_vector(6 downto 0);     -- register to output at regB
+    signal SelIn        : std_logic_vector( 6 downto 0);    -- select input register for writing
+    signal SelA         : std_logic_vector( 6 downto 0);    -- register to output at regA
+    signal SelB         : std_logic_vector( 6 downto 0);    -- register to output at regB
     signal MemRegAddr   : std_logic_vector(15 downto 0);    -- register-based indirect memory access
 
-    signal DataIOSel    : std_logic;                        -- selects whether data is input or output
+    signal DataIOSel    : std_logic_vector( 1 downto 0);    -- selects whether data is input or output (incl. src)
     signal AddrOffset   : std_logic_vector(15 downto 0);    -- offset of address
-    signal SpecAddr     : std_logic_vector(1 downto 0);     -- selects X, Y, Z, or SP
+    signal SpecAddr     : std_logic_vector( 1 downto 0);    -- selects X, Y, Z, or SP
     signal SpecWr       : std_logic;                        -- whether to write to the special addresses
-    signal RetAddrSel   : std_logic_vector(1 downto 0);     -- writes stack (SP) entry to return addr buffer
+    signal RetAddrSel   : std_logic_vector( 1 downto 0);    -- writes stack (SP) entry to return addr buffer
 
-    signal RegDataInSel : std_logic_vector(1 downto 0);     -- selects which input goes to register in
+    signal RegDataInSel : std_logic_vector( 1 downto 0);    -- selects which input goes to register in
     signal MemAddr      : std_logic_vector(15 downto 0);    -- memory address (16 bits)
 
     -- Signals between Control Unit and DMA / Memory
@@ -209,7 +209,8 @@ begin
         RegAOut         => RegA,
         RegBOut         => RegB,
 
-        SpecOut         => NewPCZ,
+        SpecOut         => open,
+        PCZ             => NewPCZ,
         SpecAddr        => SpecAddr,
         SpecWr          => SpecWr,
 
