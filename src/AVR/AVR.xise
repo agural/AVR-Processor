@@ -78,11 +78,11 @@
       <library xil_pn:name="opcodes"/>
     </file>
     <file xil_pn:name="memteste.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="6"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="7"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
     <file xil_pn:name="MEM_TEST_TB.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="7"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="8"/>
       <association xil_pn:name="PostMapSimulation" xil_pn:seqID="88"/>
       <association xil_pn:name="PostRouteSimulation" xil_pn:seqID="88"/>
       <association xil_pn:name="PostTranslateSimulation" xil_pn:seqID="88"/>
@@ -90,6 +90,10 @@
     <file xil_pn:name="DMAUnit.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="3"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="3"/>
+    </file>
+    <file xil_pn:name="std_logic_1164_additions.vhdl" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="6"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="95"/>
     </file>
   </files>
 
