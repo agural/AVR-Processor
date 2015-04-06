@@ -69,7 +69,11 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
+<<<<<<< HEAD
     <transform xil_pn:end_ts="1428303498" xil_pn:in_ck="1882815935420500539" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1428303498">
+=======
+    <transform xil_pn:end_ts="1427694930" xil_pn:in_ck="1882815935420500539" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1427694930">
+>>>>>>> 6883bfa245f85cad4ab4edc4e5f3ad1b5d8673a1
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="ALU.vhd"/>
@@ -108,7 +112,11 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
+<<<<<<< HEAD
     <transform xil_pn:end_ts="1428303501" xil_pn:in_ck="1882815935420500539" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1428303501">
+=======
+    <transform xil_pn:end_ts="1427694930" xil_pn:in_ck="1882815935420500539" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1427694930">
+>>>>>>> 6883bfa245f85cad4ab4edc4e5f3ad1b5d8673a1
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="ALU.vhd"/>
@@ -135,7 +143,11 @@
       <outfile xil_pn:name="opcodes.vhd"/>
       <outfile xil_pn:name="progmem.vhd"/>
     </transform>
+<<<<<<< HEAD
     <transform xil_pn:end_ts="1428303505" xil_pn:in_ck="1882815935420500539" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="4652906877918418942" xil_pn:start_ts="1428303501">
+=======
+    <transform xil_pn:end_ts="1427694935" xil_pn:in_ck="1882815935420500539" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="4652906877918418942" xil_pn:start_ts="1427694930">
+>>>>>>> 6883bfa245f85cad4ab4edc4e5f3ad1b5d8673a1
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="AVR_CPU_TEST_TB_beh.prj"/>
@@ -144,7 +156,11 @@
       <outfile xil_pn:name="isim"/>
       <outfile xil_pn:name="xilinxsim.ini"/>
     </transform>
+<<<<<<< HEAD
     <transform xil_pn:end_ts="1428303505" xil_pn:in_ck="-583773089871998541" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="61747371094060011" xil_pn:start_ts="1428303505">
+=======
+    <transform xil_pn:end_ts="1427694936" xil_pn:in_ck="-583773089871998541" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="61747371094060011" xil_pn:start_ts="1427694935">
+>>>>>>> 6883bfa245f85cad4ab4edc4e5f3ad1b5d8673a1
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="AVR_CPU_TEST_TB_isim_beh.wdb"/>

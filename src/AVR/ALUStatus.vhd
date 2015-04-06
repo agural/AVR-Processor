@@ -22,6 +22,8 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+library opcodes;
+use opcodes.opcodes.all;
 library ALUCommands;
 use ALUCommands.ALUCommands.all;
 
@@ -35,6 +37,7 @@ entity ALUStatus is
         statusH     : in  std_logic;                    -- Input flags from ALU calculation
         statusV     : in  std_logic;                    -- If a flag isn't here, it can be computed from ALUResult
         statusC     : in  std_logic;
+        statusZmod  : in  std_logic;                    -- Tells whether to use the normal or modified Z update
         
         bitChangeEn : in  std_logic;                    -- Allow change to individual status bits outside normal mode
         bitClrSet   : in  std_logic;                    -- If bitChangeEn, sets or clears bits according to mask
@@ -56,6 +59,7 @@ begin
     process(ALUResult, statusMask, statusH, statusV, statusN, statusC, bitChangeEn, bitClrSet, bitT)
     begin
         result <= ALUResult;
+        temp_status <= old_status;
         if (bitT = '0' AND bitChangeEn = '0') then  -- "Normal instruction" operation
             -- C-flag
             if (statusMask(flag_C) = '1') then
@@ -66,7 +70,7 @@ begin
             
             -- Z-flag
             if (statusMask(flag_Z) = '1') then
-                if (ALUResult = std_logic_vector(to_unsigned(0, ALUResult'length))) then
+                if (((statusZmod = '0') or (old_status(flag_Z) = '1')) and (ALUResult = std_logic_vector(to_unsigned(0, ALUResult'length)))) then
                     temp_status(flag_Z) <= '1';
                 else
                     temp_status(flag_Z) <= '0';
@@ -110,12 +114,11 @@ begin
                     temp_status(flag_T) <= '1';
                 end if;
             else                                    -- BLD instruction
-                if (statusMask(flag_T) = '1') then
+                if (old_status(flag_T) = '1') then
                     result <= ALUResult OR statusMask;
                 else
                     result <= ALUResult AND (not statusMask);
                 end if;
-                temp_status(flag_T) <= old_status(flag_T);
             end if;
         else                                        -- BCLR or BSET instruction operation
             if (bitClrSet = '1') then               -- BSET instruction

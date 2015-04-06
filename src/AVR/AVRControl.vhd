@@ -49,15 +49,17 @@ entity AVRControl is
         ImmediateOut            : out std_logic_vector( 7 downto 0);-- value of immediate
         ALUBlockSel             : out std_logic_vector( 1 downto 0);-- which ALU block is used
         ALUBlockInstructionSel  : out std_logic_vector( 3 downto 0);-- which instruction for ALU block
+        statusZmod              : out std_logic;                    -- normal or modified Z update
         
         EnableIn                : out std_logic;                    -- whether or not to write to register
         SelIn                   : out std_logic_vector( 6 downto 0);-- register to write to
         SelA                    : out std_logic_vector( 6 downto 0);-- first register to read
         SelB                    : out std_logic_vector( 6 downto 0);-- second register to read
+
         ALUResult               : in  std_logic_vector( 7 downto 0);-- result from ALU
         ALUStatReg              : in  std_logic_vector( 7 downto 0);-- status from ALU
         
-        DataIOSel               : out std_logic;                    -- selects whether data is input or output
+        DataIOSel               : out std_logic_vector( 1 downto 0);-- selects whether data is input or output (incl. src)
         AddrOffset              : out std_logic_vector(15 downto 0);-- offset of address
         SpecAddr                : out std_logic_vector( 1 downto 0);-- selects X, Y, Z, or SP
         SpecWr                  : out std_logic;                    -- whether to write to the special addresses
@@ -78,13 +80,19 @@ entity AVRControl is
 end AVRControl;
 
 architecture DataFlow of AVRControl is
-    signal CycleCount  : std_logic_vector(1 downto 0) := "00"; -- which clock of instruction (for multi-clock instructions)
-    signal MemRegAddrM : std_logic := '0'; -- '1' when address outputs to memory; '0' when it outputs to the registers / IO
-    signal ProgDBM     : std_logic := '0'; -- '1' when address outputs to memory; '0' when it outputs to the registers / IO
+    signal CycleCount  : std_logic_vector( 1 downto 0) := "00"; -- which clock of instruction (for multi-clock instructions)
+    signal MemRegAddrM : std_logic := '0';                      -- '1' when address outputs to memory;
+                                                                -- '0' when it outputs to the registers / IO
+    signal ProgDBM     : std_logic := '0';                      -- '1' when address outputs to memory;
+                                                                -- '0' when it outputs to the registers / IO
     
-    signal RegAddr     : std_logic_vector(6 downto 0)  := "0000000";            -- stores the first cycle of memory for registers to use
+    signal RegAddr     : std_logic_vector( 6 downto 0) := "0000000";            -- stores the first cycle of memory for registers to use
     signal MemAStore   : std_logic_vector(15 downto 0) := "0000000000000000";   -- stores the first cycle value of MemRegAddr
     signal ProgStore   : std_logic_vector(15 downto 0) := "0000000000000000";   -- stores the second cycle value of ProgDB
+    
+    signal BranchCondition  : std_logic;    -- '1' when the branch condition is satisfied
+    signal SkipCondition    : std_logic;    -- '1' when the skip condition is satisfied
+    signal TwoWordInstr     : std_logic;    -- '1' indicates an instruction that takes two words
 begin
     MemAStore   <= MemRegAddr when (CycleCount = "00") and (clock = '0') else MemAStore;
     MemRegAddrM <= 'X' when is_x(MemAStore) else
@@ -96,35 +104,46 @@ begin
     ProgDBM     <= '0' when (to_integer(unsigned(ProgStore)) <= 95) else '1';
     
     RegAddr     <= ProgStore(6 downto 0) when (std_match(IR, OpLDS) or std_match(IR, OpSTS)) else MemAStore(6 downto 0); -- output address based on instruction
-    MemAddr     <= ProgStore when (std_match(IR, OpLDS) or std_match(IR, OpSTS)) else MemAStore; -- output address based on instruction
+    MemAddr     <= ProgStore when (std_match(IR, OpLDS) or std_match(IR, OpSTS)) else
+                   MemRegAddr when ( std_match(IR, OpCALL) or std_match(IR, OpRCALL) or std_match(IR, OpICALL) or
+                                     std_match(IR, OpRET)  or std_match(IR, OpRETI) ) else
+                   MemAStore; -- output address based on instruction
+
+    TwoWordInstr    <= '1' when ( std_match(ProgDB, OpLDS) or std_match(ProgDB, OpSTS) or
+                                  std_match(ProgDB, OpJMP) or std_match(ProgDB, OpCALL) )
+                       else '0';
 
     -- Decode new instructions on clock edge
-    DecodeInstruction: process (IR, CycleCount, MemRegAddr, ProgDB, MemRegAddrM)
+    DecodeInstruction: process (IR, CycleCount, MemRegAddr, ProgDB, MemRegAddrM, ALUResult)
     begin
         ALUOp2Sel <= RegOp2;            -- default second operand is from register
-        EnableIn <= '1';                -- enable write to register by default
+        EnableIn  <= '1';               -- enable write to register by default
         SelA  <= "00" & IR(8 downto 4);         -- bits specifying first register
         SelB  <= "00" & IR(9) & IR(3 downto 0); -- bits specifying second register
         SelIn <= "00" & IR(8 downto 4);         -- normally write to first register
-        SpecWr <= '0';                  -- default don't write to the special registers
+        SpecWr       <= '0';            -- default don't write to the special registers
         RegDataInSel <= "00";           -- default input from ALUResult
-        DataIOSel <= '0';               -- default input mode for data (leave DB high-Z)
-        AddrOffset <= std_logic_vector(to_unsigned(0,16));-- default address offset is 0
-        ImmediateOut <= IR(11 downto 8) & IR(3 downto 0); -- normal immediate value
+        DataIOSel    <= "00";           -- default input mode for data (leave DB high-Z)
+        AddrOffset   <= std_logic_vector(to_unsigned(0,16));    -- default address offset is 0
+        ImmediateOut <= IR(11 downto 8) & IR(3 downto 0);       -- normal immediate value
         
         OutRd  <= '1';                  -- default off (active low)
         OutWr  <= '1';                  -- default off (active low)
 
         ALUBitClrSet <= StatusBitClear; -- arbitrary value (changed in cases where needed)
         ALUStatusBitChangeEn <= '0';    -- by default, do not change status bits
-        ALUBitTOp   <= '0';             -- by default, do not change flag T
+        ALUBitTOp       <= '0';         -- by default, do not change flag T
+        statusZmod      <= '0';         -- by default, normal Z update
+        ALUStatusMask   <= "00000000";  -- don't change any status bits
+        
+        BranchCondition <= '0';         -- default, don't branch
+        SkipCondition   <= '0';         -- default, don't skip
         
         RetAddrSel  <= "00";            -- default don't change the return address buffer
         PCUpdateSel <= "00";            -- default update PC using incrementor
         PCOffset    <= std_logic_vector(to_signed(1, 12));  -- default step PC by +1
         newIns      <= '1';             -- default get new instruction
         
-
         if std_match(IR, OpADC   ) then -- add with carry
             ALUStatusMask <= flag_mask_ZCNVSH; -- specify which bits may be changed
             ALUBlockSel <= ALUAddBlock;        -- specify add block used
@@ -142,6 +161,7 @@ begin
             ALUOp2Sel <= ImmedOp2;            -- specify immediate value used
             ALUBlockSel <= ALUAddBlock;       -- specify add block used
             ImmediateOut(7 downto 6) <= "00"; -- top 2 immediate bits are forced 0
+            ImmediateOut(5 downto 4) <= IR(7 downto 6); -- next 2 immediate bits taken from here
 
             if (CycleCount(0) = '0') then -- first clock of 2
                 newIns   <= '0';
@@ -289,6 +309,7 @@ begin
 
         if std_match(IR, OpCPC   ) then -- compare with carry
             ALUStatusMask <= flag_mask_ZCNVSH; -- specify which bits can be changed
+            statusZmod <= '1';
             ALUBlockSel <= ALUAddBlock; -- specify add block used
             EnableIn <= '0'; -- do not write
             ALUBlockInstructionSel <= AddBlockSubCarry; -- specify subtract with carry instruction
@@ -300,7 +321,6 @@ begin
             ALUBlockSel <= ALUAddBlock; -- specify add block used
             EnableIn <= '0'; -- do not write
             SelA(4)  <= '1'; -- only upper registers can be used
-            SelIn(4) <= '1'; -- only upper registers can be used
             ALUBlockInstructionSel <= AddBlockSub; -- specify subtract instruction
         end if;
 
@@ -376,6 +396,7 @@ begin
 
         if std_match(IR, OpSBC   ) then -- subtract with carry
             ALUStatusMask <= flag_mask_ZCNVSH; -- specify which bits can be changed
+            statusZmod <= '1';
             ALUBlockSel <= ALUAddBlock; -- specify add block
             ALUBlockInstructionSel <= AddBlockSubCarry; -- specify subtract with carry instruction
         end if;
@@ -394,6 +415,7 @@ begin
             ALUOp2Sel <= ImmedOp2; -- specify immediate value used
             ALUBlockSel <= ALUAddBlock; -- specify add block
             ImmediateOut(7 downto 6) <= "00"; -- top 2 bits in immediate set to 0
+            ImmediateOut(5 downto 4) <= IR(7 downto 6); -- next 2 immediate bits taken from here
 
             if (CycleCount(0) = '0') then -- first cycle
                 newIns   <= '0';
@@ -487,7 +509,7 @@ begin
                     RegDataInSel <= "11";   -- data from output of registers
                     SelIn <= RegAddr;
                 else
-                    DataIOSel <= '1'; -- output data from Rr to memory data bus
+                    DataIOSel <= "01";      -- output data from Rr to memory data bus
                 end if;
             end if;
             
@@ -576,7 +598,7 @@ begin
                     RegDataInSel <= "11";   -- data from output of registers
                     SelIn <= RegAddr;
                 else
-                    DataIOSel <= '1'; -- output data from Rr to memory data bus
+                    DataIOSel <= "01"; -- output data from Rr to memory data bus
                 end if;
             end if;
             
@@ -628,7 +650,7 @@ begin
                     RegDataInSel <= "11";   -- data from output of registers
                     SelIn <= RegAddr;
                 else
-                    DataIOSel <= '1'; -- output data from Rr to memory data bus
+                    DataIOSel <= "01"; -- output data from Rr to memory data bus
                 end if;
             end if;
             
@@ -668,41 +690,246 @@ begin
         end if;
         
         if ( std_match(IR, OpJMP) ) then
+            EnableIn <= '0'; -- do not write
             if CycleCount = "00" then
                 newIns <= '0';
                 PCOffset <= std_logic_vector(to_signed(0, 12));
-                PCUpdateSel <= "01";
             end if;
             if CycleCount = "01" then
                 newIns <= '0';
-                PCOffset <= std_logic_vector(to_signed(0, 12));
+                PCUpdateSel <= "01";-- update PC from ProgDB
             end if;
             if CycleCount = "10" then
                 -- no action (resume normal operation)
             end if;
         end if;
         
---        if ( std_match(IR, OpRJMP) ) then
---            if CycleCount(0) = '0' then
---                newIns <= '0';
---                PCOffset <= IR(11 downto 0);
---            end if;
---            if CycleCount(0) = '1' then
---                --PCOffset <= std_logic_vector(to_signed(0, 12));
---            end if;
---        end if;
+        if ( std_match(IR, OpRJMP) ) then
+            EnableIn <= '0'; -- do not write
+            if CycleCount(0) = '0' then
+                newIns <= '0';
+                PCOffset <= IR(11 downto 0);
+            end if;
+            if CycleCount(0) = '1' then
+                -- no action (resume normal operation)
+            end if;
+        end if;
         
---        if ( std_match(IR, OpBRBC) or std_match(IR, OpBRBS) ) then
---            if CycleCount(0) = '0' then
---                if (IR(10) = '0' xor ALUStatReg(to_integer(unsigned(IR(2 downto 0)))) = '0') then
---                    newIns <= '0';
---                    PCOffset <= std_logic_vector(to_signed(to_integer(signed(IR(9 downto 3))), 12));
---                end if;
---            end if;
---            if CycleCount(0) = '1' then
---                -- default operation
---            end if;
---        end if;
+        if ( std_match(IR, OpIJMP) ) then
+            EnableIn <= '0'; -- do not write
+            if CycleCount(0) = '0' then
+                newIns <= '0';
+                PCUpdateSel <= "10";-- update PC from Z
+            end if;
+            if CycleCount(0) = '1' then
+                -- no action (resume normal operation)
+            end if;
+        end if;
+        
+        if ( std_match(IR, OpCALL) ) then
+            EnableIn <= '0'; -- do not write
+            if CycleCount = "00" then
+                -- Store return address
+                RetAddrSel <= "01"; -- write address to return address
+                
+                -- PUSH return address (high byte)
+                --MemAddr <= MemRegAddr;
+                OutWr <= '0';
+                AddrOffset <= std_logic_vector(to_signed(0,16));
+                SpecAddr <= "11";
+                DataIOSel <= "11"; -- send upper byte of address
+                
+                -- PC update rules
+                newIns <= '0';
+                PCOffset <= std_logic_vector(to_signed(0, 12));
+            end if;
+            if CycleCount = "01" then
+                -- Update SP and PUSH return address (low byte)
+                OutWr <= '0';
+                AddrOffset <= std_logic_vector(to_signed(-1,16));
+                SpecWr <= '1';
+                SpecAddr <= "11";
+                DataIOSel <= "10"; -- send lower byte of address
+                
+                -- PC update rules
+                newIns <= '0';
+                PCOffset <= std_logic_vector(to_signed(0, 12));
+            end if;
+            if CycleCount = "10" then
+                -- Update SP
+                AddrOffset <= std_logic_vector(to_signed(-1,16));
+                SpecWr <= '1';
+                
+                -- PC update rules
+                PCUpdateSel <= "01";    -- update PC from ProgDB
+            end if;
+            if CycleCount = "11" then
+                -- PC update rules
+                -- no action (resume normal operation)
+            end if;
+        end if;
+        
+        if ( std_match(IR, OpRCALL) or std_match(IR, OpICALL) ) then
+            EnableIn <= '0'; -- do not write
+            if CycleCount = "00" then
+                -- Store return address
+                RetAddrSel <= "01"; -- write address to return address
+                
+                -- PUSH return address (high byte)
+                --MemAddr <= MemRegAddr;
+                OutWr <= '0';
+                AddrOffset <= std_logic_vector(to_signed(0,16));
+                SpecAddr <= "11";
+                DataIOSel <= "11"; -- send upper byte of address
+                
+                -- PC update rules
+                newIns <= '0';
+                PCOffset <= std_logic_vector(to_signed(0, 12));
+            end if;
+            if CycleCount = "01" then
+                -- Update SP and PUSH return address (low byte)
+                OutWr <= '0';
+                AddrOffset <= std_logic_vector(to_signed(-1,16));
+                SpecWr <= '1';
+                SpecAddr <= "11";
+                DataIOSel <= "10"; -- send lower byte of address
+                
+                -- PC update rules
+                newIns <= '0';
+                if (IR(14) = '0') then      -- ICALL
+                    PCUpdateSel <= "10";-- update PC from Z
+                else                        -- RCALL
+                    PCOffset <= IR(11 downto 0);
+                end if;
+            end if;
+            if CycleCount = "10" then
+                -- Update SP
+                AddrOffset <= std_logic_vector(to_signed(-1,16));
+                SpecWr <= '1';
+                
+                -- PC update rules
+                -- no action (resume normal operation)
+            end if;
+        end if;
+        
+        if ( std_match(IR, OpRET) or std_match(IR, OpRETI) ) then
+            EnableIn <= '0'; -- do not write
+            if CycleCount = "00" then
+                -- Update SP and POP return address (low byte)
+                OutRd <= '0';
+                AddrOffset <= std_logic_vector(to_signed(1,16));
+                SpecWr <= '1';
+                SpecAddr <= "11";
+                DataIOSel <= "00"; -- read lower byte of address
+                
+                -- Store return address
+                RetAddrSel <= "10"; -- read address from stack (low byte)
+                
+                -- PC update rules
+                newIns <= '0';
+                PCOffset <= std_logic_vector(to_signed(0, 12));
+            end if;
+            if CycleCount = "01" then
+                -- Update SP and POP return address (high byte)
+                OutRd <= '0';
+                AddrOffset <= std_logic_vector(to_signed(1,16));
+                SpecWr <= '1';
+                SpecAddr <= "11";
+                DataIOSel <= "00"; -- read lower byte of address
+                
+                -- Store return address
+                RetAddrSel <= "11"; -- read address from stack (high byte)
+                
+                -- PC update rules
+                newIns <= '0';
+                PCOffset <= std_logic_vector(to_signed(0, 12));
+            end if;
+            if CycleCount = "10" then
+                -- PC update rules
+                newIns <= '0';
+                PCUpdateSel <= "11";-- update PC from ProgDB
+            end if;
+            if CycleCount = "11" then
+                -- set I if RETI
+                if ( IR(4) = '1' ) then
+                    --OR operand 1 with zero to pass through to flag logic
+                    ALUBlockSel <= ALUFBlock; -- specify f block used
+                    ALUBlockInstructionSel <= FBlockOR; -- specify or used
+                    ImmediateOut <= "00000000"; -- or with zero
+                    ALUOp2Sel <= ImmedOp2; -- specify immediate value used
+
+                    --only enable changing of bit s (IR[6:4]) of status register
+                    ALUStatusMask <= "10000000"; -- clear everything except selected bit
+                    ALUBitClrSet <= StatusBitSet; -- setting this bit
+
+                    ALUStatusBitChangeEn <= '1'; -- manually changing status register bit
+                end if;
+                
+                -- PC update rules
+                -- no action (resume normal operation)
+            end if;
+        end if;
+        
+        if ( std_match(IR, OpBRBC) or std_match(IR, OpBRBS) ) then
+            EnableIn <= '0'; -- do not write
+            if CycleCount(0) = '0' then
+                if (IR(10) = '0' xor ALUStatReg(to_integer(unsigned(IR(2 downto 0)))) = '0') then
+                    PCOffset <= std_logic_vector(to_signed(to_integer(signed(IR(9 downto 3))), 12));
+                    newIns <= '0';
+                    BranchCondition <= '1';
+                end if;
+            end if;
+            if CycleCount(0) = '1' then
+                -- no action (resume normal operation)
+            end if;
+        end if;
+        
+        if ( std_match(IR, OpCPSE) ) then
+            EnableIn <= '0'; -- do not write
+            
+            if CycleCount = "00" then
+                -- Subtract Rd - Rr
+                ALUBlockSel <= ALUAddBlock; -- specify add block used
+                ALUBlockInstructionSel <= AddBlockSub; -- specify subtract instruction
+                
+                -- See if result is 0
+                if (ALUResult = "00000000") then
+                    newIns <= '0';
+                    SkipCondition <= '1';
+                end if;
+            end if;
+            if (CycleCount = "01" and TwoWordInstr = '1') then
+                newIns <= '0';
+                SkipCondition <= '1';
+            end if;
+            if CycleCount = "11" then
+                -- no action (resume normal operation)
+            end if;
+        end if;
+        
+        if ( std_match(IR, OpSBRC) or std_match(IR, OpSBRS) ) then
+            EnableIn <= '0'; -- do not write
+            if CycleCount = "00" then
+                -- OR operand 1 with zero to pass through to flag logic
+                ALUBlockSel <= ALUFBlock; -- specify f block used
+                ALUBlockInstructionSel <= FBlockOR; -- specify or used
+                ImmediateOut <= "00000000"; -- or with zero
+                ALUOp2Sel <= ImmedOp2; -- specify immediate value used
+                
+                -- See if bit of interest is set correctly
+                if (ALUResult(conv_integer(IR(2 downto 0))) = IR(9)) then
+                    newIns <= '0';
+                    SkipCondition <= '1';
+                end if;
+            end if;
+            if (CycleCount = "01" and TwoWordInstr = '1') then
+                newIns <= '0';
+                SkipCondition <= '1';
+            end if;
+            if CycleCount = "11" then
+                -- no action (resume normal operation)
+            end if;
+        end if;
 
     end process DecodeInstruction;
 
@@ -721,17 +948,24 @@ begin
                                        std_match(IR, OpSTZI) or std_match(IR, OpSTZD) or std_match(IR, OpSTDZ) or
                                        std_match(IR, OpPOP)  or std_match(IR, OpPUSH) or
                                        std_match(IR, OpLDS)  or std_match(IR, OpSTS)  or
-                                       std_match(IR, OpJMP)  or std_match(IR, OpRJMP) or
-                                       ((std_match(IR, OpBRBC) or std_match(IR, OpBRBS)) and
-                                            (IR(10) = '0' xor ALUStatReg(to_integer(unsigned(IR(2 downto 0)))) = '0')) 
-                                     ) then
+                                       std_match(IR, OpJMP)  or std_match(IR, OpRJMP) or std_match(IR, OpIJMP) or
+                                       std_match(IR, OpCALL) or std_match(IR, OpRCALL) or std_match(IR, OpICALL) or
+                                       std_match(IR, OpRET)  or std_match(IR, OpRETI) or
+                                       BranchCondition = '1' or SkipCondition = '1' ) then
                 -- update if in first clock of two clock instruction
                 CycleCount <= "01";
             end if;
-            if CycleCount = "01" and ( std_match(IR, OpLDS) or std_match(IR, OpSTS) or
-                                       std_match(IR, OpJMP) or std_match(IR, OpRJMP) ) then
+            if CycleCount = "01" and ( std_match(IR, OpLDS) or std_match(IR, OpSTS)  or
+                                       std_match(IR, OpJMP) or std_match(IR, OpCALL) or
+                                       std_match(IR, OpRCALL) or std_match(IR, OpICALL) or
+                                       std_match(IR, OpRET) or std_match(IR, OpRETI) or
+                                       (SkipCondition = '1' and TwoWordInstr = '1') ) then
                 -- update if in second clock of three clock instruction
                 CycleCount <= "10";
+            end if;
+            if CycleCount = "10" and ( std_match(IR, OpCALL) or std_match(IR, OpRET) or std_match(IR, OpRETI) ) then
+                -- update if in third clock of four clock instruction
+                CycleCount <= "11";
             end if;
         end if;
     end process UpdateCycleCount;

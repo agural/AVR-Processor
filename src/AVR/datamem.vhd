@@ -54,7 +54,16 @@ architecture RAM of DataMemory is
     -- now define the RAM itself (initialized to X)
     signal  RAMbits  :  RAMtype  := (others => (others => 'X'));
     
+    -- debugging...
+    signal  debugData : std_logic_vector(47 downto 0);
+    
 begin
+    debugData(47 downto 40) <= RAMbits(65535);
+    debugData(39 downto 32) <= RAMbits(65534);
+    debugData(31 downto 24) <= RAMbits(65533);
+    debugData(23 downto 16) <= RAMbits(65532);
+    debugData(15 downto  8) <= RAMbits(65531);
+    debugData(7  downto  0) <= RAMbits(65530);
     process
     begin
             -- wait for an input to change

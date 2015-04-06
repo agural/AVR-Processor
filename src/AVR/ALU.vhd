@@ -28,24 +28,25 @@ use ALUCommands.ALUCommands.all;
 
 entity ALU is
     port (
-        clock                   :  in  std_logic;                    -- system clock
+        clock                   :  in std_logic;                    -- system clock
 
-        ALUBlockSel             :  in  std_logic_vector(1 downto 0); -- which block is used
-        ALUBlockInstructionSel  :  in  std_logic_vector(3 downto 0); -- instruction for the block
+        ALUBlockSel             :  in std_logic_vector(1 downto 0); -- which block is used
+        ALUBlockInstructionSel  :  in std_logic_vector(3 downto 0); -- instruction for the block
 
-        ALUOp2Sel               :  in  std_logic;                    -- second input (register/immediate)
-        ImmediateOut            :  in  std_logic_vector(7 downto 0); -- value of immediate
+        ALUOp2Sel               :  in std_logic;                    -- second input (register/immediate)
+        ImmediateOut            :  in std_logic_vector(7 downto 0); -- value of immediate
 
-        ALUStatusMask           :  in  std_logic_vector(7 downto 0); -- which status bits can be changed
-        ALUStatusBitChangeEn    :  in  std_logic;                    -- instruction to change status
-        ALUBitClrSet            :  in  std_logic;                    -- set or clear status bits
-        ALUBitTOp               :  in  std_logic;                    -- instruction to change flag T
+        ALUStatusMask           :  in std_logic_vector(7 downto 0); -- which status bits can be changed
+        ALUStatusBitChangeEn    :  in std_logic;                    -- instruction to change status
+        ALUBitClrSet            :  in std_logic;                    -- set or clear status bits
+        ALUBitTOp               :  in std_logic;                    -- instruction to change flag T
+        statusZmod              :  in std_logic;                    -- whether to do standard or modified Z update
 
-        RegAOut                 :  in  std_logic_vector(7 downto 0); -- first register
-        RegBOut                 :  in  std_logic_vector(7 downto 0); -- second register
+        RegAOut                 :  in std_logic_vector(7 downto 0); -- first register
+        RegBOut                 :  in std_logic_vector(7 downto 0); -- second register
 
-        RegIn                   : out  std_logic_vector(7 downto 0); -- result
-        RegStatus               : out  std_logic_vector(7 downto 0)  -- status register
+        RegIn                   : out std_logic_vector(7 downto 0); -- result
+        RegStatus               : out std_logic_vector(7 downto 0)  -- status register
     );
 end ALU;
 
@@ -79,7 +80,6 @@ architecture Structural of ALU is
     signal statusC : std_logic; -- new flag C
 
     signal ALUResult : std_logic_vector(7 downto 0); -- result from ALU
-
 
 begin
     opA <= regAOut; -- first input is usually first register
@@ -167,13 +167,14 @@ begin
     StatusBlock : entity work.ALUStatus
     port map (
         clk => clock,
-
+        
         ALUResult => ALUResult,
         statusMask => ALUStatusMask,
 
         statusH => statusH,
         statusV => statusV,
         statusC => statusC,
+        statusZmod  => statusZmod,
 
         bitChangeEn => ALUStatusBitChangeEn,
         bitClrSet   => ALUBitClrSet,
