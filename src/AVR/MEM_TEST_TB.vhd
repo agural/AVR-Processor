@@ -29,8 +29,8 @@ use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 
-library avr;
-use avr.opcodes.all;
+library opcodes;
+use opcodes.opcodes.all;
 
 library work;
 use work.std_logic_1164_additions.all;
