@@ -1,1501 +1,415 @@
 ----------------------------------------------------------------------------
 --
---  Atmel AVR Memory Test Bench
+--  Test Bench for AVR Data Memory Unit
 --
---  This test bench checks each memory instruction for all possible input values.
---  The register values, address/data buses, and timings are all verified.
+--  This is a test bench for the AVR Data Memory Access Unit.  The test bench
+--  thoroughly exercises the memory accesses by generating various memory
+--  access via the instruction register and then checking if the memory
+--  address is correct, if the control lines (read and write) are correct,
+--  and if the memory data is correct on write operations.  The test bench
+--  entity is called mem_test_tb and it is currently defined to test the
+--  MEM_TEST entity.
 --
 --  Revision History:
---      02/05/15    Bryan He        initial version
---      02/10/15    Bryan He        added tests for LD*
---      02/17/15    Bryan He        finished writing all tests; everything passes
+--     5/19/98   Automated/Active-VHDL    Initial Revision.
+--     5/28/00   Glen George              Added much more extensive testing.
+--     7/26/00   Glen George              Fixed some minor problems.
+--     6/4/04    Glen George              Fixed formatting and updated
+--                                        comments.
+--     2/5/06    Glen George              Updated comments and formatting.
+--     2/11/13   Glen George              Added better error reporting.
+--     2/16/13   Glen George              Fixed polarity of reset.
 --
 ----------------------------------------------------------------------------
 
--- bring in the necessary packages
+
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;       --contains conversion functions
+use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 
-library opcodes;
-use opcodes.opcodes.all;
+library avr;
+use avr.opcodes.all;
 
-library ALUCommands;
-use ALUCommands.ALUCommands.all;
+library work;
+use work.std_logic_1164_additions.all;
 
-entity MEM_TEST_TB is
-end MEM_TEST_TB;
 
-architecture TB_ARCHITECTURE of MEM_TEST_TB is 
-    signal IR      :  opcode_word;                      -- Instruction Register
-    signal ProgDB  :  std_logic_vector(15 downto 0);    -- second word of instruction
-    signal Reset   :  std_logic;                        -- system reset signal (active low)
-    signal clock   :  std_logic;                        -- system clock
-    signal DataAB  :  std_logic_vector(15 downto 0);    -- data address bus
-    signal DataDB  :  std_logic_vector(7 downto 0);     -- data data bus
-    signal DataRd  :  std_logic;                        -- data read (active low)
-    signal DataWr  :  std_logic;                        -- data write (active low)
+entity mem_test_tb is
+end mem_test_tb;
 
-    -- define the registers
-    constant NUM_REGS : integer := 96; -- number of registers (including IO)
-    type REG_ARRAY is array (0 to NUM_REGS-1) of std_logic_vector(7 downto 0);
-    signal Registers : REG_ARRAY;
-    signal SP        : std_logic_vector(15 downto 0);
 
-    signal end_sim :  boolean := false;                 -- end simulation flag
-begin
-    UUT : entity work.MEM_TEST
-        port map (
-            IR      => IR,
-            ProgDB  => ProgDB,
-            Reset   => Reset,
-            clock   => clock,
-            DataAB  => DataAB,
-            DataDB  => DataDB,
-            DataRd  => DataRd,
-            DataWr  => DataWr
+architecture TB_ARCHITECTURE of mem_test_tb is
+
+    -- Component declaration of the tested unit
+    component MEM_TEST
+        port (
+            Clock   :  in     std_logic;			-- system clock
+            Reset   :  in     std_logic;			-- active low system reset
+            IR      :  in     opcode_word;			-- Instruction Register
+            DataRd  :  out    std_logic;			-- memory read signal
+            DataWr  :  out    std_logic;			-- memory write signal
+            ProgDB  :  in     std_logic_vector(15 downto 0);	-- second word of instruction
+            DataAB  :  out    std_logic_vector(15 downto 0);	-- data address bus
+            DataDB  :  inout  std_logic_vector(7 downto 0)	-- data data bus
         );
-    
-    -- Main testing procedure
+    end component;
+
+
+    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
+    signal  Clock    :  std_logic;
+    signal  Reset    :  std_logic;
+    signal  IR       :  opcode_word;
+    signal  ProgDB   :  std_logic_vector(15 downto 0);
+    signal  DataDB   :  std_logic_vector(7 downto 0);
+
+    -- Observed signals - signals mapped to the output ports of tested entity
+    signal  DataRd   :  std_logic;
+    signal  DataWr   :  std_logic;
+    signal  DataAB   :  std_logic_vector(15 downto 0);
+
+    --Signal used to stop clock signal generators
+    signal  END_SIM  :  BOOLEAN := FALSE;
+
+    -- test value types
+    type  opcode_array  is array (natural range <>) of opcode_word;
+    type  byte_array    is array (natural range <>) of std_logic_vector(7 downto 0);
+    type  addr_array    is array (natural range <>) of std_logic_vector(15 downto 0);
+    type  inst_array    is array (natural range <>) of string(1 to 17);
+
+    -- actual test vectors
+
+    -- the instructions
+    constant  TestInstructions  :  inst_array(0 to 58) := (
+        "LDI   R27, 0     ", "LDI   R26, 0     ", "LDI   R29, $FF   ",
+        "LDI   R28, $FF   ", "LDI   R31, $FF   ", "LDI   R30, $C0   ",
+        "LDS   R0, $AAAA  ", "LDS   R1, $5555  ", "LD    R7, X      ",
+        "LD    R9, -X     ", "LD    R20, X+    ", "LD    R21, X     ",
+        "LD    R6, Y+     ", "LD    R23, Y     ", "LD    R22, -Y    ",
+        "LDD   R15, Y + 30", "LD    R4, Z+     ", "LD    R13, Z     ",
+        "LD    R2, -Z     ", "LDD   R17, Z + 60", "MOV   R14, R7    ",
+        "MOV   R11, R13   ", "LDI   R24, $55   ", "LDI   R18, $AA   ",
+        "PUSH  R2         ", "PUSH  R11        ", "PUSH  R18        ",
+        "POP   R3         ", "POP   R8         ", "POP   R12        ",
+        "LDI   R27, $FF   ", "LDI   R26, $FF   ", "LDI   R29, $FF   ",
+        "LDI   R28, $C0   ", "LDI   R31, $00   ", "LDI   R30, $80   ",
+        "STS   $5555, R0  ", "STS   $AAAA, R1  ", "ST    X, R2      ",
+        "ST    -X, R4     ", "ST    X+, R17    ", "ST    X+, R9     ",
+        "ST    X, R26     ", "ST    Y+, R21    ", "ST    Y, R23     ",
+        "ST    -Y, R22    ", "ST    Y, R28     ", "STD   Y + 60, R24",
+        "STD   Y + 2, R20 ", "STD   Y + 22, R15", "STD   Y + 1, R13 ",
+        "ST    Z+, R14    ", "ST    Z, R3      ", "ST    -Z, R18    ",
+        "ST    Z, R31     ", "STD   Z + 30, R8 ", "STD   Z + 1, R11 ",
+        "STD   Z + 63, R12", "STD   Z + 32, R6 "                      );
+
+    -- the Instruction Register values
+    signal  IRTestVals      :  opcode_array(0 to 58) := (
+                               X"E0B0", X"E0A0", X"EFDF", X"EFCF", X"EFFF", 
+                               X"ECE0", X"9000", X"9010", X"907C", X"909E", 
+                               X"914D", X"915C", X"9069", X"8178", X"916A", 
+                               X"8CFE", X"9041", X"80D0", X"9022", X"AD14", 
+                               X"2CE7", X"2CBD", X"E585", X"EA2A", X"922F", 
+                               X"92BF", X"932F", X"903F", X"908F", X"90CF", 
+                               X"EFBF", X"EFAF", X"EFDF", X"ECC0", X"E0F0", 
+                               X"E8E0", X"9200", X"9210", X"922C", X"924E", 
+                               X"931D", X"929D", X"93AC", X"9359", X"8378", 
+                               X"936A", X"83C8", X"AF8C", X"834A", X"8AFE", 
+                               X"82D9", X"92E1", X"8230", X"9322", X"83F0", 
+                               X"8E86", X"82B1", X"AEC7", X"A260"          );
+
+    -- second word of instruction for each instruction (most are 1 word)
+    signal  ProgDBVals      :  opcode_array(0 to 58) := (
+                               "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", 
+                               "XXXXXXXXXXXXXXXX", X"AAAA",            X"5555",            "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", 
+                               "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", 
+                               "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", 
+                               "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", 
+                               "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", 
+                               "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", 
+                               "XXXXXXXXXXXXXXXX", X"5555",            X"AAAA",            "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", 
+                               "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", 
+                               "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", 
+                               "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", 
+                               "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXX"                     );
+
+    -- supplied data bus values for each instruction (for read operations)
+    signal  DataDBVals      :  byte_array(0 to 58) := (
+                               "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", 
+                               "ZZZZZZZZ", X"32",      X"A1",      X"67",      X"F0",      
+                               X"0F",      X"5A",      X"A5",      X"B3",      X"29",      
+                               X"C7",      X"EE",      X"00",      X"FF",      X"21",      
+                               "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", 
+                               "ZZZZZZZZ", "ZZZZZZZZ", X"CC",      X"39",      X"66",      
+                               "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", 
+                               "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", 
+                               "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", 
+                               "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", 
+                               "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", 
+                               "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ", "ZZZZZZZZ" 
+           );
+
+    -- expected data addres bus values for each instruction
+    signal  DataABTestVals  :  addr_array(0 to 58) := (
+                               "----------------", "----------------", "----------------", "----------------", "----------------", 
+                               "----------------", X"AAAA",            X"5555",            X"0000",            X"FFFF",            
+                               X"FFFF",            X"0000",            X"FFFF",            X"0000",            X"FFFF",            
+                               X"001D",            X"FFC0",            X"FFC1",            X"FFC0",            X"FFFC",            
+                               "----------------", "----------------", "----------------", "----------------", X"FFFF",            
+                               X"FFFE",            X"FFFD",            X"FFFD",            X"FFFE",            X"FFFF",            
+                               "----------------", "----------------", "----------------", "----------------", "----------------", 
+                               "----------------", X"5555",            X"AAAA",            X"FFFF",            X"FFFE",            
+                               X"FFFE",            X"FFFF",            X"0000",            X"FFC0",            X"FFC1",            
+                               X"FFC0",            X"FFC0",            X"FFFC",            X"FFC2",            X"FFD6",            
+                               X"FFC1",            X"0080",            X"0081",            X"0080",            X"0080",            
+                               X"009E",            X"0081",            X"00BF",            X"00A0"                     );
+
+    -- expected data bus write signal for each instruction
+    signal  DataWrTestVals  :  std_logic_vector(0 to 58) :=
+                               "11111111111111111111111100011111111100000000000000000000000";
+
+    -- expected data bus read signal for each instruction
+    signal  DataRdTestVals  :  std_logic_vector(0 to 58) :=
+                               "11111100000000000000111111100011111111111111111111111111111";
+
+    -- expected data bus output values for each instruction (only has a value on writes)
+    signal  DataDBTestVals  :  byte_array(0 to 58) := (
+                               "--------", "--------", "--------", "--------", "--------", 
+                               "--------", "--------", "--------", "--------", "--------", 
+                               "--------", "--------", "--------", "--------", "--------", 
+                               "--------", "--------", "--------", "--------", "--------", 
+                               "--------", "--------", "--------", "--------", X"FF",      
+                               X"00",      X"AA",      "--------", "--------", "--------", 
+                               "--------", "--------", "--------", "--------", "--------", 
+                               "--------", X"32",      X"A1",      X"FF",      X"EE",      
+                               X"21",      X"F0",      X"00",      X"5A",      X"B3",      
+                               X"29",      X"C0",      X"55",      X"0F",      X"C7",      
+                               X"00",      X"67",      X"CC",      X"AA",      X"00",      
+                               X"39",      X"00",      X"66",      X"A5"                 );
+
+
+
+begin
+
+    -- Unit Under Test port map
+    UUT : MEM_TEST
+        port map (
+            Clock   =>  Clock,
+            Reset   =>  Reset,
+            IR      =>  IR,
+            DataRd  =>  DataRd,
+            DataWr  =>  DataWr,
+            ProgDB  =>  ProgDB,
+            DataAB  =>  DataAB,
+            DataDB  =>  DataDB
+        );
+
+
+    -- now generate the stimulus and test the design
     process
-        procedure run_LDI (
-            d : std_logic_vector(3 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-        begin
-                -- 1110kkkkddddkkkk
-            IR <= "1110XXXXXXXXXXXX";
-            IR(11 downto 8) <= k(7 downto 4);
-            IR( 3 downto 0) <= k(3 downto 0);
-            IR( 7 downto 4) <= d;
-            Registers(conv_integer('1' & d)) <= k;
-            wait until (clock = '1');
-        end procedure;
-
-        procedure run_LDX (
-            d : std_logic_vector(4 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(27) & Registers(26));
-                -- 1001000ddddd1100 report integer'image(reg);
-            IR <= "1001000XXXXX1100";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "DataRd error 1";
-            assert (DataWr = '1') report "DataWr error 1";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "DataRd error 2";
-            assert (DataWr = '1') report "DataWr error 2";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "AB error 1";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataWr = '1') report "DataWr error 3";
-            if (conv_integer(address) > 95) then
-                Registers(conv_integer(d)) <= k;
-                assert (DataRd = '0') report "DataRd error 3a";
-                assert (DataAB = address) report "AB error 2";
-                DataDB <= k;
-            else
-                Registers(conv_integer(d)) <= Registers(conv_integer(address));
-                assert (DataRd = '1') report "DataRd error 3b";
-            end if;
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "DataRd error 4";
-            assert (DataWr = '1') report "DataWr error 4";
-            DataDB <= (others => 'Z');
-
-        end procedure;
-
-        procedure run_LDXI (
-            d : std_logic_vector(4 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(27) & Registers(26));
-                -- 1001000ddddd1101
-            IR <= "1001000XXXXX1101";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDXI 1";
-            assert (DataWr = '1') report "LDXI 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDXI 3";
-            assert (DataWr = '1') report "LDXI 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address);
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataWr = '1') report "LDXI 5";
-            if (conv_integer(address) > 95) then
-                Registers(conv_integer(d)) <= k;
-                assert (DataRd = '0') report "LDXI 6";
-                assert (DataAB = address) report "LDXI 7";
-                DataDB <= k;
-            else
-                Registers(conv_integer(d)) <= Registers(conv_integer(address));
-                assert (DataRd = '1') report "LDXI 8";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-            address := std_logic_vector(unsigned(address) + 1);
-            if (conv_integer(d) /= 27) then
-                Registers(27) <= address(15 downto 8);
-            end if;
-            if (conv_integer(d) /= 26) then
-                Registers(26) <= address(7 downto 0);
-            end if;
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDXI 9";
-            assert (DataWr = '1') report "LDXI 10";
-        end procedure;
-
-        procedure run_LDXD (
-            d : std_logic_vector(4 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(27) & Registers(26));
-            address := std_logic_vector(unsigned(address) - 1);
-            Registers(27) <= address(15 downto 8);
-            Registers(26) <= address(7 downto 0);
-
-                -- 1001000ddddd1110
-            IR <= "1001000XXXXX1110";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDXD 1";
-            assert (DataWr = '1') report "LDXD 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDXD 3";
-            assert (DataWr = '1') report "LDXD 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address);
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataWr = '1') report "LDXD 5";
-            if (conv_integer(address) > 95) then
-                Registers(conv_integer(d)) <= k;
-                assert (DataRd = '0') report "LDXD 6";
-                assert (DataAB = address) report "LDXD 7";
-                DataDB <= k;
-            else
-                Registers(conv_integer(d)) <= Registers(conv_integer(address));
-                assert (DataRd = '1') report "LDXD 8";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDXD 9";
-            assert (DataWr = '1') report "LDXD 10";
-        end procedure;
-
-        procedure run_LDYI (
-            d : std_logic_vector(4 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(29) & Registers(28));
-                -- 1001000ddddd1001
-            IR <= "1001000XXXXX1001";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDYI 1";
-            assert (DataWr = '1') report "LDYI 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDYI 3";
-            assert (DataWr = '1') report "LDYI 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address);
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataWr = '1') report "LDYI 5";
-            if (conv_integer(address) > 95) then
-                Registers(conv_integer(d)) <= k;
-                assert (DataRd = '0') report "LDYI 6";
-                assert (DataAB = address) report "LDYI 7";
-                DataDB <= k;
-            else
-                Registers(conv_integer(d)) <= Registers(conv_integer(address));
-                assert (DataRd = '1') report "LDYI 8";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-            address := std_logic_vector(unsigned(address) + 1);
-            if (conv_integer(d) /= 29) then
-                Registers(29) <= address(15 downto 8);
-            end if;
-            if (conv_integer(d) /= 28) then
-                Registers(28) <= address(7 downto 0);
-            end if;
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDYI 9";
-            assert (DataWr = '1') report "LDYI 10";
-        end procedure;
-
-        procedure run_LDYD (
-            d : std_logic_vector(4 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(29) & Registers(28));
-            address := std_logic_vector(unsigned(address) - 1);
-            Registers(29) <= address(15 downto 8);
-            Registers(28) <= address(7 downto 0);
-
-                -- 1001000ddddd1010
-            IR <= "1001000XXXXX1010";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDYD 1";
-            assert (DataWr = '1') report "LDYD 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDYD 3";
-            assert (DataWr = '1') report "LDYD 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address);
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataWr = '1') report "LDYD 5";
-            if (conv_integer(address) > 95) then
-                Registers(conv_integer(d)) <= k;
-                assert (DataRd = '0') report "LDYD 6";
-                assert (DataAB = address) report "LDYD 7";
-                DataDB <= k;
-            else
-                Registers(conv_integer(d)) <= Registers(conv_integer(address));
-                assert (DataRd = '1') report "LDYD 8";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDYD 9";
-            assert (DataWr = '1') report "LDYD 10";
-        end procedure;
-
-
-        procedure run_LDZI (
-            d : std_logic_vector(4 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(31) & Registers(30));
-                -- 1001000ddddd0001
-            IR <= "1001000XXXXX0001";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDZI 1";
-            assert (DataWr = '1') report "LDZI 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDZI 3";
-            assert (DataWr = '1') report "LDZI 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address);
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataWr = '1') report "LDZI 5";
-            if (conv_integer(address) > 95) then
-                Registers(conv_integer(d)) <= k;
-                assert (DataRd = '0') report "LDZI 6";
-                assert (DataAB = address) report "LDZI 7";
-                DataDB <= k;
-            else
-                Registers(conv_integer(d)) <= Registers(conv_integer(address));
-                assert (DataRd = '1') report "LDZI 8";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-            address := std_logic_vector(unsigned(address) + 1);
-            if (conv_integer(d) /= 31) then
-                Registers(31) <= address(15 downto 8);
-            end if;
-            if (conv_integer(d) /= 30) then
-                Registers(30) <= address(7 downto 0);
-            end if;
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDZI 9";
-            assert (DataWr = '1') report "LDZI 10";
-        end procedure;
-
-        procedure run_LDZD (
-            d : std_logic_vector(4 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(31) & Registers(30));
-            address := std_logic_vector(unsigned(address) - 1);
-            Registers(31) <= address(15 downto 8);
-            Registers(30) <= address(7 downto 0);
-
-                -- 1001000ddddd0010
-            IR <= "1001000XXXXX0010";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDZD 1";
-            assert (DataWr = '1') report "LDZD 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDZD 3";
-            assert (DataWr = '1') report "LDZD 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address);
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataWr = '1') report "LDZD 5";
-            if (conv_integer(address) > 95) then
-                Registers(conv_integer(d)) <= k;
-                assert (DataRd = '0') report "LDZD 6";
-                assert (DataAB = address) report "LDZD 7";
-                DataDB <= k;
-            else
-                Registers(conv_integer(d)) <= Registers(conv_integer(address));
-                assert (DataRd = '1') report "LDZD 8";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDZD 9";
-            assert (DataWr = '1') report "LDZD 10";
-        end procedure;
-
-
-        procedure run_LDDY (
-            d : std_logic_vector(4 downto 0);
-            q : std_logic_vector(5 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(29) & Registers(28)) + q;
-
-                -- 10q0qq0ddddd1qqq
-            IR <= "10X0XX0XXXXX1XXX";
-            IR(8 downto 4) <= d;
-            IR(13) <= q(5);
-            IR(11 downto 10) <= q(4 downto 3);
-            IR(2 downto 0) <= q(2 downto 0);
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDDY 1";
-            assert (DataWr = '1') report "LDDY 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDDY 3";
-            assert (DataWr = '1') report "LDDY 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "LDDY 5";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataWr = '1') report "LDDY 6";
-            if (conv_integer(address) > 95) then
-                Registers(conv_integer(d)) <= k;
-                assert (DataRd = '0') report "LDDY 7";
-                assert (DataAB = address) report "LDDY 8";
-                DataDB <= k;
-            else
-                Registers(conv_integer(d)) <= Registers(conv_integer(address));
-                assert (DataRd = '1') report "LDDY 9";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDDY 10";
-            assert (DataWr = '1') report "LDDY 11";
-        end procedure;
-
-        procedure run_LDDZ (
-            d : std_logic_vector(4 downto 0);
-            q : std_logic_vector(5 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(31) & Registers(30)) + q;
-
-                -- 10q0qq0ddddd0qqq
-            IR <= "10X0XX0XXXXX0XXX";
-            IR(8 downto 4) <= d;
-            IR(13) <= q(5);
-            IR(11 downto 10) <= q(4 downto 3);
-            IR(2 downto 0) <= q(2 downto 0);
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDDZ 1";
-            assert (DataWr = '1') report "LDDZ 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDDZ 3";
-            assert (DataWr = '1') report "LDDZ 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "LDDZ 5";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataWr = '1') report "LDDZ 6";
-            if (conv_integer(address) > 95) then
-                Registers(conv_integer(d)) <= k;
-                assert (DataRd = '0') report "LDDZ 7";
-                assert (DataAB = address) report "LDDZ 8";
-                DataDB <= k;
-            else
-                Registers(conv_integer(d)) <= Registers(conv_integer(address));
-                assert (DataRd = '1') report "LDDZ 9";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDDZ 10";
-            assert (DataWr = '1') report "LDDZ 11";
-        end procedure;
-
-        procedure run_LDS (
-            d : std_logic_vector(4 downto 0);
-            k : std_logic_vector(7 downto 0);
-            m : std_logic_vector(15 downto 0)) is
-        begin
-                -- 1001000ddddd0000
-            IR <= "1001000XXXXX0000";
-            IR(8 downto 4) <= d;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDS 1";
-            assert (DataWr = '1') report "LDS 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDS 3";
-            assert (DataWr = '1') report "LDS 4";
-            ProgDB <= m;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDS 5";
-            assert (DataWr = '1') report "LDS 6";
-            if (conv_integer(m) > 95) then
-                assert (DataAB = m) report "LDS 7";
-            end if;
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDS 8";
-            assert (DataWr = '1') report "LDS 9";
-            if (conv_integer(m) > 95) then
-                assert (DataAB = m) report "LDS 10";
-            end if;
-            ProgDB <= (others => 'Z');
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataWr = '1') report "LDS 11";
-            if (conv_integer(m) > 95) then
-                Registers(conv_integer(d)) <= k;
-                assert (DataRd = '0') report "LDS 12";
-                assert (DataAB = m) report "LDS 13";
-                DataDB <= k;
-            else
-                Registers(conv_integer(d)) <= Registers(conv_integer(m));
-                assert (DataRd = '1') report "LDS 14";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "LDS 15";
-            assert (DataWr = '1') report "LDS 16";
-        end procedure;
-
-        procedure run_MOV (
-            d : std_logic_vector(4 downto 0);
-            r : std_logic_vector(4 downto 0)) is
-        begin
-                -- 001011rdddddrrrr
-            IR <= "001011XXXXXXXXXX";
-            IR(8 downto 4) <= d;
-            IR(9) <= r(4);
-            IR(3 downto 0) <= r(3 downto 0);
-            Registers(conv_integer(d)) <= Registers(conv_integer(r));
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "MOV 1";
-            assert (DataWr = '1') report "MOV 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "MOV 3";
-            assert (DataWr = '1') report "MOV 4";
-        end procedure;
-
-        procedure run_STX (
-            d : std_logic_vector(4 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(27) & Registers(26));
-                -- 1001001rrrrr1100
-            IR <= "1001001XXXXX1100";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STX 1";
-            assert (DataWr = '1') report "STX 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STX 3";
-            assert (DataWr = '1') report "STX 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "STX 5";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STX 6";
-            if (conv_integer(address) > 95) then
-                assert (DataWr = '0') report "STX 7";
-                assert (DataAB = address) report "STX 8";
-                assert (DataDB = Registers(conv_integer(d))) report "STX 9";
-            else
-                Registers(conv_integer(address)) <= Registers(conv_integer(d));
-                assert (DataWr = '1') report "STX 10";
-            end if;
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STX 11";
-            assert (DataWr = '1') report "STX 12";
-        end procedure;
-
-        procedure run_STXI (
-            d : std_logic_vector(4 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(27) & Registers(26));
-                -- 1001001rrrrr1101
-            IR <= "1001001XXXXX1101";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STXI 1";
-            assert (DataWr = '1') report "STXI 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STXI 3";
-            assert (DataWr = '1') report "STXI 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "STXI 6";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STXI 7";
-            if (conv_integer(address) > 95) then
-                assert (DataWr = '0') report "STXI 8";
-                assert (DataAB = address) report "STXI 9";
-                assert (DataDB = Registers(conv_integer(d))) report "STXI 10";
-            else
-                Registers(conv_integer(address)) <= Registers(conv_integer(d));
-                assert (DataWr = '1') report "STXI 11";
-            end if;
-
-            wait until (clock = '1');
-            address := std_logic_vector(unsigned(address) + 1);
-            if (conv_integer(d) /= 27) then
-                Registers(27) <= address(15 downto 8);
-            end if;
-            if (conv_integer(d) /= 26) then
-                Registers(26) <= address(7 downto 0);
-            end if;
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "STXI 12";
-            assert (DataWr = '1') report "STXI 13";
-        end procedure;
-
-        procedure run_STXD (
-            d : std_logic_vector(4 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(27) & Registers(26));
-            address := std_logic_vector(unsigned(address) - 1);
-            Registers(27) <= address(15 downto 8);
-            Registers(26) <= address(7 downto 0);
-
-                -- 1001001rrrrr1110
-            IR <= "1001001XXXXX1110";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STXD 1";
-            assert (DataWr = '1') report "STXD 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STXD 3";
-            assert (DataWr = '1') report "STXD 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "STXD 6";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STXD 7";
-            if (conv_integer(address) > 95) then
-                assert (DataWr = '0') report "STXD 8";
-                assert (DataAB = address) report "STXD 9";
-                assert (DataDB = Registers(conv_integer(d))) report "STXD 10";
-            else
-                Registers(conv_integer(address)) <= Registers(conv_integer(d));
-                assert (DataWr = '1') report "STXD 11";
-            end if;
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STXD 12";
-            assert (DataWr = '1') report "STXD 13";
-        end procedure;
-
-        procedure run_STYI (
-            d : std_logic_vector(4 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(29) & Registers(28));
-                -- 1001001rrrrr1001
-            IR <= "1001001XXXXX1001";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STYI 1";
-            assert (DataWr = '1') report "STYI 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STYI 3";
-            assert (DataWr = '1') report "STYI 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "STYI 6";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STYI 7";
-            if (conv_integer(address) > 95) then
-                assert (DataWr = '0') report "STYI 8";
-                assert (DataAB = address) report "STYI 9";
-                assert (DataDB = Registers(conv_integer(d))) report "STYI 10";
-            else
-                Registers(conv_integer(address)) <= Registers(conv_integer(d));
-                assert (DataWr = '1') report "STYI 11";
-            end if;
-
-            wait until (clock = '1');
-            address := std_logic_vector(unsigned(address) + 1);
-            if (conv_integer(d) /= 29) then
-                Registers(29) <= address(15 downto 8);
-            end if;
-            if (conv_integer(d) /= 28) then
-                Registers(28) <= address(7 downto 0);
-            end if;
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "STYI 12";
-            assert (DataWr = '1') report "STYI 13";
-        end procedure;
-
-        procedure run_STYD (
-            d : std_logic_vector(4 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(29) & Registers(28));
-            address := std_logic_vector(unsigned(address) - 1);
-            Registers(29) <= address(15 downto 8);
-            Registers(28) <= address(7 downto 0);
-
-                -- 1001001rrrrr1010
-            IR <= "1001001XXXXX1010";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STYD 1";
-            assert (DataWr = '1') report "STYD 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STYD 3";
-            assert (DataWr = '1') report "STYD 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "STYD 6";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STYD 7";
-            if (conv_integer(address) > 95) then
-                assert (DataWr = '0') report "STYD 8";
-                assert (DataAB = address) report "STYD 9";
-                assert (DataDB = Registers(conv_integer(d))) report "STYD 10";
-            else
-                Registers(conv_integer(address)) <= Registers(conv_integer(d));
-                assert (DataWr = '1') report "STYD 11";
-            end if;
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STYD 12";
-            assert (DataWr = '1') report "STYD 13";
-        end procedure;
-
-        procedure run_STZI (
-            d : std_logic_vector(4 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(31) & Registers(30));
-                -- 1001001rrrrr0001
-            IR <= "1001001XXXXX0001";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STZI 1";
-            assert (DataWr = '1') report "STZI 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STZI 3";
-            assert (DataWr = '1') report "STZI 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "STZI 6";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STZI 7";
-            if (conv_integer(address) > 95) then
-                assert (DataWr = '0') report "STZI 8";
-                assert (DataAB = address) report "STZI 9";
-                assert (DataDB = Registers(conv_integer(d))) report "STZI 10";
-            else
-                Registers(conv_integer(address)) <= Registers(conv_integer(d));
-                assert (DataWr = '1') report "STZI 11";
-            end if;
-
-            wait until (clock = '1');
-            address := std_logic_vector(unsigned(address) + 1);
-            if (conv_integer(d) /= 31) then
-                Registers(31) <= address(15 downto 8);
-            end if;
-            if (conv_integer(d) /= 30) then
-                Registers(30) <= address(7 downto 0);
-            end if;
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "STZI 12";
-            assert (DataWr = '1') report "STZI 13";
-        end procedure;
-
-        procedure run_STZD (
-            d : std_logic_vector(4 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(31) & Registers(30));
-            address := std_logic_vector(unsigned(address) - 1);
-            Registers(31) <= address(15 downto 8);
-            Registers(30) <= address(7 downto 0);
-
-                -- 1001001rrrrr0010
-            IR <= "1001001XXXXX0010";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STZD 1";
-            assert (DataWr = '1') report "STZD 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STZD 3";
-            assert (DataWr = '1') report "STZD 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "STZD 6";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STZD 7";
-            if (conv_integer(address) > 95) then
-                assert (DataWr = '0') report "STZD 8";
-                assert (DataAB = address) report "STZD 9";
-                assert (DataDB = Registers(conv_integer(d))) report "STZD 10";
-            else
-                Registers(conv_integer(address)) <= Registers(conv_integer(d));
-                assert (DataWr = '1') report "STZD 11";
-            end if;
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STZD 12";
-            assert (DataWr = '1') report "STZD 13";
-        end procedure;
-
-        procedure run_STDY (
-            d : std_logic_vector(4 downto 0);
-            q : std_logic_vector(5 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(29) & Registers(28)) + q;
-
-                -- 10q0qq1rrrrr1qqq
-            IR <= "10X0XX1XXXXX1XXX";
-            IR(8 downto 4) <= d;
-            IR(13) <= q(5);
-            IR(11 downto 10) <= q(4 downto 3);
-            IR(2 downto 0) <= q(2 downto 0);
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STDY 1";
-            assert (DataWr = '1') report "STDY 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STDY 3";
-            assert (DataWr = '1') report "STDY 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "STDY 5";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STDY 6";
-            if (conv_integer(address) > 95) then
-                assert (DataWr = '0') report "STDY 7";
-                assert (DataAB = address) report "STDY 8";
-                assert (DataDB = Registers(conv_integer(d))) report "STDY 9";
-            else
-                Registers(conv_integer(address)) <= Registers(conv_integer(d));
-                assert (DataWr = '1') report "STDY 10";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "STDY 11";
-            assert (DataWr = '1') report "STDY 12";
-        end procedure;
-
-        procedure run_STDZ (
-            d : std_logic_vector(4 downto 0);
-            q : std_logic_vector(5 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := (Registers(31) & Registers(30)) + q;
-
-                -- 10q0qq1rrrrr0qqq
-            IR <= "10X0XX1XXXXX0XXX";
-            IR(8 downto 4) <= d;
-            IR(13) <= q(5);
-            IR(11 downto 10) <= q(4 downto 3);
-            IR(2 downto 0) <= q(2 downto 0);
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STDZ 1";
-            assert (DataWr = '1') report "STDZ 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STDZ 3";
-            assert (DataWr = '1') report "STDZ 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "STDZ 5";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STDZ 6";
-            if (conv_integer(address) > 95) then
-                assert (DataWr = '0') report "STDZ 7";
-                assert (DataAB = address) report "STDZ 8";
-                assert (DataDB = Registers(conv_integer(d))) report "STDZ 9";
-            else
-                Registers(conv_integer(address)) <= Registers(conv_integer(d));
-                assert (DataWr = '1') report "STDZ 10";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "STDZ 11";
-            assert (DataWr = '1') report "STDZ 12";
-        end procedure;
-
-        procedure run_STS (
-            d : std_logic_vector(4 downto 0);
-            m : std_logic_vector(15 downto 0)) is
-        begin
-                -- 1001001rrrrr0000
-            IR <= "1001001XXXXX0000";
-            IR(8 downto 4) <= d;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STS 1";
-            assert (DataWr = '1') report "STS 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STS 3";
-            assert (DataWr = '1') report "STS 4";
-            ProgDB <= m;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STS 5";
-            assert (DataWr = '1') report "STS 6";
-            if (conv_integer(m) > 95) then
-                assert (DataAB = m) report "STS 7";
-            end if;
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STS 8";
-            assert (DataWr = '1') report "STS 9";
-            if (conv_integer(m) > 95) then
-                assert (DataAB = m) report "STS 10";
-            end if;
-            ProgDB <= (others => 'Z');
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "STS 11";
-            if (conv_integer(m) > 95) then
-                assert (DataDB = Registers(conv_integer(d))) report "STS 12";
-                assert (DataWr = '0') report "STS 13";
-                assert (DataAB = m) report "STS 14";
-            else
-                Registers(conv_integer(m)) <= Registers(conv_integer(d));
-                assert (DataWr = '1') report "STS 15";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "STS 16";
-            assert (DataWr = '1') report "STS 17";
-        end procedure;
-
-        procedure run_POP (
-            d : std_logic_vector(4 downto 0);
-            k : std_logic_vector(7 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := std_logic_vector(unsigned(SP) + 1);
-            SP <= address;
-
-                -- 1001000ddddd1111
-            IR <= "1001000XXXXX1111";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "POP 1";
-            assert (DataWr = '1') report "POP 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "POP 3";
-            assert (DataWr = '1') report "POP 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address);
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataWr = '1') report "POP 5";
-            if (conv_integer(address) > 95) then
-                Registers(conv_integer(d)) <= k;
-                assert (DataRd = '0') report "POP 6";
-                assert (DataAB = address) report "POP 7";
-                DataDB <= k;
-            else
-                Registers(conv_integer(d)) <= Registers(conv_integer(address));
-                assert (DataRd = '1') report "POP 8";
-            end if;
-
-            wait until (clock = '1');
-            DataDB <= (others => 'Z');
-
-            wait for 1 ns;
-            assert (DataRd = '1') report "POP 9";
-            assert (DataWr = '1') report "POP 10";
-        end procedure;
-
-        procedure run_PUSH (
-            d : std_logic_vector(4 downto 0)) is
-            variable address : std_logic_vector(15 downto 0);
-        begin
-            address := SP;
-
-                -- 1001001rrrrr1111
-            IR <= "1001001XXXXX1111";
-            IR(8 downto 4) <= d;
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "PUSH 1";
-            assert (DataWr = '1') report "PUSH 2";
-
-            wait until (clock = '1');
-            wait for 1 ns;
-            assert (DataRd = '1') report "PUSH 3";
-            assert (DataWr = '1') report "PUSH 4";
-            if (conv_integer(address) > 95) then
-                assert (DataAB = address) report "PUSH 6";
-            end if;
-
-            wait until (clock = '0');
-            wait for 1 ns;
-            assert (DataRd = '1') report "PUSH 7";
-            if (conv_integer(address) > 95) then
-                assert (DataWr = '0') report "PUSH 8";
-                assert (DataAB = address) report "PUSH 9";
-                assert (DataDB = Registers(conv_integer(d))) report "PUSH 10";
-            else
-                Registers(conv_integer(address)) <= Registers(conv_integer(d));
-                assert (DataWr = '1') report "PUSH 11";
-            end if;
-
-            wait until (clock = '1');
-            SP <= std_logic_vector(unsigned(SP) - 1);
-            wait for 1 ns;
-            assert (DataRd = '1') report "PUSH 12";
-            assert (DataWr = '1') report "PUSH 13";
-        end procedure;
-
     begin
-        IR <= (others => '0');
-        Reset <= '0'; -- reset
-        DataDB <= (others => 'Z');
-        wait for 25 ns;
 
-        Reset <= '1'; -- stop reset
-        SP <= (others => '1');
-        wait until (clock = '1');
-        report "START SIMULATIONS";
+        -- initialize into the reset state
+        Reset   <=  '0';
+        IR      <=  IRTestVals(0);
+        ProgDB  <=  ProgDBVals(0);
+        DataDB  <=  "ZZZZZZZZ";
 
-        for i in 0 to 95 loop
-            -- Set register 27 (high byte of X)
-            run_LDI("1011", "00000000");
-            -- Set register 26 (low byte of X)
-            run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
+        -- wait for a while to remove the reset signal
+        wait for 320 ns;
+        Reset  <=  '1';
 
-            -- Put value in register 16
-            run_LDI("0000", std_logic_vector(to_unsigned(i, 8)));
+        -- wait for the rising clock edge
+        -- this may need to be changed to get student FSM synced correctly
+        --    (change should be adding multiples of 100 ns)
+        wait for 50 ns;
 
-            -- Copy from register 16 to each register
-            run_STX("10000");
 
-            if (i < 32) then
-                -- Set register 27 (high byte of X)
-                run_LDI("1011", "00000000");
-                -- Set register 26 (low byte of X)
-                run_LDI("1010", "11111111"); -- somewhere in memory
-                -- Test store (check value in register)
-                run_STX(std_logic_vector(to_unsigned(i, 5)));
+        -- now loop on the test values
+        for test_no in IRTestVals'range  loop
+
+            -- generate the instruction and program data bus
+            IR      <=  IRTestVals(test_no);
+            ProgDB  <=  "XXXXXXXXXXXXXXXX";     -- don't care on first clock
+
+            -- check that the read and write lines are not low
+            if  (DataRd /= '1')  then
+                -- there is an error - report it
+                REPORT "Failure in Testing - illegal DataRd activation"
+                SEVERITY ERROR;
             end if;
+            if  (DataWr /= '1')  then
+                -- there is an error - report it
+                REPORT "Failure in Testing - illegal DataWr activation"
+                SEVERITY ERROR;
+            end if;
+
+            -- wait a half clock (all instructions take two clocks)
+            wait for 50 ns;     -- half a clock cycle
+
+            -- check that the read and write lines are not low
+            -- they should not be activated in the first clock
+            if  (DataRd /= '1')  then
+                -- there is an error - report it
+                REPORT "Failure in Testing - illegal DataRd activation"
+                SEVERITY ERROR;
+            end if;
+            if  (DataWr /= '1')  then
+                -- there is an error - report it
+                REPORT "Failure in Testing - illegal DataWr activation"
+                SEVERITY ERROR;
+            end if;
+
+            -- now wait the second half of the clock cycle
+            wait for 50 ns;
+
+            -- start of second clock cycle
+
+            -- make sure still no read or write
+            if  (DataRd /= '1')  then
+                -- there is an error - report it
+                REPORT "Failure in Testing - illegal DataRd activation"
+                SEVERITY ERROR;
+            end if;
+            if  (DataWr /= '1')  then
+                -- there is an error - report it
+                REPORT "Failure in Testing - illegal DataWr activation"
+                SEVERITY ERROR;
+            end if;
+
+
+            -- for the second cycle of the instruction set the program data
+            --    bus and the data memory data bus
+            ProgDB  <=  ProgDBVals(test_no);
+            DataDB  <=  DataDBVals(test_no);
+
+
+            -- if the program data bus has a value (address) will need another
+            -- clock since this is an absolute addressing mode instruction
+            if  (ProgDBVals(test_no) /= "XXXXXXXXXXXXXXXX")  then
+
+                wait for 50 ns;     -- first half clock of the 2nd cycle of 3
+
+                -- middle of second cycle
+
+                -- make sure still no read or write
+                if  (DataRd /= '1')  then
+                    -- there is an error - report it
+                    REPORT "Failure in Testing - illegal DataRd activation"
+                    SEVERITY ERROR;
+                end if;
+                if  (DataWr /= '1')  then
+                    -- there is an error - report it
+                    REPORT "Failure in Testing - illegal DataWr activation"
+                    SEVERITY ERROR;
+                end if;
+
+                wait for 50 ns;     -- second half of the clock cycle
+
+                -- start of the third cycle
+
+                -- should still be no read or write
+                if  (DataRd /= '1')  then
+                    -- there is an error - report it
+                    REPORT "Failure in Testing - illegal DataRd activation"
+                    SEVERITY ERROR;
+                end if;
+                if  (DataWr /= '1')  then
+                    -- there is an error - report it
+                    REPORT "Failure in Testing - illegal DataWr activation"
+                    SEVERITY ERROR;
+                end if;
+
+            end if;
+
+
+            -- wait for the outputs to be ready
+            wait for 50 ns;
+
+            -- end of the last cycle (either the 2nd or 3rd cycle)
+
+            -- test the outputs
+
+            -- first test the read and write lines
+            if  (DataRd /= DataRdTestVals(test_no))  then
+                -- read line is wrong - report it
+                REPORT "Failure in Testing - illegal DataRd value"
+                SEVERITY ERROR;
+            end if;
+            if  (DataWr /= DataWrTestVals(test_no))  then
+                -- write line is wrong - report it
+                REPORT "Failure in Testing - illegal DataWr value"
+                SEVERITY ERROR;
+            end if;
+
+            -- test the data address bus
+            if (std_match(DataAB, DataABTestVals(test_no))) then
+                -- all is OK - do nothing
+                null;
+            else
+                -- there is an addressing error - report it
+                REPORT "Failed Test #" &
+                       " - Bad Address Bus Value --" &
+                       " Instruction: " & TestInstructions(test_no) &
+                       " IR: " & to_hstring(IR) &
+                       " Address: " & to_hstring(DataAB) &
+                       " Expected Address: " & to_hstring(DataABTestVals(test_no))
+                SEVERITY ERROR;
+            end if;
+
+            -- finally, test the data memory data bus
+            if (std_match(DataDB, DataDBTestVals(test_no))) then
+                -- all is OK - do nothing
+                null;
+            else
+                -- there is an error on the data bus - report it
+                REPORT "Failed Test #" &
+                       " - Bad Data Memory Data Bus Value --" &
+                       " Instruction: " & TestInstructions(test_no) &
+                       " IR: " & to_hstring(IR) &
+                       " Data: " & to_hstring(DataDB) &
+                       " Expected Data: " & to_hstring(DataDBTestVals(test_no))
+                SEVERITY ERROR;
+            end if;
+
+            -- now wait for the next clock
+            wait for 50 ns;     -- just half a cycle to wait
+
         end loop;
-        -- all registers and I/O have a valid value now
-
-        -- test LDX
-        -- loads value into each register and then stores to make sure value is correct
-        for reg in 0 to 31 loop
-            for i in 0 to 100 loop -- go through enough to check Registers, IO, and Memory
-                -- Set register 27 (high byte of X)
-                run_LDI("1011", "00000000");
-                -- Set register 26 (low byte of X)
-                run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
-                run_LDX(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
-                run_STX(std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-
-            for i in 1 to 10 loop -- check non-zero values for upper byte
-                -- Set register 27 (high byte of X)
-                run_LDI("1011", std_logic_vector(to_unsigned(i, 8)));
-                -- Set register 26 (low byte of X)
-                run_LDI("1010", std_logic_vector(to_unsigned(i, 8)));
-                run_LDX(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
-                run_STX(std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with LDX";
-
-        -- test LDXI
-        -- Set register 27 (high byte of X)
-        run_LDI("1011", "00000000");
-        -- Set register 26 (low byte of X)
-        run_LDI("1010", "00000000");
-        for reg in 0 to 31 loop
-            for i in 0 to 10 loop -- go through Registers, IO, and Memory, and inc upper byte
-                run_LDXI(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
-                run_STX (std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with LDXI";
-
-        -- test LDXD
-        -- Set register 27 (high byte of X)
-        run_LDI("1011", "00000001");
-        -- Set register 26 (low byte of X)
-        run_LDI("1010", "00000000");
-        for reg in 0 to 10 loop
-            for i in 0 to 9 loop -- go through Registers, IO, and Memory, and inc upper byte
-                run_LDXD(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
-                run_STX (std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with LDXD";
-
-        -- test LDYI
-        -- Set register 29 (high byte of Y)
-        run_LDI("1101", "00000000");
-        -- Set register 28 (low byte of Y)
-        run_LDI("1100", "00000000");
-        for reg in 0 to 31 loop
-            for i in 0 to 10 loop -- go through Registers, IO, and Memory, and inc upper byte
-                run_LDYI(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
-                run_STX (std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with LDYI";
-
-        -- test LDYD
-        -- Set register 29 (high byte of Y)
-        run_LDI("1101", "00000001");
-        -- Set register 28 (low byte of Y)
-        run_LDI("1100", "00000000");
-        for reg in 0 to 10 loop
-            for i in 0 to 9 loop -- go through Registers, IO, and Memory, and inc upper byte
-                run_LDYD(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
-                run_STX (std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with LDYD";
-
-        -- test LDZI
-        -- Set register 31 (high byte of Z)
-        run_LDI("1111", "00000000");
-        -- Set register 30 (low byte of Z)
-        run_LDI("1110", "00000000");
-        for reg in 0 to 31 loop
-            for i in 0 to 10 loop -- go through Registers, IO, and Memory, and inc upper byte
-                run_LDZI(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
-                run_STX (std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with LDZI";
-
-        -- test LDZD
-        -- Set register 31 (high byte of Z)
-        run_LDI("1111", "00000001");
-        -- Set register 30 (low byte of Z)
-        run_LDI("1110", "00000000");
-        for reg in 0 to 10 loop
-            for i in 0 to 9 loop -- go through Registers, IO, and Memory, and inc upper byte
-                run_LDZD(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)));
-                run_STX (std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with LDZD";
 
 
-        -- fill registers with distinct values to make errors easier to detect
-        for i in 0 to 31 loop
-            -- Set register i to i (fill with distinct values)
-            run_LDI(std_logic_vector(to_unsigned(i, 5)), std_logic_vector(to_unsigned(i, 8)));
-        end loop;
+        -- signal the end of the simulation
+        END_SIM <= TRUE;
 
-        -- test LDDY
-        for reg in 0 to 31 loop
-            for start in 94 to 96 loop -- values near IO to mem border
-                -- Set register 29 (high byte of Y)
-                run_LDI("1101", "00000000");
-                -- Set register 28 (low byte of Y)
-                run_LDI("1100", std_logic_vector(to_unsigned(start, 8)));
-                for i in 0 to 10 loop
-                    run_LDDY(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 6)), std_logic_vector(to_unsigned(i, 8)));
-                    run_STX (std_logic_vector(to_unsigned(reg, 5)));
-                end loop;
-            end loop;
-        end loop;
-        report "Done with LDDY";
+        --  end of stimulus events, wait for simulation to end
+        wait;
 
-        -- fill registers with distinct values to make errors easier to detect
-        for i in 0 to 31 loop
-            -- Set register i to i (fill with distinct values)
-            run_LDI(std_logic_vector(to_unsigned(i, 5)), std_logic_vector(to_unsigned(i, 8)));
-        end loop;
+    end process; -- end of stimulus process
 
-        -- test LDDZ
-        for reg in 0 to 31 loop
-            for start in 94 to 96 loop -- values near IO to mem border
-                -- Set register 31 (high byte of Z)
-                run_LDI("1111", "00000000");
-                -- Set register 30 (low byte of Z)
-                run_LDI("1110", std_logic_vector(to_unsigned(start, 8)));
-                for i in 0 to 10 loop
-                    run_LDDZ(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 6)), std_logic_vector(to_unsigned(i, 8)));
-                    run_STX (std_logic_vector(to_unsigned(reg, 5)));
-                end loop;
-            end loop;
-        end loop;
-        report "Done with LDDZ";
-
-        -- test LDS
-        for reg in 0 to 31 loop
-            for i in 0 to 100 loop -- go through Registers, IO, and Memory
-                run_LDS(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 8)), std_logic_vector(to_unsigned(i, 16)));
-                run_STX(std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with LDS";
- 
-
-        -- test MOV
-        for i in 0 to 31 loop
-            for j in 0 to 31 loop
-                run_MOV(std_logic_vector(to_unsigned(i, 5)), std_logic_vector(to_unsigned(j, 5)));
-
-                -- Set register 27 (high byte of X)
-                run_LDI("1011", "00000000");
-                -- Set register 26 (low byte of X)
-                run_LDI("1010", "11111111"); -- somewhere in memory
-                -- try to store (and check value in register)
-                run_STX(std_logic_vector(to_unsigned(i, 5)));
-            end loop;
-        end loop;
-        report "Done with MOV";
-
-        -- test STXI
-        for reg in 0 to 5 loop
-            -- Set register 27 (high byte of X)
-            run_LDI("1011", "00000000");
-            -- Set register 26 (low byte of X)
-            run_LDI("1010", "00011100"); -- start after X registers
-            for i in 0 to 100 loop
-                run_STXI(std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with STXI";
-
-        -- test STXD
-        for reg in 0 to 5 loop
-            -- Set register 27 (high byte of X)
-            run_LDI("1011", "00000000");
-            -- Set register 26 (low byte of X)
-            run_LDI("1010", std_logic_vector(to_unsigned(150, 8))); -- start in memory
-            for i in 0 to 100 loop
-                run_STXD(std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with STXD";
-        
-
-        -- test STYI
-        for reg in 0 to 5 loop
-            -- Set register 29 (high byte of Y)
-            run_LDI("1111", "00000000");
-            -- Set register 28 (low byte of Y)
-            run_LDI("1100", "00011110"); -- start after Y registers
-            for i in 0 to 100 loop
-                run_STYI(std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with STYI";
-
-        -- test STYD
-        for reg in 0 to 5 loop
-            -- Set register 29 (high byte of Y)
-            run_LDI("1101", "00000000");
-            -- Set register 28 (low byte of Y)
-            run_LDI("1100", std_logic_vector(to_unsigned(150, 8))); -- start in memory
-            for i in 0 to 100 loop
-                run_STYD(std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with STYD";
-        
-        -- test STZI
-        for reg in 0 to 5 loop
-            -- Set register 31 (high byte of Z)
-            run_LDI("1111", "00000000");
-            -- Set register 30 (low byte of Z)
-            run_LDI("1110", "00100000"); -- start after Z registers
-            for i in 0 to 100 loop
-                run_STZI(std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with STZI";
-
-        -- test STZD
-        for reg in 0 to 5 loop
-            -- Set register 31 (high byte of Z)
-            run_LDI("1111", "00000000");
-            -- Set register 30 (low byte of Z)
-            run_LDI("1110", std_logic_vector(to_unsigned(150, 8))); -- start in memory
-            for i in 0 to 100 loop
-                run_STZD(std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with STZD";
-
-        -- test STDY
-        for reg in 0 to 31 loop
-            for start in 90 to 96 loop -- values near IO to mem border
-                -- Set register 29 (high byte of Y)
-                run_LDI("1101", "00000000");
-                -- Set register 28 (low byte of Y)
-                run_LDI("1100", std_logic_vector(to_unsigned(start, 8)));
-                for i in 0 to 10 loop
-                    run_STDY(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 6)), std_logic_vector(to_unsigned(i, 8)));
-                    run_STX (std_logic_vector(to_unsigned(reg, 5)));
-                end loop;
-            end loop;
-        end loop;
-        report "Done with STDY";
- 
-        -- test STDZ
-        for reg in 0 to 31 loop
-            for start in 90 to 96 loop -- values near IO to mem border
-                -- Set register 31 (high byte of Z)
-                run_LDI("1111", "00000000");
-                -- Set register 30 (low byte of Z)
-                run_LDI("1110", std_logic_vector(to_unsigned(start, 8)));
-                for i in 0 to 10 loop
-                    run_STDZ(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 6)), std_logic_vector(to_unsigned(i, 8)));
-                    run_STX (std_logic_vector(to_unsigned(reg, 5)));
-                end loop;
-            end loop;
-        end loop;
-        report "Done with STDZ";
-
-        -- fill registers with distinct values to make errors easier to detect
-        for i in 0 to 31 loop
-            -- Set register i to i (fill with distinct values)
-            run_LDI(std_logic_vector(to_unsigned(i, 5)), std_logic_vector(to_unsigned(i, 8)));
-        end loop;
- 
-        -- test STS
-        for reg in 0 to 31 loop
-            for i in 0 to 100 loop -- go through Registers, IO, and Memory
-                run_STS(std_logic_vector(to_unsigned(reg, 5)), std_logic_vector(to_unsigned(i, 16)));
-                run_STX(std_logic_vector(to_unsigned(reg, 5)));
-            end loop;
-        end loop;
-        report "Done with STS";
-
-         -- test PUSH
-         for i in 0 to 100 loop
-             run_PUSH(std_logic_vector(to_unsigned(i, 8)));
-         end loop;
-         report "Done with PUSH";
-
-         -- test POP
-         -- Set register 27 (high byte of X)
-         run_LDI("1011", "00000000");
-         -- Set register 26 (low byte of X)
-         run_LDI("1010", "11111111"); -- somewhere in memory
-         for i in 0 to 100 loop
-             run_POP("00000", std_logic_vector(to_unsigned(i, 8)));
-             run_STX("00000");
-         end loop;
-         report "Done with POP";
-
-         wait until (clock = '1');
-         wait until (clock = '1');
-         report "DONE WITH SIMULATIONS"; 
-         end_sim <= true;    --end of stimulus events
-         wait;               --wait for the simulation to end
-    end process;
     
-    -- Clock process definitions
-    CLOCK_CLK : process
-    begin
-        -- this process generates a 20 ns period, 50% duty cycle clock
-        -- only generate clock if still simulating
-        if end_sim = false then
-            clock <= '0';
-            wait for 10 ns;
-        else
-            wait;
-        end if;
-  
-        if end_sim = false then
-            clock <= '1';
-            wait for 10 ns;
-        else
-            wait;
-        end if;
-   end process;
-end TB_ARCHITECTURE;
+    -- clock process
+    --
+    -- generates a clock with a 100 ns period and a 50% duty cycle
 
+    CLOCK_clock : process
+    begin
+
+        -- stop the clock when the end of the test vectors is reached
+        if  END_SIM = FALSE  then
+            clock <= '0';
+            wait for 50 ns;
+        else
+            wait;
+        end if;
+
+        if  END_SIM = FALSE  then
+            clock <= '1';
+            wait for 50 ns;
+        else
+            wait;
+        end if;
+
+    end process;
+
+
+end TB_ARCHITECTURE;

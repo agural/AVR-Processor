@@ -77,7 +77,6 @@
     <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="MEM_TEST.stx"/>
     <file xil_pn:fileType="FILE_SYMBOL" xil_pn:name="MEM_TEST.sym" xil_pn:origination="imported"/>
     <file xil_pn:fileType="FILE_XST" xil_pn:name="MEM_TEST.xst"/>
-    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="MEM_TEST_TB_beh.prj"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="MEM_TEST_TB_isim_beh.exe"/>
     <file xil_pn:fileType="FILE_ISIM_MISC" xil_pn:name="MEM_TEST_TB_isim_beh.wdb"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="MEM_TEST_TB_stx_beh.prj"/>
@@ -90,8 +89,6 @@
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="REG_TEST_TB_stx_beh.prj"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="_stx_beh.prj"/>
     <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/xst.xmsgs"/>
-    <file xil_pn:fileType="FILE_LOG" xil_pn:name="fuse.log"/>
-    <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="isim"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_CMD" xil_pn:name="isim.cmd"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_LOG" xil_pn:name="isim.log"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="testbench_isim_beh.exe"/>
@@ -127,11 +124,11 @@
       <outfile xil_pn:name="memteste.vhd"/>
       <outfile xil_pn:name="opcodes.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1423540862" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-3213656055080532752" xil_pn:start_ts="1423540862">
+    <transform xil_pn:end_ts="1428352626" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-7415742722629211407" xil_pn:start_ts="1428352626">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1423540862" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="-1945339088188453134" xil_pn:start_ts="1423540862">
+    <transform xil_pn:end_ts="1428352626" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="1901628613979757363" xil_pn:start_ts="1428352626">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
@@ -160,19 +157,17 @@
       <outfile xil_pn:name="memteste.vhd"/>
       <outfile xil_pn:name="opcodes.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1423540923" xil_pn:in_ck="6017717149626901124" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="7756975690952225818" xil_pn:start_ts="1423540862">
-      <status xil_pn:value="SuccessfullyRun"/>
+    <transform xil_pn:end_ts="1428352628" xil_pn:in_ck="6017717149626901124" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="-200013513536248132" xil_pn:start_ts="1428352626">
+      <status xil_pn:value="FailedRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <outfile xil_pn:name="REG_TEST_TB_beh.prj"/>
-      <outfile xil_pn:name="REG_TEST_TB_isim_beh.exe"/>
-      <outfile xil_pn:name="fuse.log"/>
-      <outfile xil_pn:name="isim"/>
-      <outfile xil_pn:name="xilinxsim.ini"/>
     </transform>
-    <transform xil_pn:end_ts="1423540924" xil_pn:in_ck="2374181055579393121" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="6942639812640200647" xil_pn:start_ts="1423540923">
-      <status xil_pn:value="SuccessfullyRun"/>
+    <transform xil_pn:end_ts="1428352066" xil_pn:in_ck="-8653038377660057150" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="-1337538096476503671" xil_pn:start_ts="1428352065">
+      <status xil_pn:value="AbortedRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <outfile xil_pn:name="REG_TEST_TB_isim_beh.wdb"/>
+      <status xil_pn:value="OutOfDateForProperties"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <status xil_pn:value="OutOfDateForced"/>
+      <outfile xil_pn:name="MEM_TEST_TB_isim_beh.wdb"/>
       <outfile xil_pn:name="isim.cmd"/>
     </transform>
     <transform xil_pn:end_ts="1423227485" xil_pn:name="TRAN_copyInitialToXSTAbstractSynthesis" xil_pn:start_ts="1423227485">
