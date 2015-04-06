@@ -35,7 +35,11 @@ begin
         -- each bit [i] of result is an F-block MUX of the bit of the operand
         -- indexed by bits [i] of opA and opB
         for i in 0 to 7 loop
-            result(i) <= operand(to_integer(unsigned(std_logic_vector(to_unsigned(0,0)) & opA(i) & opB(i))));
+            if (is_x(operand) or is_x(opA) or is_x(opB)) then
+                result(i) <= 'X';
+            else
+                result(i) <= operand(to_integer(unsigned(std_logic_vector(to_unsigned(0,0)) & opA(i) & opB(i))));
+            end if;
         end loop;
     end process;
 end DataFlow;

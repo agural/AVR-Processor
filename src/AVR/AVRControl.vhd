@@ -87,7 +87,8 @@ architecture DataFlow of AVRControl is
     signal ProgStore   : std_logic_vector(15 downto 0) := "0000000000000000";   -- stores the second cycle value of ProgDB
 begin
     MemAStore   <= MemRegAddr when (CycleCount = "00") and (clock = '0') else MemAStore;
-    MemRegAddrM <= '0' when (CycleCount = "00") and (to_integer(unsigned(MemAStore)) <= 95) else
+    MemRegAddrM <= 'X' when is_x(MemAStore) else
+                   '0' when (CycleCount = "00") and (to_integer(unsigned(MemAStore)) <= 95) else
                    '1' when CycleCount = "00" else
                    MemRegAddrM;
     
