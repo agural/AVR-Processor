@@ -3,13 +3,61 @@
 200 ns clocks
 first instruction on 520 ns
 
-at 2320 ns (10): Error: Failure in Testing - illegal DataRd value
-at 2920 ns (13): Error: Failure in Testing - illegal DataRd value
-at 3320 ns (15): Error: Failure in Testing - illegal DataRd value
-at 3720 ns (17): Error: Failure in Testing - illegal DataRd value
-at 9320 ns (45): Error: Failure in Testing - illegal DataWr value
-at 9320 ns (45): Error: Failed Test # - Bad Data Memory Data Bus Value -- Instruction: ST    X, R26      IR: 93AC Data: ZZ Expected Data: 00
-at 9520 ns (46): Error: Failed Test # - Bad Data Memory Data Bus Value -- Instruction: ST    Y+, R21     IR: 9359 Data: 32 Expected Data: 5A
-at 9720 ns (47): Error: Failed Test # - Bad Data Memory Data Bus Value -- Instruction: ST    Y, R23      IR: 8378 Data: 32 Expected Data: B3
-at 10720 ns (52): Error: Failed Test # - Bad Data Memory Data Bus Value -- Instruction: STD   Y + 22, R15 IR: 8AFE Data: FF Expected Data: C7
-at 11120 ns (54): Error: Failed Test # - Bad Data Memory Data Bus Value -- Instruction: ST    Z+, R14     IR: 92E1 Data: 32 Expected Data: 67
+at  2320 ns ( 9): Error: Failure in Testing - illegal DataRd value
+at  2920 ns (12): Error: Failure in Testing - illegal DataRd value
+at  3320 ns (14): Error: Failure in Testing - illegal DataRd value
+at  3720 ns (16): Error: Failure in Testing - illegal DataRd value
+at  9320 ns (44): Error: Failure in Testing - illegal DataWr value
+at  9320 ns (44): Error: Failed Test # - Bad Data Memory Data Bus Value -- Instruction: ST    X, R26      IR: 93AC Data: ZZ Expected Data: 00
+at  9520 ns (45): Error: Failed Test # - Bad Data Memory Data Bus Value -- Instruction: ST    Y+, R21     IR: 9359 Data: 32 Expected Data: 5A
+at  9720 ns (46): Error: Failed Test # - Bad Data Memory Data Bus Value -- Instruction: ST    Y, R23      IR: 8378 Data: 32 Expected Data: B3
+at 10720 ns (51): Error: Failed Test # - Bad Data Memory Data Bus Value -- Instruction: STD   Y + 22, R15 IR: 8AFE Data: FF Expected Data: C7
+at 11120 ns (53): Error: Failed Test # - Bad Data Memory Data Bus Value -- Instruction: ST    Z+, R14     IR: 92E1 Data: 32 Expected Data: 67
+
+ 9: LD    R7, X
+X = 0
+Maps to Register 0
+R7 now contains $AAAA (from Register 0)
+
+12: LD    R21, X
+X = 0 (decremented and then incremented)
+Maps to Register 0
+R21 now contains $AAAA (from Register 0)
+
+14: LD    R23, Y
+Y = 0 (got incremented once from FFFF)
+Maps to Register 0
+R23 now contains $AAAA (from Register 0)
+
+16: LDD   R15, Y + 30
+Y = FFFF
+Y + 30 = 29 (decimal)
+R29 contains FF (from third instruction)
+R15 now contains FF (from R29)
+
+44: ST    X, R26
+X = 0
+Maps to Register 0
+R26 contains FF
+R0 now contains FF (from R26)
+(shouldn't write, and should not check address bus)
+
+45: ST    Y+, R21
+R21 is last changed in instruction 12 (LD    R21, X)
+X = 0, so this came from register 0, instead of memory
+Register 0 was set to 32 in instruction 7 (LDS   R0, $AAAA)
+
+46: ST    Y, R23
+R23 is last changed in instruction 14 (LD    R23, Y)
+Y = 0, so this came from register 0, instead of memory
+Register 0 was set to 32 in instruction 7 (LDS   R0, $AAAA)
+
+51: STD   Y + 22, R15
+R23 is last changed in instruction 16 (LDD   R15, Y + 30), where it was set to
+FF, because it came from R29, rather than memory.
+
+53: ST    Z+, R14
+R14 is last changed in instruction 24 (MOV   R14, R7)
+R7 is last changed in instruction 9 (LD    R7, X)
+X = 0 during this instruction, so R7 was set to 32 (from R0), instead of what
+was on the data bus

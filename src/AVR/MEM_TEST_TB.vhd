@@ -166,11 +166,17 @@ architecture TB_ARCHITECTURE of mem_test_tb is
 
     -- expected data bus write signal for each instruction
     signal  DataWrTestVals  :  std_logic_vector(0 to 58) :=
-                               "11111111111111111111111100011111111100000000000000000000000";
+                               -- Original
+                            -- "11111111111111111111111100011111111100000000000000000000000";
+                               -- Changed
+                               "11111111111111111111111100011111111100000010000000000000000";
 
     -- expected data bus read signal for each instruction
     signal  DataRdTestVals  :  std_logic_vector(0 to 58) :=
-                               "11111100000000000000111111100011111111111111111111111111111";
+                               -- Original
+                            -- "11111100000000000000111111100011111111111111111111111111111";
+                               -- Changed
+                               "11111100100101010000111111100011111111111111111111111111111";
 
     -- expected data bus output values for each instruction (only has a value on writes)
     signal  DataDBTestVals  :  byte_array(0 to 58) := (
@@ -182,9 +188,18 @@ architecture TB_ARCHITECTURE of mem_test_tb is
                                X"00",      X"AA",      "--------", "--------", "--------", 
                                "--------", "--------", "--------", "--------", "--------", 
                                "--------", X"32",      X"A1",      X"FF",      X"EE",      
-                               X"21",      X"F0",      X"00",      X"5A",      X"B3",      
-                               X"29",      X"C0",      X"55",      X"0F",      X"C7",      
-                               X"00",      X"67",      X"CC",      X"AA",      X"00",      
+                               -- Original
+                            -- X"21",      X"F0",      X"00",      X"5A",      X"B3",      
+                               -- Changed
+                               X"21",      X"F0",      "--------", X"32",      X"32",      
+                               -- Original
+                            -- X"29",      X"C0",      X"55",      X"0F",      X"C7",      
+                               -- Changed
+                               X"29",      X"C0",      X"55",      X"0F",      X"FF",      
+                               -- Original
+                            -- X"00",      X"67",      X"CC",      X"AA",      X"00",      
+                               -- Changed
+                               X"00",      X"32",      X"CC",      X"AA",      X"00",      
                                X"39",      X"00",      X"66",      X"A5"                 );
 
 
